@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+
+  task:
+    build:
+      context: .
+      dockerfile: use `./scripts/build` instead of `docker-compose build`
+    image: "allcups-itrally-2020-task:latest"
+    container_name: hl-cup-2020_task
+    restart: always
+    ports:
+      - "${HLCUP2020_ADDR_PORT:-0}:8000"
+      - "${HLCUP2020_METRICS_ADDR_PORT:-0}:9000"
+    environment:
+      HLCUP2020_APIKEY_ADMIN: "${HLCUP2020_APIKEY_ADMIN:?}"
