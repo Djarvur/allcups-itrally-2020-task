@@ -4,16 +4,16 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/pkg/netx"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/check"
 )
 
 func Test(t *testing.T) {
 	want := &ServeConfig{
 		APIKeyAdmin: "admin",
-		Addr:        netx.NewAddr(def.Hostname, def.Port),
-		MetricsAddr: netx.NewAddr(def.Hostname, def.MetricsPort),
+		Addr:        netx.NewAddr(def.Hostname, 8000),
+		MetricsAddr: netx.NewAddr(def.Hostname, 9000),
 	}
 
 	t.Run("required", func(tt *testing.T) {

@@ -11,8 +11,8 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/pkg/netx"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
@@ -98,7 +98,7 @@ func fromRequest(r *http.Request, auth *app.Auth) (Ctx, Log, string) { //nolint:
 	if auth != nil {
 		userID = auth.UserID
 	}
-	log := structlog.FromContext(ctx, nil).SetDefaultKeyvals(def.LogUser, userID)
+	log := structlog.FromContext(ctx, nil).SetDefaultKeyvals(def.LogUserID, userID)
 	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
 	return ctx, log, remoteIP
 }

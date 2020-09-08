@@ -13,11 +13,11 @@ Service implementing the task for IT RALLY 2020 HighLoad Cup (runs on All Cups p
 - Tools used to build/test project:
 
 ```sh
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.30.0
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
 go get gotest.tools/gotestsum@v0.5.3
-curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v0.25.0/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
 go get github.com/golang/mock/mockgen@v1.4.4
 go get github.com/cheekybits/genny@master
+curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v0.25.0/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
 ```
 
 ## Setup
@@ -50,6 +50,7 @@ convenience only.
     - Access project at host/port(s) defined in `env.sh`.
 
 ### Cheatsheet
+
 ```sh
 dc up -d --remove-orphans               # (re)start all project's services
 dc logs -f -t                           # view logs of all services
@@ -65,3 +66,7 @@ It's recommended to avoid `docker-compose down` - this command will also
 remove docker's network for the project, and next `dc up -d` will create a
 new network… repeat this many enough times and docker will exhaust
 available networks, then you'll have to restart docker service or reboot.
+
+# Deploy
+
+TODO

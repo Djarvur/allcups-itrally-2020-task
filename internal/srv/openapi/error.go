@@ -7,7 +7,7 @@ import (
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/go-openapi/swag"
 )
 

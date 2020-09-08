@@ -9,7 +9,7 @@ import (
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/felixge/httpsnoop"
 	"github.com/go-openapi/swag"
 	"github.com/powerman/structlog"

@@ -3,7 +3,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

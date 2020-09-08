@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/go-openapi/loads"
 	"github.com/powerman/check"
 )
@@ -34,7 +34,7 @@ func TestServeSwagger(tt *testing.T) {
 		{path.Join(basePath, "swagger.json"), 200},
 	}
 	for _, tc := range testCases {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*def.TestSecond)
+		ctx, cancel := context.WithTimeout(context.Background(), def.TestTimeout)
 		req, err := http.NewRequestWithContext(ctx, "GET", tsURL+tc.path, nil)
 		t.Nil(err)
 		resp, err := c.Do(req)

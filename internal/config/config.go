@@ -8,15 +8,13 @@
 package config
 
 import (
-	"strconv"
-
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/pkg/netx"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/appcfg"
 	"github.com/spf13/pflag"
 )
 
-// envPrefix defines common prefix for environment variables.
+// EnvPrefix defines common prefix for environment variables.
 const envPrefix = "HLCUP2020_"
 
 // All configurable values of the microservice.
@@ -30,8 +28,8 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	MetricsAddrPort appcfg.Port           `env:"METRICS_ADDR_PORT"`
 }{ // Defaults, if any:
 	AddrHost:        appcfg.MustNotEmptyString(def.Hostname),
-	AddrPort:        appcfg.MustPort(strconv.Itoa(def.Port)),
-	MetricsAddrPort: appcfg.MustPort(strconv.Itoa(def.MetricsPort)),
+	AddrPort:        appcfg.MustPort("8000"),
+	MetricsAddrPort: appcfg.MustPort("9000"),
 }
 
 // FlagSets for all CLI subcommands which use flags to set config values.
@@ -42,6 +40,8 @@ type FlagSets struct {
 var fs FlagSets //nolint:gochecknoglobals // Flags are global anyway.
 
 // Init updates config defaults (from env) and setup subcommands flags.
+//
+// Init must be called once before using this package.
 func Init(flagsets FlagSets) error {
 	fs = flagsets
 

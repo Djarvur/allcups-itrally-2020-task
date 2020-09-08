@@ -9,9 +9,9 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/pkg/netx"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/check"
 )
 
@@ -20,16 +20,14 @@ func TestSmoke(tt *testing.T) {
 
 	s := &service{cfg: cfg}
 
-	ctxStartup, cancel := context.WithTimeout(ctx, 10*def.TestSecond)
+	ctxStartup, cancel := context.WithTimeout(ctx, def.TestTimeout)
 	defer cancel()
 	ctxShutdown, shutdown := context.WithCancel(ctx)
 	errc := make(chan error)
 	go func() { errc <- s.runServe(ctxStartup, ctxShutdown, shutdown) }()
 	defer func() {
 		shutdown()
-		if err := <-errc; err != nil {
-			t.Log("failed to Serve:", err)
-		}
+		t.Nil(<-errc, "RunServe")
 	}()
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to service"))
 

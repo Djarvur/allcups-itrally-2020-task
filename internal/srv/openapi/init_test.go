@@ -9,9 +9,9 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/pkg/netx"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	oapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
@@ -76,7 +76,7 @@ func testNewServer(t *check.C) (c *client.HighLoadCup2020, url string, mockAppl 
 	url = fmt.Sprintf("http://%s", ln.Addr().String())
 
 	// Avoid race between server.Serve() and server.Shutdown().
-	ctx, cancel := context.WithTimeout(context.Background(), 10*def.TestSecond)
+	ctx, cancel := context.WithTimeout(context.Background(), def.TestTimeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	t.Must(t.Nil(err))
