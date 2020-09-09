@@ -3,9 +3,6 @@
 // Package restapi HighLoad Cup 2020
 //
 //  # IT RALLY 2020 HighLoad Cup
-//  ## List of all custom errors
-//  First number is HTTP Status code, second is value of "code" field in returned JSON object, text description may or may not match "message" field in returned JSON object.
-//  - 409.1000: contact already exists
 //
 //  Schemes:
 //    http

@@ -6,6 +6,8 @@ package op
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"fmt"
+
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 )
@@ -25,79 +27,223 @@ type Client struct {
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	AddContact(params *AddContactParams, authInfo runtime.ClientAuthInfoWriter) (*AddContactCreated, error)
+	Cash(params *CashParams) (*CashCreated, error)
 
-	ListContacts(params *ListContactsParams, authInfo runtime.ClientAuthInfoWriter) (*ListContactsOK, error)
+	CheckCube(params *CheckCubeParams) (*CheckCubeOK, error)
+
+	DigCube(params *DigCubeParams) (*DigCubeOK, error)
+
+	GetAccount(params *GetAccountParams) (*GetAccountOK, error)
+
+	ListLicenses(params *ListLicensesParams) (*ListLicensesOK, error)
+
+	ObtainLicenses(params *ObtainLicensesParams) (*ObtainLicensesOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
 
 /*
-  AddContact Add new contact.
+  Cash Returns a list of found treasures IDs.
 */
-func (a *Client) AddContact(params *AddContactParams, authInfo runtime.ClientAuthInfoWriter) (*AddContactCreated, error) {
+func (a *Client) Cash(params *CashParams) (*CashCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewAddContactParams()
+		params = NewCashParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "addContact",
+		ID:                 "cash",
 		Method:             "POST",
-		PathPattern:        "/contacts",
+		PathPattern:        "/cash",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &AddContactReader{formats: a.formats},
-		AuthInfo:           authInfo,
+		Reader:             &CashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*AddContactCreated)
+	success, ok := result.(*CashCreated)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*AddContactDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for cash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-  ListContacts Return all contacts ordered by ID.
+  CheckCube Returns number of objects (treasures or even rocks) in the provided cube.
 */
-func (a *Client) ListContacts(params *ListContactsParams, authInfo runtime.ClientAuthInfoWriter) (*ListContactsOK, error) {
+func (a *Client) CheckCube(params *CheckCubeParams) (*CheckCubeOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewListContactsParams()
+		params = NewCheckCubeParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "listContacts",
-		Method:             "GET",
-		PathPattern:        "/contacts",
+		ID:                 "checkCube",
+		Method:             "POST",
+		PathPattern:        "/check",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &ListContactsReader{formats: a.formats},
-		AuthInfo:           authInfo,
+		Reader:             &CheckCubeReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*ListContactsOK)
+	success, ok := result.(*CheckCubeOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*ListContactsDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for checkCube: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  DigCube Returns a list of found treasures IDs.
+*/
+func (a *Client) DigCube(params *DigCubeParams) (*DigCubeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDigCubeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "digCube",
+		Method:             "POST",
+		PathPattern:        "/dig",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DigCubeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DigCubeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for digCube: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  GetAccount Returns a current balance.
+*/
+func (a *Client) GetAccount(params *GetAccountParams) (*GetAccountOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAccountParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getAccount",
+		Method:             "GET",
+		PathPattern:        "/account",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAccountReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetAccountOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getAccount: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  ListLicenses Returns a list of currently provided licenses.
+*/
+func (a *Client) ListLicenses(params *ListLicensesParams) (*ListLicensesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListLicensesParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "listLicenses",
+		Method:             "GET",
+		PathPattern:        "/license",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListLicensesReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListLicensesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listLicenses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  ObtainLicenses Returns a newly created license IDs.
+*/
+func (a *Client) ObtainLicenses(params *ObtainLicensesParams) (*ObtainLicensesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewObtainLicensesParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "obtainLicenses",
+		Method:             "POST",
+		PathPattern:        "/license",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ObtainLicensesReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ObtainLicensesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for obtainLicenses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 // SetTransport changes the transport on the client

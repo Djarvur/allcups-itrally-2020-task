@@ -5,93 +5,177 @@ info:
   version: 0.0.1
   description: |
     # IT RALLY 2020 HighLoad Cup
-    ## List of all custom errors
-    First number is HTTP Status code, second is value of "code" field in returned JSON object, text description may or may not match "message" field in returned JSON object.
-    - 409.1000: contact already exists
 basePath: /
 schemes:
   - http
-
-securityDefinitions:
-  api_key:
-    type: apiKey
-    in: header
-    name: API-Key
-
-definitions:
-  # This model should match output of api.ServeError handler, to ensure
-  # errors returned by go-swagger (like failed validation) use same
-  # format as general errors returned by our handlers.
-  # By default api.ServeError = github.com/go-openapi/errors.ServeError.
-  Error:
-    type: object
-    required:
-      - code
-      - message
-    properties:
-      code:
-        description: Either same as HTTP Status Code OR >= 600.
-        type: integer
-        format: int32
-      message:
-        type: string
-
-  Contact:
-    type: object
-    required:
-      - name
-    properties:
-      id:
-        type: integer
-        format: int32
-        readOnly: true
-      name:
-        type: string
-        minLength: 1
-
-responses:
-  GenericError:
-    description: Generic error response.
-    schema:
-      $ref: '#/definitions/Error'
-
-security:
-  - api_key: []
 consumes:
   - application/json
 produces:
   - application/json
 
-paths:
-  /contacts:
-    get:
-      operationId: listContacts
-      description: Return all contacts ordered by ID.
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Contact'
-        default: {$ref: '#/responses/GenericError'}
 
+definitions:
+  number:
+    description: number
+    type: integer
+  amount:
+    description: amount
+    type: integer
+  amounts:
+    description: list of amounts
+    type: array
+    items:
+      $ref: '#/definitions/amount'
+  license:
+    type: object
+    properties:
+      id:
+        type: string
+      amount:
+        $ref: '#/definitions/amount'
+  licenses:
+    description: list of licenses issued
+    type: array
+    items:
+      $ref: '#/definitions/license'
+  position:
+    type: object
+    properties:
+      'x':
+        type: integer
+      'y':
+        type: integer
+      'height':
+        type: integer
+      'width':
+        type: integer
+      'depth':
+        type: integer
+  check:
+    type: object
+    properties:
+      license:
+        type: string
+      position:
+        $ref: '#/definitions/position'
+  dig:
+    type: object
+    properties:
+      license:
+        type: string
+        description: ID of the license this request is attached to.
+      full:
+        type: boolean
+        description: Should the whole cube be digged. Request will stop on the first treasure found if false.
+      position:
+        $ref: '#/definitions/position'
+  treasure:
+    type: string
+    description: treasure ID to be cashed
+  treasures:
+    description: list of treasure IDs
+    type: array
+    items:
+      $ref: '#/definitions/treasure'
+
+responses:
+  amount:
+    description: amount
+    schema:
+      $ref: '#/definitions/amount'
+  amounts:
+    description: list of amounts
+    schema:
+      $ref: '#/definitions/amounts'
+  licenses:
+    description: list of licenses issued
+    schema:
+      $ref: '#/definitions/licenses'
+  check:
+    description: number of objects (treasures or even rocks) found
+    schema:
+      $ref: '#/definitions/number'
+  dig:
+    description: list of treasures found
+    schema:
+      $ref: '#/definitions/treasures'
+  err500:
+    description: Internal Server Error
+  err402:
+    description: Not enough money
+
+paths:
+  /account:
+    get:
+      operationId: getAccount
+      description: Returns a current balance.
+      responses:
+        '200': { $ref: '#/responses/amount' }
+        '500': { $ref: '#/responses/err500' }
+  /license:
+    get:
+      operationId: listLicenses
+      description: Returns a list of currently provided licenses.
+      responses:
+        '200': { $ref: '#/responses/licenses' }
+        '500': { $ref: '#/responses/err500' }
     post:
-      operationId: addContact
-      description: Add new contact.
+      operationId: obtainLicenses
+      description: Returns a newly created license IDs.
       parameters:
-        - name: contact
+        - name: amounts
+          description: Array of amounts for the licenses ordered.
           required: true
           in: body
           schema:
-            $ref: '#/definitions/Contact'
+            $ref: '#/definitions/amounts'
+      responses:
+        '200': { $ref: '#/responses/licenses' }
+        '402': { $ref: '#/responses/err402' }
+        '500': { $ref: '#/responses/err500' }
+  /check:
+    post:
+      operationId: checkCube
+      description: Returns number of objects (treasures or even rocks) in the provided cube.
+      parameters:
+        - name: request
+          description: Cube to be checked with the license should be used to check. License available amount will be reduced according to the cube volume.
+          required: true
+          in: body
+          schema:
+            $ref: '#/definitions/check'
+      responses:
+        '200': { $ref: '#/responses/check' }
+        '402': { $ref: '#/responses/err402' }
+        '500': { $ref: '#/responses/err500' }
+  /dig:
+    post:
+      operationId: digCube
+      description: Returns a list of found treasures IDs.
+      parameters:
+        - name: request
+          description: Cube to be digged with the license should be charged.
+          required: true
+          in: body
+          schema:
+            $ref: '#/definitions/dig'
+      responses:
+        '200': { $ref: '#/responses/dig' }
+        '402': { $ref: '#/responses/err402' }
+        '500': { $ref: '#/responses/err500' }
+  /cash:
+    post:
+      operationId: cash
+      description: Returns a list of found treasures IDs.
+      parameters:
+        - name: request
+          description: Cube to be digged with the license should be charged.
+          required: true
+          in: body
+          schema:
+            $ref: '#/definitions/treasures'
       responses:
         '201':
-          description: Contact added.
-          schema:
-            $ref: '#/definitions/Contact'
-        default:
-          description: |
-            - 409.1000: contact already exists
-          schema:
-            $ref: '#/definitions/Error'
+          description: Cashed
+        '500': { $ref: '#/responses/err500' }
+

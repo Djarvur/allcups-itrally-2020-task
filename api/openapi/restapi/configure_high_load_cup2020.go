@@ -10,7 +10,6 @@ import (
 	"github.com/go-openapi/runtime"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 )
 
 
@@ -36,26 +35,34 @@ func configureAPI(api *op.HighLoadCup2020API) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	// Applies when the "API-Key" header is set
-	if api.APIKeyAuth == nil {
-		api.APIKeyAuth = func(token string) (*app.Auth, error) {
-			return nil, errors.NotImplemented("api key auth (api_key) API-Key from header param [API-Key] has not yet been implemented")
-		}
-	}
-
-	// Set your custom authorizer if needed. Default one is security.Authorized()
-	// Expected interface runtime.Authorizer
-	//
-	// Example:
-	// api.APIAuthorizer = security.Authorized()
-	if api.AddContactHandler == nil {
-		api.AddContactHandler = op.AddContactHandlerFunc(func(params op.AddContactParams, principal *app.Auth) op.AddContactResponder {
-			return op.AddContactNotImplemented()
+	if api.CashHandler == nil {
+		api.CashHandler = op.CashHandlerFunc(func(params op.CashParams) op.CashResponder {
+			return op.CashNotImplemented()
 		})
 	}
-	if api.ListContactsHandler == nil {
-		api.ListContactsHandler = op.ListContactsHandlerFunc(func(params op.ListContactsParams, principal *app.Auth) op.ListContactsResponder {
-			return op.ListContactsNotImplemented()
+	if api.CheckCubeHandler == nil {
+		api.CheckCubeHandler = op.CheckCubeHandlerFunc(func(params op.CheckCubeParams) op.CheckCubeResponder {
+			return op.CheckCubeNotImplemented()
+		})
+	}
+	if api.DigCubeHandler == nil {
+		api.DigCubeHandler = op.DigCubeHandlerFunc(func(params op.DigCubeParams) op.DigCubeResponder {
+			return op.DigCubeNotImplemented()
+		})
+	}
+	if api.GetAccountHandler == nil {
+		api.GetAccountHandler = op.GetAccountHandlerFunc(func(params op.GetAccountParams) op.GetAccountResponder {
+			return op.GetAccountNotImplemented()
+		})
+	}
+	if api.ListLicensesHandler == nil {
+		api.ListLicensesHandler = op.ListLicensesHandlerFunc(func(params op.ListLicensesParams) op.ListLicensesResponder {
+			return op.ListLicensesNotImplemented()
+		})
+	}
+	if api.ObtainLicensesHandler == nil {
+		api.ObtainLicensesHandler = op.ObtainLicensesHandlerFunc(func(params op.ObtainLicensesParams) op.ObtainLicensesResponder {
+			return op.ObtainLicensesNotImplemented()
 		})
 	}
 
