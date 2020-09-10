@@ -31,7 +31,7 @@ definitions:
     properties:
       id:
         type: string
-      amount:
+      remain:
         $ref: '#/definitions/amount'
   licenses:
     description: list of licenses issued
@@ -48,8 +48,6 @@ definitions:
       'height':
         type: integer
       'width':
-        type: integer
-      'depth':
         type: integer
   check:
     type: object
@@ -79,8 +77,8 @@ definitions:
       $ref: '#/definitions/treasure'
 
 responses:
-  amount:
-    description: amount
+  balance:
+    description: balance
     schema:
       $ref: '#/definitions/amount'
   amounts:
@@ -105,14 +103,14 @@ responses:
     description: Not enough money
 
 paths:
-  /account:
+  /balance:
     get:
-      operationId: getAccount
+      operationId: getBalance
       description: Returns a current balance.
       responses:
-        '200': { $ref: '#/responses/amount' }
+        '200': { $ref: '#/responses/balance' }
         '500': { $ref: '#/responses/err500' }
-  /license:
+  /licenses:
     get:
       operationId: listLicenses
       description: Returns a list of currently provided licenses.
@@ -120,15 +118,15 @@ paths:
         '200': { $ref: '#/responses/licenses' }
         '500': { $ref: '#/responses/err500' }
     post:
-      operationId: obtainLicenses
-      description: Returns a newly created license IDs.
+      operationId: obtainLicense
+      description: Returns a newly created license.
       parameters:
-        - name: amounts
-          description: Array of amounts for the licenses ordered.
+        - name: amount
+          description: Amount to spend for a license.
           required: true
           in: body
           schema:
-            $ref: '#/definitions/amounts'
+            $ref: '#/definitions/amount'
       responses:
         '200': { $ref: '#/responses/licenses' }
         '402': { $ref: '#/responses/err402' }
@@ -136,7 +134,7 @@ paths:
   /check:
     post:
       operationId: checkCube
-      description: Returns number of objects (treasures or even rocks) in the provided cube.
+      description: Returns number of treasures in the provided cube.
       parameters:
         - name: request
           description: Cube to be checked with the license should be used to check. License available amount will be reduced according to the cube volume.
@@ -169,7 +167,7 @@ paths:
       description: Returns a list of found treasures IDs.
       parameters:
         - name: request
-          description: Cube to be digged with the license should be charged.
+          description: .
           required: true
           in: body
           schema:
