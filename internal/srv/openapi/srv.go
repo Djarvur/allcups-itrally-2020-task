@@ -4,17 +4,14 @@ package openapi
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"path"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/go-openapi/loads"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/powerman/structlog"
 	"github.com/sebest/xff"
@@ -56,11 +53,8 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 
 	api := op.NewHighLoadCup2020API(swaggerSpec)
 	api.Logger = structlog.New(structlog.KeyUnit, "swagger").Printf
-	api.APIKeyAuth = srv.authenticate
-	api.APIAuthorizer = runtime.AuthorizerFunc(srv.authorize)
 
-	api.ListContactsHandler = op.ListContactsHandlerFunc(srv.listContacts)
-	api.AddContactHandler = op.AddContactHandlerFunc(srv.addContact)
+	api.GetBalanceHandler = op.GetBalanceHandlerFunc(srv.getBalance)
 
 	server := restapi.NewServer(api)
 	server.Host = cfg.Addr.Host()
@@ -92,13 +86,8 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	return server, nil
 }
 
-func fromRequest(r *http.Request, auth *app.Auth) (Ctx, Log, string) { //nolint:unparam // Some results may be unused yet.
+func fromRequest(r *http.Request) (Ctx, Log) {
 	ctx := r.Context()
-	userID := ""
-	if auth != nil {
-		userID = auth.UserID
-	}
-	log := structlog.FromContext(ctx, nil).SetDefaultKeyvals(def.LogUserID, userID)
-	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
-	return ctx, log, remoteIP
+	log := structlog.FromContext(ctx, nil)
+	return ctx, log
 }

@@ -31,6 +31,5 @@ func newErrCode(statusCode int, extraCode int32) errCode {
 //
 //nolint:gochecknoglobals,gomnd // Const.
 var (
-	codeInternal      = newErrCode(500, 0)
-	codeContactExists = newErrCode(409, 1000)
+	codeInternal = newErrCode(500, 0)
 )

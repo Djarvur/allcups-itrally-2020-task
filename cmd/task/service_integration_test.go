@@ -9,7 +9,6 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/check"
@@ -38,23 +37,9 @@ func TestSmoke(tt *testing.T) {
 	})
 
 	{
-		params := op.NewAddContactParams()
-		params.Contact = &model.Contact{Name: apiContact1.Name}
-		res, err := openapiClient.Op.AddContact(params, apiKeyUser)
-		t.DeepEqual(openapi.ErrPayload(err), apiError403)
-		t.Nil(res)
-	}
-	{
-		params := op.NewAddContactParams()
-		params.Contact = &model.Contact{Name: apiContact1.Name}
-		res, err := openapiClient.Op.AddContact(params, apiKeyAdmin)
-		t.Nil(openapi.ErrPayload(err))
-		t.DeepEqual(res, &op.AddContactCreated{Payload: apiContact1})
-	}
-	{
-		params := op.NewListContactsParams()
-		res, err := openapiClient.Op.ListContacts(params, apiKeyAdmin)
-		t.Nil(openapi.ErrPayload(err))
-		t.DeepEqual(res, &op.ListContactsOK{Payload: []*model.Contact{apiContact1}})
+		params := op.NewGetBalanceParams()
+		res, err := openapiClient.Op.GetBalance(params)
+		t.TODO().Nil(err)
+		t.TODO().DeepEqual(res, &op.GetBalanceOK{Payload: model.Wallet{}})
 	}
 }

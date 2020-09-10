@@ -45,20 +45,20 @@ func NewHighLoadCup2020API(spec *loads.Document) *HighLoadCup2020API {
 		CashHandler: CashHandlerFunc(func(params CashParams) CashResponder {
 			return CashNotImplemented()
 		}),
-		CheckCubeHandler: CheckCubeHandlerFunc(func(params CheckCubeParams) CheckCubeResponder {
-			return CheckCubeNotImplemented()
+		DigHandler: DigHandlerFunc(func(params DigParams) DigResponder {
+			return DigNotImplemented()
 		}),
-		DigCubeHandler: DigCubeHandlerFunc(func(params DigCubeParams) DigCubeResponder {
-			return DigCubeNotImplemented()
+		ExploreAreaHandler: ExploreAreaHandlerFunc(func(params ExploreAreaParams) ExploreAreaResponder {
+			return ExploreAreaNotImplemented()
 		}),
-		GetAccountHandler: GetAccountHandlerFunc(func(params GetAccountParams) GetAccountResponder {
-			return GetAccountNotImplemented()
+		GetBalanceHandler: GetBalanceHandlerFunc(func(params GetBalanceParams) GetBalanceResponder {
+			return GetBalanceNotImplemented()
+		}),
+		IssueLicenseHandler: IssueLicenseHandlerFunc(func(params IssueLicenseParams) IssueLicenseResponder {
+			return IssueLicenseNotImplemented()
 		}),
 		ListLicensesHandler: ListLicensesHandlerFunc(func(params ListLicensesParams) ListLicensesResponder {
 			return ListLicensesNotImplemented()
-		}),
-		ObtainLicensesHandler: ObtainLicensesHandlerFunc(func(params ObtainLicensesParams) ObtainLicensesResponder {
-			return ObtainLicensesNotImplemented()
 		}),
 	}
 }
@@ -97,16 +97,16 @@ type HighLoadCup2020API struct {
 
 	// CashHandler sets the operation handler for the cash operation
 	CashHandler CashHandler
-	// CheckCubeHandler sets the operation handler for the check cube operation
-	CheckCubeHandler CheckCubeHandler
-	// DigCubeHandler sets the operation handler for the dig cube operation
-	DigCubeHandler DigCubeHandler
-	// GetAccountHandler sets the operation handler for the get account operation
-	GetAccountHandler GetAccountHandler
+	// DigHandler sets the operation handler for the dig operation
+	DigHandler DigHandler
+	// ExploreAreaHandler sets the operation handler for the explore area operation
+	ExploreAreaHandler ExploreAreaHandler
+	// GetBalanceHandler sets the operation handler for the get balance operation
+	GetBalanceHandler GetBalanceHandler
+	// IssueLicenseHandler sets the operation handler for the issue license operation
+	IssueLicenseHandler IssueLicenseHandler
 	// ListLicensesHandler sets the operation handler for the list licenses operation
 	ListLicensesHandler ListLicensesHandler
-	// ObtainLicensesHandler sets the operation handler for the obtain licenses operation
-	ObtainLicensesHandler ObtainLicensesHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -186,20 +186,20 @@ func (o *HighLoadCup2020API) Validate() error {
 	if o.CashHandler == nil {
 		unregistered = append(unregistered, "CashHandler")
 	}
-	if o.CheckCubeHandler == nil {
-		unregistered = append(unregistered, "CheckCubeHandler")
+	if o.DigHandler == nil {
+		unregistered = append(unregistered, "DigHandler")
 	}
-	if o.DigCubeHandler == nil {
-		unregistered = append(unregistered, "DigCubeHandler")
+	if o.ExploreAreaHandler == nil {
+		unregistered = append(unregistered, "ExploreAreaHandler")
 	}
-	if o.GetAccountHandler == nil {
-		unregistered = append(unregistered, "GetAccountHandler")
+	if o.GetBalanceHandler == nil {
+		unregistered = append(unregistered, "GetBalanceHandler")
+	}
+	if o.IssueLicenseHandler == nil {
+		unregistered = append(unregistered, "IssueLicenseHandler")
 	}
 	if o.ListLicensesHandler == nil {
 		unregistered = append(unregistered, "ListLicensesHandler")
-	}
-	if o.ObtainLicensesHandler == nil {
-		unregistered = append(unregistered, "ObtainLicensesHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -296,23 +296,23 @@ func (o *HighLoadCup2020API) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/check"] = NewCheckCube(o.context, o.CheckCubeHandler)
+	o.handlers["POST"]["/dig"] = NewDig(o.context, o.DigHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/dig"] = NewDigCube(o.context, o.DigCubeHandler)
+	o.handlers["POST"]["/explore"] = NewExploreArea(o.context, o.ExploreAreaHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/account"] = NewGetAccount(o.context, o.GetAccountHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/license"] = NewListLicenses(o.context, o.ListLicensesHandler)
+	o.handlers["GET"]["/balance"] = NewGetBalance(o.context, o.GetBalanceHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/license"] = NewObtainLicenses(o.context, o.ObtainLicensesHandler)
+	o.handlers["POST"]["/licenses"] = NewIssueLicense(o.context, o.IssueLicenseHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/licenses"] = NewListLicenses(o.context, o.ListLicensesHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

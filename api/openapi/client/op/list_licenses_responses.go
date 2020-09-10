@@ -29,15 +29,15 @@ func (o *ListLicensesReader) ReadResponse(response runtime.ClientResponse, consu
 			return nil, err
 		}
 		return result, nil
-	case 500:
-		result := NewListLicensesInternalServerError()
+	default:
+		result := NewListLicensesDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -48,17 +48,17 @@ func NewListLicensesOK() *ListLicensesOK {
 
 /*ListLicensesOK handles this case with default header values.
 
-list of licenses issued
+List of issued licenses.
 */
 type ListLicensesOK struct {
-	Payload model.Licenses
+	Payload model.LicenseList
 }
 
 func (o *ListLicensesOK) Error() string {
-	return fmt.Sprintf("[GET /license][%d] listLicensesOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /licenses][%d] listLicensesOK  %+v", 200, o.Payload)
 }
 
-func (o *ListLicensesOK) GetPayload() model.Licenses {
+func (o *ListLicensesOK) GetPayload() model.LicenseList {
 	return o.Payload
 }
 
@@ -72,23 +72,44 @@ func (o *ListLicensesOK) readResponse(response runtime.ClientResponse, consumer 
 	return nil
 }
 
-// NewListLicensesInternalServerError creates a ListLicensesInternalServerError with default headers values
-func NewListLicensesInternalServerError() *ListLicensesInternalServerError {
-	return &ListLicensesInternalServerError{}
+// NewListLicensesDefault creates a ListLicensesDefault with default headers values
+func NewListLicensesDefault(code int) *ListLicensesDefault {
+	return &ListLicensesDefault{
+		_statusCode: code,
+	}
 }
 
-/*ListLicensesInternalServerError handles this case with default header values.
+/*ListLicensesDefault handles this case with default header values.
 
-Internal Server Error
+General errors using same model as used by go-swagger for validation errors.
 */
-type ListLicensesInternalServerError struct {
+type ListLicensesDefault struct {
+	_statusCode int
+
+	Payload *model.Error
 }
 
-func (o *ListLicensesInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /license][%d] listLicensesInternalServerError ", 500)
+// Code gets the status code for the list licenses default response
+func (o *ListLicensesDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *ListLicensesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListLicensesDefault) Error() string {
+	return fmt.Sprintf("[GET /licenses][%d] listLicenses default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *ListLicensesDefault) GetPayload() *model.Error {
+	return o.Payload
+}
+
+func (o *ListLicensesDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(model.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

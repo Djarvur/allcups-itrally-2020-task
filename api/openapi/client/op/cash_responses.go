@@ -7,9 +7,12 @@ package op
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 )
 
 // CashReader is a Reader for the Cash structure.
@@ -20,62 +23,93 @@ type CashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *CashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 201:
-		result := NewCashCreated()
+	case 200:
+		result := NewCashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-	case 500:
-		result := NewCashInternalServerError()
+	default:
+		result := NewCashDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
-// NewCashCreated creates a CashCreated with default headers values
-func NewCashCreated() *CashCreated {
-	return &CashCreated{}
+// NewCashOK creates a CashOK with default headers values
+func NewCashOK() *CashOK {
+	return &CashOK{}
 }
 
-/*CashCreated handles this case with default header values.
+/*CashOK handles this case with default header values.
 
-Cashed
+Payment for treasure.
 */
-type CashCreated struct {
+type CashOK struct {
+	Payload model.Wallet
 }
 
-func (o *CashCreated) Error() string {
-	return fmt.Sprintf("[POST /cash][%d] cashCreated ", 201)
+func (o *CashOK) Error() string {
+	return fmt.Sprintf("[POST /cash][%d] cashOK  %+v", 200, o.Payload)
 }
 
-func (o *CashCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *CashOK) GetPayload() model.Wallet {
+	return o.Payload
+}
+
+func (o *CashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
 
-// NewCashInternalServerError creates a CashInternalServerError with default headers values
-func NewCashInternalServerError() *CashInternalServerError {
-	return &CashInternalServerError{}
+// NewCashDefault creates a CashDefault with default headers values
+func NewCashDefault(code int) *CashDefault {
+	return &CashDefault{
+		_statusCode: code,
+	}
 }
 
-/*CashInternalServerError handles this case with default header values.
+/*CashDefault handles this case with default header values.
 
-Internal Server Error
+General errors using same model as used by go-swagger for validation errors.
 */
-type CashInternalServerError struct {
+type CashDefault struct {
+	_statusCode int
+
+	Payload *model.Error
 }
 
-func (o *CashInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /cash][%d] cashInternalServerError ", 500)
+// Code gets the status code for the cash default response
+func (o *CashDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *CashInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *CashDefault) Error() string {
+	return fmt.Sprintf("[POST /cash][%d] cash default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *CashDefault) GetPayload() *model.Error {
+	return o.Payload
+}
+
+func (o *CashDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(model.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

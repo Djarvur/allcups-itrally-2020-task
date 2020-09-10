@@ -62,11 +62,11 @@ for the cash operation typically these are written to a http.Request
 */
 type CashParams struct {
 
-	/*Request
-	  Cube to be digged with the license should be charged.
+	/*Args
+	  Treasure for exchange.
 
 	*/
-	Request model.Treasures
+	Args model.Treasure
 
 	timeout    time.Duration
 	Context    context.Context
@@ -106,15 +106,15 @@ func (o *CashParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithRequest adds the request to the cash params
-func (o *CashParams) WithRequest(request model.Treasures) *CashParams {
-	o.SetRequest(request)
+// WithArgs adds the args to the cash params
+func (o *CashParams) WithArgs(args model.Treasure) *CashParams {
+	o.SetArgs(args)
 	return o
 }
 
-// SetRequest adds the request to the cash params
-func (o *CashParams) SetRequest(request model.Treasures) {
-	o.Request = request
+// SetArgs adds the args to the cash params
+func (o *CashParams) SetArgs(args model.Treasure) {
+	o.Args = args
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -125,10 +125,8 @@ func (o *CashParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry
 	}
 	var res []error
 
-	if o.Request != nil {
-		if err := r.SetBodyParam(o.Request); err != nil {
-			return err
-		}
+	if err := r.SetBodyParam(o.Args); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

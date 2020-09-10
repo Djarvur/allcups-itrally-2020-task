@@ -31,85 +31,57 @@ func init() {
   "info": {
     "description": "# IT RALLY 2020 HighLoad Cup\n",
     "title": "HighLoad Cup 2020",
-    "version": "0.0.1"
+    "version": "0.1.0"
   },
   "basePath": "/",
   "paths": {
-    "/account": {
+    "/balance": {
       "get": {
         "description": "Returns a current balance.",
-        "operationId": "getAccount",
+        "operationId": "getBalance",
         "responses": {
           "200": {
-            "$ref": "#/responses/amount"
+            "$ref": "#/responses/balance"
           },
-          "500": {
-            "$ref": "#/responses/err500"
+          "default": {
+            "$ref": "#/responses/error"
           }
         }
       }
     },
     "/cash": {
       "post": {
-        "description": "Returns a list of found treasures IDs.",
+        "description": "Exchange provided treasure for money.",
         "operationId": "cash",
         "parameters": [
           {
-            "description": "Cube to be digged with the license should be charged.",
-            "name": "request",
+            "description": "Treasure for exchange.",
+            "name": "args",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/treasures"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Cashed"
-          },
-          "500": {
-            "$ref": "#/responses/err500"
-          }
-        }
-      }
-    },
-    "/check": {
-      "post": {
-        "description": "Returns number of objects (treasures or even rocks) in the provided cube.",
-        "operationId": "checkCube",
-        "parameters": [
-          {
-            "description": "Cube to be checked with the license should be used to check. License available amount will be reduced according to the cube volume.",
-            "name": "request",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/check"
+              "$ref": "#/definitions/treasure"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/check"
+            "$ref": "#/responses/cash"
           },
-          "402": {
-            "$ref": "#/responses/err402"
-          },
-          "500": {
-            "$ref": "#/responses/err500"
+          "default": {
+            "$ref": "#/responses/error"
           }
         }
       }
     },
     "/dig": {
       "post": {
-        "description": "Returns a list of found treasures IDs.",
-        "operationId": "digCube",
+        "description": "Dig at given point and depth, returns found treasures.",
+        "operationId": "dig",
         "parameters": [
           {
-            "description": "Cube to be digged with the license should be charged.",
-            "name": "request",
+            "description": "License, place and depth to dig.",
+            "name": "args",
             "in": "body",
             "required": true,
             "schema": {
@@ -121,51 +93,70 @@ func init() {
           "200": {
             "$ref": "#/responses/dig"
           },
-          "402": {
-            "$ref": "#/responses/err402"
-          },
-          "500": {
-            "$ref": "#/responses/err500"
+          "default": {
+            "$ref": "#/responses/error"
           }
         }
       }
     },
-    "/license": {
-      "get": {
-        "description": "Returns a list of currently provided licenses.",
-        "operationId": "listLicenses",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/licenses"
-          },
-          "500": {
-            "$ref": "#/responses/err500"
-          }
-        }
-      },
+    "/explore": {
       "post": {
-        "description": "Returns a newly created license IDs.",
-        "operationId": "obtainLicenses",
+        "description": "Returns amount of treasures in the provided area at full depth.",
+        "operationId": "exploreArea",
         "parameters": [
           {
-            "description": "Array of amounts for the licenses ordered.",
-            "name": "amounts",
+            "description": "Area to be explored.",
+            "name": "args",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/amounts"
+              "$ref": "#/definitions/area"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/licenses"
+            "$ref": "#/responses/explore"
           },
-          "402": {
-            "$ref": "#/responses/err402"
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
+    "/licenses": {
+      "get": {
+        "description": "Returns a list of issued licenses.",
+        "operationId": "listLicenses",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/licenseList"
           },
-          "500": {
-            "$ref": "#/responses/err500"
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      },
+      "post": {
+        "description": "Issue a new license.",
+        "operationId": "issueLicense",
+        "parameters": [
+          {
+            "description": "Amount of money to spend for a license.",
+            "name": "args",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/wallet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/license"
+          },
+          "default": {
+            "$ref": "#/responses/error"
           }
         }
       }
@@ -173,53 +164,100 @@ func init() {
   },
   "definitions": {
     "amount": {
-      "description": "amount",
+      "description": "Non-negative amount of treasures/etc.",
       "type": "integer"
     },
-    "amounts": {
-      "description": "list of amounts",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/amount"
-      }
-    },
-    "check": {
+    "area": {
       "type": "object",
+      "required": [
+        "posX",
+        "posY"
+      ],
       "properties": {
-        "license": {
-          "type": "string",
+        "posX": {
+          "type": "integer",
           "x-order": 0
         },
-        "position": {
-          "x-order": 1,
-          "$ref": "#/definitions/position"
+        "posY": {
+          "type": "integer",
+          "x-order": 1
+        },
+        "sizeX": {
+          "type": "integer",
+          "minimum": 1,
+          "x-order": 2
+        },
+        "sizeY": {
+          "type": "integer",
+          "minimum": 1,
+          "x-order": 3
         }
       }
     },
     "dig": {
       "type": "object",
+      "required": [
+        "licenseID",
+        "posX",
+        "posY",
+        "depth"
+      ],
       "properties": {
-        "full": {
-          "description": "Should the whole cube be digged. Request will stop on the first treasure found if false.",
-          "type": "boolean",
-          "x-order": 1
+        "depth": {
+          "type": "integer",
+          "minimum": 1,
+          "x-order": 3
         },
-        "license": {
+        "licenseID": {
           "description": "ID of the license this request is attached to.",
           "type": "string",
           "x-order": 0
         },
-        "position": {
-          "x-order": 2,
-          "$ref": "#/definitions/position"
+        "posX": {
+          "type": "integer",
+          "x-order": 1
+        },
+        "posY": {
+          "type": "integer",
+          "x-order": 2
+        }
+      }
+    },
+    "error": {
+      "description": "This model should match output of errors returned by go-swagger\n(like failed validation), to ensure our handlers use same format.\n",
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "Either same as HTTP Status Code OR \u003e= 600 with HTTP Status Code 422.",
+          "type": "integer",
+          "format": "int32",
+          "x-order": 0
+        },
+        "message": {
+          "type": "string",
+          "x-order": 1
         }
       }
     },
     "license": {
+      "description": "License for digging.",
       "type": "object",
+      "required": [
+        "id",
+        "digAllowed",
+        "digUsed"
+      ],
       "properties": {
-        "amount": {
+        "digAllowed": {
           "x-order": 1,
+          "$ref": "#/definitions/amount"
+        },
+        "digUsed": {
+          "x-order": 2,
           "$ref": "#/definitions/amount"
         },
         "id": {
@@ -228,89 +266,98 @@ func init() {
         }
       }
     },
-    "licenses": {
-      "description": "list of licenses issued",
+    "licenseList": {
+      "description": "List of issued licenses.",
       "type": "array",
       "items": {
         "$ref": "#/definitions/license"
       }
     },
-    "number": {
-      "description": "number",
-      "type": "integer"
-    },
-    "position": {
+    "report": {
       "type": "object",
+      "required": [
+        "area",
+        "amount"
+      ],
       "properties": {
-        "depth": {
-          "type": "integer",
-          "x-order": 4
+        "amount": {
+          "x-order": 1,
+          "$ref": "#/definitions/amount"
         },
-        "height": {
-          "type": "integer",
+        "amountPerDepth": {
+          "description": "Histogram, key is depth (\"1\", \"2\", …).",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/amount"
+          },
           "x-order": 2
         },
-        "width": {
-          "type": "integer",
-          "x-order": 3
-        },
-        "x": {
-          "type": "integer",
-          "x-order": 0
-        },
-        "y": {
-          "type": "integer",
-          "x-order": 1
+        "area": {
+          "x-order": 0,
+          "$ref": "#/definitions/area"
         }
       }
     },
     "treasure": {
-      "description": "treasure ID to be cashed",
+      "description": "Treasure ID.",
       "type": "string"
     },
-    "treasures": {
-      "description": "list of treasure IDs",
+    "treasureList": {
+      "description": "List of treasures.",
       "type": "array",
       "items": {
         "$ref": "#/definitions/treasure"
       }
+    },
+    "wallet": {
+      "description": "Wallet with some amount of money.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "responses": {
-    "amount": {
-      "description": "amount",
+    "balance": {
+      "description": "Current balance.",
       "schema": {
-        "$ref": "#/definitions/amount"
+        "$ref": "#/definitions/wallet"
       }
     },
-    "amounts": {
-      "description": "list of amounts",
+    "cash": {
+      "description": "Payment for treasure.",
       "schema": {
-        "$ref": "#/definitions/amounts"
-      }
-    },
-    "check": {
-      "description": "number of objects (treasures or even rocks) found",
-      "schema": {
-        "$ref": "#/definitions/number"
+        "$ref": "#/definitions/wallet"
       }
     },
     "dig": {
-      "description": "list of treasures found",
+      "description": "List of treasures found.",
       "schema": {
-        "$ref": "#/definitions/treasures"
+        "$ref": "#/definitions/treasureList"
       }
     },
-    "err402": {
-      "description": "Not enough money"
-    },
-    "err500": {
-      "description": "Internal Server Error"
-    },
-    "licenses": {
-      "description": "list of licenses issued",
+    "error": {
+      "description": "General errors using same model as used by go-swagger for validation errors.",
       "schema": {
-        "$ref": "#/definitions/licenses"
+        "$ref": "#/definitions/error"
+      }
+    },
+    "explore": {
+      "description": "Report about found treasures.",
+      "schema": {
+        "$ref": "#/definitions/report"
+      }
+    },
+    "license": {
+      "description": "Issued license.",
+      "schema": {
+        "$ref": "#/definitions/license"
+      }
+    },
+    "licenseList": {
+      "description": "List of issued licenses.",
+      "schema": {
+        "$ref": "#/definitions/licenseList"
       }
     }
   }
@@ -329,91 +376,69 @@ func init() {
   "info": {
     "description": "# IT RALLY 2020 HighLoad Cup\n",
     "title": "HighLoad Cup 2020",
-    "version": "0.0.1"
+    "version": "0.1.0"
   },
   "basePath": "/",
   "paths": {
-    "/account": {
+    "/balance": {
       "get": {
         "description": "Returns a current balance.",
-        "operationId": "getAccount",
+        "operationId": "getBalance",
         "responses": {
           "200": {
-            "description": "amount",
+            "description": "Current balance.",
             "schema": {
-              "$ref": "#/definitions/amount"
+              "$ref": "#/definitions/wallet"
             }
           },
-          "500": {
-            "description": "Internal Server Error"
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           }
         }
       }
     },
     "/cash": {
       "post": {
-        "description": "Returns a list of found treasures IDs.",
+        "description": "Exchange provided treasure for money.",
         "operationId": "cash",
         "parameters": [
           {
-            "description": "Cube to be digged with the license should be charged.",
-            "name": "request",
+            "description": "Treasure for exchange.",
+            "name": "args",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/treasures"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Cashed"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/check": {
-      "post": {
-        "description": "Returns number of objects (treasures or even rocks) in the provided cube.",
-        "operationId": "checkCube",
-        "parameters": [
-          {
-            "description": "Cube to be checked with the license should be used to check. License available amount will be reduced according to the cube volume.",
-            "name": "request",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/check"
+              "$ref": "#/definitions/treasure"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "number of objects (treasures or even rocks) found",
+            "description": "Payment for treasure.",
             "schema": {
-              "$ref": "#/definitions/number"
+              "$ref": "#/definitions/wallet"
             }
           },
-          "402": {
-            "description": "Not enough money"
-          },
-          "500": {
-            "description": "Internal Server Error"
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           }
         }
       }
     },
     "/dig": {
       "post": {
-        "description": "Returns a list of found treasures IDs.",
-        "operationId": "digCube",
+        "description": "Dig at given point and depth, returns found treasures.",
+        "operationId": "dig",
         "parameters": [
           {
-            "description": "Cube to be digged with the license should be charged.",
-            "name": "request",
+            "description": "License, place and depth to dig.",
+            "name": "args",
             "in": "body",
             "required": true,
             "schema": {
@@ -423,62 +448,96 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "list of treasures found",
+            "description": "List of treasures found.",
             "schema": {
-              "$ref": "#/definitions/treasures"
+              "$ref": "#/definitions/treasureList"
             }
           },
-          "402": {
-            "description": "Not enough money"
-          },
-          "500": {
-            "description": "Internal Server Error"
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           }
         }
       }
     },
-    "/license": {
-      "get": {
-        "description": "Returns a list of currently provided licenses.",
-        "operationId": "listLicenses",
-        "responses": {
-          "200": {
-            "description": "list of licenses issued",
-            "schema": {
-              "$ref": "#/definitions/licenses"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
+    "/explore": {
       "post": {
-        "description": "Returns a newly created license IDs.",
-        "operationId": "obtainLicenses",
+        "description": "Returns amount of treasures in the provided area at full depth.",
+        "operationId": "exploreArea",
         "parameters": [
           {
-            "description": "Array of amounts for the licenses ordered.",
-            "name": "amounts",
+            "description": "Area to be explored.",
+            "name": "args",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/amounts"
+              "$ref": "#/definitions/area"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "list of licenses issued",
+            "description": "Report about found treasures.",
             "schema": {
-              "$ref": "#/definitions/licenses"
+              "$ref": "#/definitions/report"
             }
           },
-          "402": {
-            "description": "Not enough money"
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/licenses": {
+      "get": {
+        "description": "Returns a list of issued licenses.",
+        "operationId": "listLicenses",
+        "responses": {
+          "200": {
+            "description": "List of issued licenses.",
+            "schema": {
+              "$ref": "#/definitions/licenseList"
+            }
           },
-          "500": {
-            "description": "Internal Server Error"
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Issue a new license.",
+        "operationId": "issueLicense",
+        "parameters": [
+          {
+            "description": "Amount of money to spend for a license.",
+            "name": "args",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/wallet"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issued license.",
+            "schema": {
+              "$ref": "#/definitions/license"
+            }
+          },
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           }
         }
       }
@@ -486,53 +545,105 @@ func init() {
   },
   "definitions": {
     "amount": {
-      "description": "amount",
-      "type": "integer"
+      "description": "Non-negative amount of treasures/etc.",
+      "type": "integer",
+      "minimum": 0
     },
-    "amounts": {
-      "description": "list of amounts",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/amount"
-      }
-    },
-    "check": {
+    "area": {
       "type": "object",
+      "required": [
+        "posX",
+        "posY"
+      ],
       "properties": {
-        "license": {
-          "type": "string",
+        "posX": {
+          "type": "integer",
+          "minimum": 0,
           "x-order": 0
         },
-        "position": {
-          "x-order": 1,
-          "$ref": "#/definitions/position"
+        "posY": {
+          "type": "integer",
+          "minimum": 0,
+          "x-order": 1
+        },
+        "sizeX": {
+          "type": "integer",
+          "minimum": 1,
+          "x-order": 2
+        },
+        "sizeY": {
+          "type": "integer",
+          "minimum": 1,
+          "x-order": 3
         }
       }
     },
     "dig": {
       "type": "object",
+      "required": [
+        "licenseID",
+        "posX",
+        "posY",
+        "depth"
+      ],
       "properties": {
-        "full": {
-          "description": "Should the whole cube be digged. Request will stop on the first treasure found if false.",
-          "type": "boolean",
-          "x-order": 1
+        "depth": {
+          "type": "integer",
+          "minimum": 1,
+          "x-order": 3
         },
-        "license": {
+        "licenseID": {
           "description": "ID of the license this request is attached to.",
           "type": "string",
           "x-order": 0
         },
-        "position": {
-          "x-order": 2,
-          "$ref": "#/definitions/position"
+        "posX": {
+          "type": "integer",
+          "minimum": 0,
+          "x-order": 1
+        },
+        "posY": {
+          "type": "integer",
+          "minimum": 0,
+          "x-order": 2
+        }
+      }
+    },
+    "error": {
+      "description": "This model should match output of errors returned by go-swagger\n(like failed validation), to ensure our handlers use same format.\n",
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "Either same as HTTP Status Code OR \u003e= 600 with HTTP Status Code 422.",
+          "type": "integer",
+          "format": "int32",
+          "x-order": 0
+        },
+        "message": {
+          "type": "string",
+          "x-order": 1
         }
       }
     },
     "license": {
+      "description": "License for digging.",
       "type": "object",
+      "required": [
+        "id",
+        "digAllowed",
+        "digUsed"
+      ],
       "properties": {
-        "amount": {
+        "digAllowed": {
           "x-order": 1,
+          "$ref": "#/definitions/amount"
+        },
+        "digUsed": {
+          "x-order": 2,
           "$ref": "#/definitions/amount"
         },
         "id": {
@@ -541,89 +652,98 @@ func init() {
         }
       }
     },
-    "licenses": {
-      "description": "list of licenses issued",
+    "licenseList": {
+      "description": "List of issued licenses.",
       "type": "array",
       "items": {
         "$ref": "#/definitions/license"
       }
     },
-    "number": {
-      "description": "number",
-      "type": "integer"
-    },
-    "position": {
+    "report": {
       "type": "object",
+      "required": [
+        "area",
+        "amount"
+      ],
       "properties": {
-        "depth": {
-          "type": "integer",
-          "x-order": 4
+        "amount": {
+          "x-order": 1,
+          "$ref": "#/definitions/amount"
         },
-        "height": {
-          "type": "integer",
+        "amountPerDepth": {
+          "description": "Histogram, key is depth (\"1\", \"2\", …).",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/amount"
+          },
           "x-order": 2
         },
-        "width": {
-          "type": "integer",
-          "x-order": 3
-        },
-        "x": {
-          "type": "integer",
-          "x-order": 0
-        },
-        "y": {
-          "type": "integer",
-          "x-order": 1
+        "area": {
+          "x-order": 0,
+          "$ref": "#/definitions/area"
         }
       }
     },
     "treasure": {
-      "description": "treasure ID to be cashed",
+      "description": "Treasure ID.",
       "type": "string"
     },
-    "treasures": {
-      "description": "list of treasure IDs",
+    "treasureList": {
+      "description": "List of treasures.",
       "type": "array",
       "items": {
         "$ref": "#/definitions/treasure"
       }
+    },
+    "wallet": {
+      "description": "Wallet with some amount of money.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "responses": {
-    "amount": {
-      "description": "amount",
+    "balance": {
+      "description": "Current balance.",
       "schema": {
-        "$ref": "#/definitions/amount"
+        "$ref": "#/definitions/wallet"
       }
     },
-    "amounts": {
-      "description": "list of amounts",
+    "cash": {
+      "description": "Payment for treasure.",
       "schema": {
-        "$ref": "#/definitions/amounts"
-      }
-    },
-    "check": {
-      "description": "number of objects (treasures or even rocks) found",
-      "schema": {
-        "$ref": "#/definitions/number"
+        "$ref": "#/definitions/wallet"
       }
     },
     "dig": {
-      "description": "list of treasures found",
+      "description": "List of treasures found.",
       "schema": {
-        "$ref": "#/definitions/treasures"
+        "$ref": "#/definitions/treasureList"
       }
     },
-    "err402": {
-      "description": "Not enough money"
-    },
-    "err500": {
-      "description": "Internal Server Error"
-    },
-    "licenses": {
-      "description": "list of licenses issued",
+    "error": {
+      "description": "General errors using same model as used by go-swagger for validation errors.",
       "schema": {
-        "$ref": "#/definitions/licenses"
+        "$ref": "#/definitions/error"
+      }
+    },
+    "explore": {
+      "description": "Report about found treasures.",
+      "schema": {
+        "$ref": "#/definitions/report"
+      }
+    },
+    "license": {
+      "description": "Issued license.",
+      "schema": {
+        "$ref": "#/definitions/license"
+      }
+    },
+    "licenseList": {
+      "description": "List of issued licenses.",
+      "schema": {
+        "$ref": "#/definitions/licenseList"
       }
     }
   }

@@ -1,4 +1,4 @@
-//go:generate genny -in=$GOFILE -out=gen.$GOFILE gen "ListContacts=AddContact"
+//go:generate genny -in=$GOFILE -out=gen.$GOFILE gen "GetBalance=Cash,Dig,ExploreArea,IssueLicense,ListLicenses"
 
 package openapi
 
@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-func errListContacts(log Log, err error, code errCode) op.ListContactsResponder {
+func errGetBalance(log Log, err error, code errCode) op.GetBalanceResponder {
 	if code.status < http.StatusInternalServerError {
 		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
 	} else {
@@ -20,10 +20,10 @@ func errListContacts(log Log, err error, code errCode) op.ListContactsResponder 
 
 	msg := err.Error()
 	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
-		msg = "internal error"
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
 	}
 
-	return op.NewListContactsDefault(code.status).WithPayload(&model.Error{
+	return op.NewGetBalanceDefault(code.status).WithPayload(&model.Error{
 		Code:    swag.Int32(code.extra),
 		Message: swag.String(msg),
 	})

@@ -17,7 +17,7 @@ import (
 // ListLicensesOKCode is the HTTP code returned for type ListLicensesOK
 const ListLicensesOKCode int = 200
 
-/*ListLicensesOK list of licenses issued
+/*ListLicensesOK List of issued licenses.
 
 swagger:response listLicensesOK
 */
@@ -26,7 +26,7 @@ type ListLicensesOK struct {
 	/*
 	  In: Body
 	*/
-	Payload model.Licenses `json:"body,omitempty"`
+	Payload model.LicenseList `json:"body,omitempty"`
 }
 
 // NewListLicensesOK creates ListLicensesOK with default headers values
@@ -36,13 +36,13 @@ func NewListLicensesOK() *ListLicensesOK {
 }
 
 // WithPayload adds the payload to the list licenses o k response
-func (o *ListLicensesOK) WithPayload(payload model.Licenses) *ListLicensesOK {
+func (o *ListLicensesOK) WithPayload(payload model.LicenseList) *ListLicensesOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the list licenses o k response
-func (o *ListLicensesOK) SetPayload(payload model.Licenses) {
+func (o *ListLicensesOK) SetPayload(payload model.LicenseList) {
 	o.Payload = payload
 }
 
@@ -53,7 +53,7 @@ func (o *ListLicensesOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = model.Licenses{}
+		payload = model.LicenseList{}
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {
@@ -63,31 +63,65 @@ func (o *ListLicensesOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 
 func (o *ListLicensesOK) ListLicensesResponder() {}
 
-// ListLicensesInternalServerErrorCode is the HTTP code returned for type ListLicensesInternalServerError
-const ListLicensesInternalServerErrorCode int = 500
+/*ListLicensesDefault General errors using same model as used by go-swagger for validation errors.
 
-/*ListLicensesInternalServerError Internal Server Error
-
-swagger:response listLicensesInternalServerError
+swagger:response listLicensesDefault
 */
-type ListLicensesInternalServerError struct {
+type ListLicensesDefault struct {
+	_statusCode int
+
+	/*
+	  In: Body
+	*/
+	Payload *model.Error `json:"body,omitempty"`
 }
 
-// NewListLicensesInternalServerError creates ListLicensesInternalServerError with default headers values
-func NewListLicensesInternalServerError() *ListLicensesInternalServerError {
+// NewListLicensesDefault creates ListLicensesDefault with default headers values
+func NewListLicensesDefault(code int) *ListLicensesDefault {
+	if code <= 0 {
+		code = 500
+	}
 
-	return &ListLicensesInternalServerError{}
+	return &ListLicensesDefault{
+		_statusCode: code,
+	}
+}
+
+// WithStatusCode adds the status to the list licenses default response
+func (o *ListLicensesDefault) WithStatusCode(code int) *ListLicensesDefault {
+	o._statusCode = code
+	return o
+}
+
+// SetStatusCode sets the status to the list licenses default response
+func (o *ListLicensesDefault) SetStatusCode(code int) {
+	o._statusCode = code
+}
+
+// WithPayload adds the payload to the list licenses default response
+func (o *ListLicensesDefault) WithPayload(payload *model.Error) *ListLicensesDefault {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the list licenses default response
+func (o *ListLicensesDefault) SetPayload(payload *model.Error) {
+	o.Payload = payload
 }
 
 // WriteResponse to the client
-func (o *ListLicensesInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *ListLicensesDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
-	rw.WriteHeader(500)
+	rw.WriteHeader(o._statusCode)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
-func (o *ListLicensesInternalServerError) ListLicensesResponder() {}
+func (o *ListLicensesDefault) ListLicensesResponder() {}
 
 type ListLicensesNotImplementedResponder struct {
 	middleware.Responder

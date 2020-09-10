@@ -12,18 +12,25 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
-// License license
+// License License for digging.
 //
 // swagger:model license
 type License struct {
 
 	// id
-	ID string `json:"id,omitempty"`
+	// Required: true
+	ID *string `json:"id"`
 
-	// amount
-	Amount Amount `json:"amount,omitempty"`
+	// dig allowed
+	// Required: true
+	DigAllowed Amount `json:"digAllowed"`
+
+	// dig used
+	// Required: true
+	DigUsed Amount `json:"digUsed"`
 }
 
 // UnmarshalJSON unmarshals this object while disallowing additional properties from JSON
@@ -31,10 +38,16 @@ func (m *License) UnmarshalJSON(data []byte) error {
 	var props struct {
 
 		// id
-		ID string `json:"id,omitempty"`
+		// Required: true
+		ID *string `json:"id"`
 
-		// amount
-		Amount Amount `json:"amount,omitempty"`
+		// dig allowed
+		// Required: true
+		DigAllowed Amount `json:"digAllowed"`
+
+		// dig used
+		// Required: true
+		DigUsed Amount `json:"digUsed"`
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(data))
@@ -44,7 +57,8 @@ func (m *License) UnmarshalJSON(data []byte) error {
 	}
 
 	m.ID = props.ID
-	m.Amount = props.Amount
+	m.DigAllowed = props.DigAllowed
+	m.DigUsed = props.DigUsed
 	return nil
 }
 
@@ -52,7 +66,15 @@ func (m *License) UnmarshalJSON(data []byte) error {
 func (m *License) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAmount(formats); err != nil {
+	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDigAllowed(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDigUsed(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -62,15 +84,32 @@ func (m *License) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *License) validateAmount(formats strfmt.Registry) error {
+func (m *License) validateID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Amount) { // not required
-		return nil
+	if err := validate.Required("id", "body", m.ID); err != nil {
+		return err
 	}
 
-	if err := m.Amount.Validate(formats); err != nil {
+	return nil
+}
+
+func (m *License) validateDigAllowed(formats strfmt.Registry) error {
+
+	if err := m.DigAllowed.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("amount")
+			return ve.ValidateName("digAllowed")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *License) validateDigUsed(formats strfmt.Registry) error {
+
+	if err := m.DigUsed.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("digUsed")
 		}
 		return err
 	}

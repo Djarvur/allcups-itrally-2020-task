@@ -31,7 +31,7 @@ func NewCash(ctx *middleware.Context, handler CashHandler) *Cash {
 
 /*Cash swagger:route POST /cash cash
 
-Returns a list of found treasures IDs.
+Exchange provided treasure for money.
 
 */
 type Cash struct {

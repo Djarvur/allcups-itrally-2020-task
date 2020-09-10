@@ -29,9 +29,9 @@ func NewListLicenses(ctx *middleware.Context, handler ListLicensesHandler) *List
 	return &ListLicenses{Context: ctx, Handler: handler}
 }
 
-/*ListLicenses swagger:route GET /license listLicenses
+/*ListLicenses swagger:route GET /licenses listLicenses
 
-Returns a list of currently provided licenses.
+Returns a list of issued licenses.
 
 */
 type ListLicenses struct {

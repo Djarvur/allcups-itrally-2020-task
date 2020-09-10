@@ -10,59 +10,118 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 )
 
-// CashCreatedCode is the HTTP code returned for type CashCreated
-const CashCreatedCode int = 201
+// CashOKCode is the HTTP code returned for type CashOK
+const CashOKCode int = 200
 
-/*CashCreated Cashed
+/*CashOK Payment for treasure.
 
-swagger:response cashCreated
+swagger:response cashOK
 */
-type CashCreated struct {
+type CashOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload model.Wallet `json:"body,omitempty"`
 }
 
-// NewCashCreated creates CashCreated with default headers values
-func NewCashCreated() *CashCreated {
+// NewCashOK creates CashOK with default headers values
+func NewCashOK() *CashOK {
 
-	return &CashCreated{}
+	return &CashOK{}
+}
+
+// WithPayload adds the payload to the cash o k response
+func (o *CashOK) WithPayload(payload model.Wallet) *CashOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the cash o k response
+func (o *CashOK) SetPayload(payload model.Wallet) {
+	o.Payload = payload
 }
 
 // WriteResponse to the client
-func (o *CashCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *CashOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.WriteHeader(200)
+	payload := o.Payload
+	if payload == nil {
+		// return empty array
+		payload = model.Wallet{}
+	}
 
-	rw.WriteHeader(201)
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
-func (o *CashCreated) CashResponder() {}
+func (o *CashOK) CashResponder() {}
 
-// CashInternalServerErrorCode is the HTTP code returned for type CashInternalServerError
-const CashInternalServerErrorCode int = 500
+/*CashDefault General errors using same model as used by go-swagger for validation errors.
 
-/*CashInternalServerError Internal Server Error
-
-swagger:response cashInternalServerError
+swagger:response cashDefault
 */
-type CashInternalServerError struct {
+type CashDefault struct {
+	_statusCode int
+
+	/*
+	  In: Body
+	*/
+	Payload *model.Error `json:"body,omitempty"`
 }
 
-// NewCashInternalServerError creates CashInternalServerError with default headers values
-func NewCashInternalServerError() *CashInternalServerError {
+// NewCashDefault creates CashDefault with default headers values
+func NewCashDefault(code int) *CashDefault {
+	if code <= 0 {
+		code = 500
+	}
 
-	return &CashInternalServerError{}
+	return &CashDefault{
+		_statusCode: code,
+	}
+}
+
+// WithStatusCode adds the status to the cash default response
+func (o *CashDefault) WithStatusCode(code int) *CashDefault {
+	o._statusCode = code
+	return o
+}
+
+// SetStatusCode sets the status to the cash default response
+func (o *CashDefault) SetStatusCode(code int) {
+	o._statusCode = code
+}
+
+// WithPayload adds the payload to the cash default response
+func (o *CashDefault) WithPayload(payload *model.Error) *CashDefault {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the cash default response
+func (o *CashDefault) SetPayload(payload *model.Error) {
+	o.Payload = payload
 }
 
 // WriteResponse to the client
-func (o *CashInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *CashDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
-	rw.WriteHeader(500)
+	rw.WriteHeader(o._statusCode)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
-func (o *CashInternalServerError) CashResponder() {}
+func (o *CashDefault) CashResponder() {}
 
 type CashNotImplementedResponder struct {
 	middleware.Responder

@@ -18,12 +18,9 @@ var (
 
 // Appl provides application features (use cases) service.
 type Appl interface {
-	// Contacts returns all contacts.
+	// Balance returns current balance.
 	// Errors: none.
-	Contacts(Ctx, Auth) ([]Contact, error)
-	// AddContact adds new contact.
-	// Errors: ErrContactExists.
-	AddContact(_ Ctx, _ Auth, name string) (*Contact, error)
+	Balance(Ctx) ([]Coin, error)
 }
 
 // Repo provides data storage.
@@ -37,10 +34,8 @@ type Repo interface {
 }
 
 type (
-	// Auth describes authentication.
-	Auth struct {
-		UserID string
-	}
+	// Coin is an unique coin.
+	Coin string
 	// Contact describes record in address book.
 	Contact struct {
 		ID   int

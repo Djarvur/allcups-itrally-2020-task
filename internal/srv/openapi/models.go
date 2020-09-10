@@ -5,17 +5,10 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 )
 
-func apiContact(v app.Contact) *model.Contact {
-	return &model.Contact{
-		ID:   int32(v.ID),
-		Name: &v.Name,
-	}
-}
-
-func apiContacts(vs []app.Contact) []*model.Contact {
-	ms := make([]*model.Contact, len(vs))
+func apiWallet(vs []app.Coin) model.Wallet {
+	ms := make(model.Wallet, len(vs))
 	for i := range vs {
-		ms[i] = apiContact(vs[i])
+		ms[i] = string(vs[i])
 	}
 	return ms
 }

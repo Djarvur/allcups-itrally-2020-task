@@ -40,29 +40,29 @@ func configureAPI(api *op.HighLoadCup2020API) http.Handler {
 			return op.CashNotImplemented()
 		})
 	}
-	if api.CheckCubeHandler == nil {
-		api.CheckCubeHandler = op.CheckCubeHandlerFunc(func(params op.CheckCubeParams) op.CheckCubeResponder {
-			return op.CheckCubeNotImplemented()
+	if api.DigHandler == nil {
+		api.DigHandler = op.DigHandlerFunc(func(params op.DigParams) op.DigResponder {
+			return op.DigNotImplemented()
 		})
 	}
-	if api.DigCubeHandler == nil {
-		api.DigCubeHandler = op.DigCubeHandlerFunc(func(params op.DigCubeParams) op.DigCubeResponder {
-			return op.DigCubeNotImplemented()
+	if api.ExploreAreaHandler == nil {
+		api.ExploreAreaHandler = op.ExploreAreaHandlerFunc(func(params op.ExploreAreaParams) op.ExploreAreaResponder {
+			return op.ExploreAreaNotImplemented()
 		})
 	}
-	if api.GetAccountHandler == nil {
-		api.GetAccountHandler = op.GetAccountHandlerFunc(func(params op.GetAccountParams) op.GetAccountResponder {
-			return op.GetAccountNotImplemented()
+	if api.GetBalanceHandler == nil {
+		api.GetBalanceHandler = op.GetBalanceHandlerFunc(func(params op.GetBalanceParams) op.GetBalanceResponder {
+			return op.GetBalanceNotImplemented()
+		})
+	}
+	if api.IssueLicenseHandler == nil {
+		api.IssueLicenseHandler = op.IssueLicenseHandlerFunc(func(params op.IssueLicenseParams) op.IssueLicenseResponder {
+			return op.IssueLicenseNotImplemented()
 		})
 	}
 	if api.ListLicensesHandler == nil {
 		api.ListLicensesHandler = op.ListLicensesHandlerFunc(func(params op.ListLicensesParams) op.ListLicensesResponder {
 			return op.ListLicensesNotImplemented()
-		})
-	}
-	if api.ObtainLicensesHandler == nil {
-		api.ObtainLicensesHandler = op.ObtainLicensesHandlerFunc(func(params op.ObtainLicensesParams) op.ObtainLicensesResponder {
-			return op.ObtainLicensesNotImplemented()
 		})
 	}
 

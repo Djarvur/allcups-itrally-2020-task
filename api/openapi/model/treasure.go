@@ -9,7 +9,7 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Treasure treasure ID to be cashed
+// Treasure Treasure ID.
 //
 // swagger:model treasure
 type Treasure string

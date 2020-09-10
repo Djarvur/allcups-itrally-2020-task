@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-func errAddContact(log Log, err error, code errCode) op.AddContactResponder {
+func errCash(log Log, err error, code errCode) op.CashResponder {
 	if code.status < http.StatusInternalServerError {
 		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
 	} else {
@@ -22,10 +22,82 @@ func errAddContact(log Log, err error, code errCode) op.AddContactResponder {
 
 	msg := err.Error()
 	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
-		msg = "internal error"
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
 	}
 
-	return op.NewAddContactDefault(code.status).WithPayload(&model.Error{
+	return op.NewCashDefault(code.status).WithPayload(&model.Error{
+		Code:    swag.Int32(code.extra),
+		Message: swag.String(msg),
+	})
+}
+
+func errDig(log Log, err error, code errCode) op.DigResponder {
+	if code.status < http.StatusInternalServerError {
+		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	} else {
+		log.PrintErr("server error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	}
+
+	msg := err.Error()
+	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
+	}
+
+	return op.NewDigDefault(code.status).WithPayload(&model.Error{
+		Code:    swag.Int32(code.extra),
+		Message: swag.String(msg),
+	})
+}
+
+func errExploreArea(log Log, err error, code errCode) op.ExploreAreaResponder {
+	if code.status < http.StatusInternalServerError {
+		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	} else {
+		log.PrintErr("server error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	}
+
+	msg := err.Error()
+	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
+	}
+
+	return op.NewExploreAreaDefault(code.status).WithPayload(&model.Error{
+		Code:    swag.Int32(code.extra),
+		Message: swag.String(msg),
+	})
+}
+
+func errIssueLicense(log Log, err error, code errCode) op.IssueLicenseResponder {
+	if code.status < http.StatusInternalServerError {
+		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	} else {
+		log.PrintErr("server error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	}
+
+	msg := err.Error()
+	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
+	}
+
+	return op.NewIssueLicenseDefault(code.status).WithPayload(&model.Error{
+		Code:    swag.Int32(code.extra),
+		Message: swag.String(msg),
+	})
+}
+
+func errListLicenses(log Log, err error, code errCode) op.ListLicensesResponder {
+	if code.status < http.StatusInternalServerError {
+		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	} else {
+		log.PrintErr("server error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	}
+
+	msg := err.Error()
+	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
+	}
+
+	return op.NewListLicensesDefault(code.status).WithPayload(&model.Error{
 		Code:    swag.Int32(code.extra),
 		Message: swag.String(msg),
 	})

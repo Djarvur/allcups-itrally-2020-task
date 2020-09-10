@@ -32,11 +32,11 @@ type CashParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Cube to be digged with the license should be charged.
+	/*Treasure for exchange.
 	  Required: true
 	  In: body
 	*/
-	Request model.Treasures
+	Args model.Treasure
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,12 +50,12 @@ func (o *CashParams) BindRequest(r *http.Request, route *middleware.MatchedRoute
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body model.Treasures
+		var body model.Treasure
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
-				res = append(res, errors.Required("request", "body", ""))
+				res = append(res, errors.Required("args", "body", ""))
 			} else {
-				res = append(res, errors.NewParseError("request", "body", "", err))
+				res = append(res, errors.NewParseError("args", "body", "", err))
 			}
 		} else {
 			// validate body object
@@ -64,11 +64,11 @@ func (o *CashParams) BindRequest(r *http.Request, route *middleware.MatchedRoute
 			}
 
 			if len(res) == 0 {
-				o.Request = body
+				o.Args = body
 			}
 		}
 	} else {
-		res = append(res, errors.Required("request", "body", ""))
+		res = append(res, errors.Required("args", "body", ""))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

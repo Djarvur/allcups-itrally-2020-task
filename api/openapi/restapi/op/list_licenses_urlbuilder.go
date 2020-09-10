@@ -35,7 +35,7 @@ func (o *ListLicensesURL) SetBasePath(bp string) {
 func (o *ListLicensesURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/license"
+	var _path = "/licenses"
 
 	_basePath := o._basePath
 	if _basePath == "" {

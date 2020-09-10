@@ -12,6 +12,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Dig dig
@@ -20,13 +21,23 @@ import (
 type Dig struct {
 
 	// ID of the license this request is attached to.
-	License string `json:"license,omitempty"`
+	// Required: true
+	LicenseID *string `json:"licenseID"`
 
-	// Should the whole cube be digged. Request will stop on the first treasure found if false.
-	Full bool `json:"full,omitempty"`
+	// pos x
+	// Required: true
+	// Minimum: 0
+	PosX *int64 `json:"posX"`
 
-	// position
-	Position *Position `json:"position,omitempty"`
+	// pos y
+	// Required: true
+	// Minimum: 0
+	PosY *int64 `json:"posY"`
+
+	// depth
+	// Required: true
+	// Minimum: 1
+	Depth *int64 `json:"depth"`
 }
 
 // UnmarshalJSON unmarshals this object while disallowing additional properties from JSON
@@ -34,13 +45,23 @@ func (m *Dig) UnmarshalJSON(data []byte) error {
 	var props struct {
 
 		// ID of the license this request is attached to.
-		License string `json:"license,omitempty"`
+		// Required: true
+		LicenseID *string `json:"licenseID"`
 
-		// Should the whole cube be digged. Request will stop on the first treasure found if false.
-		Full bool `json:"full,omitempty"`
+		// pos x
+		// Required: true
+		// Minimum: 0
+		PosX *int64 `json:"posX"`
 
-		// position
-		Position *Position `json:"position,omitempty"`
+		// pos y
+		// Required: true
+		// Minimum: 0
+		PosY *int64 `json:"posY"`
+
+		// depth
+		// Required: true
+		// Minimum: 1
+		Depth *int64 `json:"depth"`
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(data))
@@ -49,9 +70,10 @@ func (m *Dig) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	m.License = props.License
-	m.Full = props.Full
-	m.Position = props.Position
+	m.LicenseID = props.LicenseID
+	m.PosX = props.PosX
+	m.PosY = props.PosY
+	m.Depth = props.Depth
 	return nil
 }
 
@@ -59,7 +81,19 @@ func (m *Dig) UnmarshalJSON(data []byte) error {
 func (m *Dig) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validatePosition(formats); err != nil {
+	if err := m.validateLicenseID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePosX(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePosY(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDepth(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -69,19 +103,49 @@ func (m *Dig) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Dig) validatePosition(formats strfmt.Registry) error {
+func (m *Dig) validateLicenseID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Position) { // not required
-		return nil
+	if err := validate.Required("licenseID", "body", m.LicenseID); err != nil {
+		return err
 	}
 
-	if m.Position != nil {
-		if err := m.Position.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("position")
-			}
-			return err
-		}
+	return nil
+}
+
+func (m *Dig) validatePosX(formats strfmt.Registry) error {
+
+	if err := validate.Required("posX", "body", m.PosX); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("posX", "body", int64(*m.PosX), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Dig) validatePosY(formats strfmt.Registry) error {
+
+	if err := validate.Required("posY", "body", m.PosY); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("posY", "body", int64(*m.PosY), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Dig) validateDepth(formats strfmt.Registry) error {
+
+	if err := validate.Required("depth", "body", m.Depth); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("depth", "body", int64(*m.Depth), 1, false); err != nil {
+		return err
 	}
 
 	return nil

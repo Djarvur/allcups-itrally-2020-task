@@ -8,76 +8,33 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
-	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 )
 
-func TestListContacts(tt *testing.T) {
+func TestGetBalance(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 	c, _, mockApp := testNewServer(t)
-	params := op.NewListContactsParams()
+	params := op.NewGetBalanceParams()
 
-	mockApp.EXPECT().Contacts(gomock.Any(), authUser).Return(nil, io.EOF)
-	mockApp.EXPECT().Contacts(gomock.Any(), authUser).Return(nil, nil)
-	mockApp.EXPECT().Contacts(gomock.Any(), authAdmin).Return([]app.Contact{appContact1, appContact2}, nil)
+	mockApp.EXPECT().Balance(gomock.Any()).Return(nil, io.EOF)
+	mockApp.EXPECT().Balance(gomock.Any()).Return(nil, nil)
+	mockApp.EXPECT().Balance(gomock.Any()).Return([]app.Coin{"coin1", "coin2"}, nil)
 
 	testCases := []struct {
-		apiKey  runtime.ClientAuthInfoWriter
-		want    []*model.Contact
+		want    model.Wallet
 		wantErr *model.Error
 	}{
-		{nil, nil, apiError401},
-		{apiKeyUser, nil, apiError500},
-		{apiKeyUser, []*model.Contact{}, nil},
-		{apiKeyAdmin, []*model.Contact{apiContact1, apiContact2}, nil},
+		{nil, apiError500},
+		{model.Wallet{}, nil},
+		{model.Wallet{"coin1", "coin2"}, nil},
 	}
 	for _, tc := range testCases {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := c.Op.ListContacts(params, tc.apiKey)
-			if tc.wantErr == nil {
-				t.Nil(openapi.ErrPayload(err))
-				t.DeepEqual(res.Payload, tc.want)
-			} else {
-				t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
-				t.Nil(res)
-			}
-		})
-	}
-}
-
-func TestAddContact(tt *testing.T) {
-	t := check.T(tt)
-	t.Parallel()
-	c, _, mockApp := testNewServer(t)
-	params := op.NewAddContactParams()
-
-	mockApp.EXPECT().AddContact(gomock.Any(), authAdmin, " ").Return(nil, io.EOF)
-	mockApp.EXPECT().AddContact(gomock.Any(), authAdmin, "A").Return(nil, app.ErrContactExists)
-	mockApp.EXPECT().AddContact(gomock.Any(), authAdmin, "B").Return(&appContact2, nil)
-
-	testCases := []struct {
-		apiKey  runtime.ClientAuthInfoWriter
-		name    string
-		want    *model.Contact
-		wantErr *model.Error
-	}{
-		{nil, "A", nil, apiError401},
-		{apiKeyUser, "A", nil, apiError403},
-		{apiKeyAdmin, " ", nil, apiError500},
-		{apiKeyAdmin, "A", nil, apiError1000},
-		{apiKeyAdmin, "B", apiContact2, nil},
-	}
-	for _, tc := range testCases {
-		tc := tc
-		t.Run("", func(tt *testing.T) {
-			t := check.T(tt)
-			params.Contact = &model.Contact{Name: swag.String(tc.name)}
-			res, err := c.Op.AddContact(params, tc.apiKey)
+			res, err := c.Op.GetBalance(params)
 			if tc.wantErr == nil {
 				t.Nil(openapi.ErrPayload(err))
 				t.DeepEqual(res.Payload, tc.want)
