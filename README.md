@@ -44,6 +44,7 @@ convenience only.
   to auto-generated code
 - `go test ./...` - test project (excluding integration tests), fast
 - `./scripts/test` - thoroughly test project, slow
+- `./scripts/test-ci-circle` - run tests locally like CircleCI will do
 - `./scripts/build` - build docker image and binaries in `bin/`
     - Then use mentioned above `dc` (or `docker-compose`) to run and
       control the project.
