@@ -1,0 +1,69 @@
+version: 2.1
+
+# Snippets for jobs:
+setup_env: &setup_env
+  run:
+    name: Setup environment
+    command: |
+      env | sort > /tmp/env.old
+
+      export GOLANGCI_LINT_VER=1.31.0
+      export GOTESTSUM_VER=0.5.3
+      export GOSWAGGER_VER=0.25.0
+
+      env | sort > /tmp/env.new
+      ! diff -u /tmp/env.old /tmp/env.new | sed -n '/^+[^+]/s/^./export /p' >> $BASH_ENV
+      env | grep _VER | sort > /tmp/tools.ver
+
+      test -d ~/.ssh || install -m 0700 -d ~/.ssh
+      test -f ~/.ssh/config || install -m 0600 /dev/null ~/.ssh/config
+      test -d /run/.ssh && sudo sh -c "cp /run/.ssh/* $HOME/.ssh/; chown -R circleci:circleci $HOME/.ssh" || true # For scripts/test-ci.
+      test -d ~/.cache && sudo chown -R circleci:circleci ~/go ~/.cache || true # For scripts/test-ci.
+      echo -e 'Host *\n\tStrictHostKeyChecking accept-new' >> ~/.ssh/config
+      git config --global url.ssh://git@github.com/.insteadOf https://github.com/
+
+jobs:
+  test:
+    docker:
+      - image: "cimg/go:1.15"
+        environment:
+          GOFLAGS: "-mod=readonly"
+          HLCUP2020_APIKEY_ADMIN: "admin"
+    steps:
+      - checkout
+      - *setup_env
+      - restore_cache:
+          keys:
+            - v5-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
+            - v5-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-
+            - v5-{{ checksum "/tmp/tools.ver" }}-
+      - run:
+          name: Install tools
+          command: |
+            cd /
+            golangci-lint --version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
+              curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GOLANGCI_LINT_VER
+            gotestsum --version | tee /dev/stderr | grep -wq $GOTESTSUM_VER ||
+              curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum
+            swagger version | tee /dev/stderr | grep -wq v$GOSWAGGER_VER ||
+              curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v${GOSWAGGER_VER}/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
+      - run:
+          name: Ensure API spec match auto-generated code
+          command: |
+            go generate ./api/...
+            git add . && git status --short && git diff-index --quiet HEAD
+      - run: scripts/test
+      - save_cache:
+          when: always
+          key: v5-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
+          paths:
+            - ~/go/bin/
+            - ~/go/pkg/
+            - ~/go/src/
+            - ~/.cache/go-build/
+            - ~/.cache/golangci-lint/
+
+workflows:
+  default:
+    jobs:
+      - test

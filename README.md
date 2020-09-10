@@ -1,5 +1,5 @@
 # IT RALLY 2020 HighLoad Cup: The task
-[![Project Layout](https://img.shields.io/badge/Standard%20Go-Project%20Layout-informational)](https://github.com/golang-standards/project-layout) [![Release](https://img.shields.io/github/v/release/Djarvur/allcups-itrally-2020-task)](https://github.com/Djarvur/allcups-itrally-2020-task/releases/latest)
+[![CircleCI](https://circleci.com/gh/Djarvur/allcups-itrally-2020-task.svg?style=svg&circle-token=245b43b1cdcb425be9eaa937cc2ae54b88d54dc9)](https://circleci.com/gh/Djarvur/allcups-itrally-2020-task) ![Go](https://github.com/Djarvur/allcups-itrally-2020-task/workflows/Go/badge.svg?event=push) [![Project Layout](https://img.shields.io/badge/Standard%20Go-Project%20Layout-informational)](https://github.com/golang-standards/project-layout) [![Release](https://img.shields.io/github/v/release/Djarvur/allcups-itrally-2020-task)](https://github.com/Djarvur/allcups-itrally-2020-task/releases/latest)
 
 Service implementing the task for IT RALLY 2020 HighLoad Cup (runs on All Cups platform).
 
@@ -44,6 +44,7 @@ convenience only.
   to auto-generated code
 - `go test ./...` - test project (excluding integration tests), fast
 - `./scripts/test` - thoroughly test project, slow
+- `./scripts/test-ci-circle` - run tests locally like CircleCI will do
 - `./scripts/build` - build docker image and binaries in `bin/`
     - Then use mentioned above `dc` (or `docker-compose`) to run and
       control the project.

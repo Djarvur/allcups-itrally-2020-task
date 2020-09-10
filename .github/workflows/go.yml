@@ -1,0 +1,59 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GOFLAGS: "-mod=readonly"
+      GOLANGCI_LINT_VER: "1.31.0"
+      GOTESTSUM_VER: "0.5.3"
+      GOSWAGGER_VER: "0.25.0"
+      HLCUP2020_APIKEY_ADMIN: "admin"
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ^1.15.1
+ 
+      - uses: actions/checkout@v2
+ 
+      - name: Setup
+        run: |
+          env | grep _VER | sort > /tmp/tools.ver
+ 
+      - uses: actions/cache@v2
+        id: cache
+        with:
+          path: |
+            ~/go/bin
+            ~/go/pkg
+            ~/go/src
+            ~/.cache/go-build
+            ~/.cache/golangci-lint
+          key: v3-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            v3-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-
+            v3-${{ runner.os }}-
+ 
+      - name: Install tools
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          golangci-lint version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GOLANGCI_LINT_VER
+          gotestsum --version | tee /dev/stderr | grep -wq $GOTESTSUM_VER ||
+            curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum
+          swagger version | tee /dev/stderr | grep -wq v$GOSWAGGER_VER ||
+            curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v${GOSWAGGER_VER}/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
+ 
+      - name: Ensure API spec match auto-generated code
+        run: |
+          go generate ./api/...
+          git add . && git status --short && git diff-index --quiet HEAD
+ 
+      - run: scripts/test
