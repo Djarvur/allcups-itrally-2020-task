@@ -2,96 +2,226 @@ swagger: '2.0'
 
 info:
   title: HighLoad Cup 2020
-  version: 0.0.1
+  version: 0.1.0
   description: |
     # IT RALLY 2020 HighLoad Cup
-    ## List of all custom errors
-    First number is HTTP Status code, second is value of "code" field in returned JSON object, text description may or may not match "message" field in returned JSON object.
-    - 409.1000: contact already exists
 basePath: /
 schemes:
   - http
-
-securityDefinitions:
-  api_key:
-    type: apiKey
-    in: header
-    name: API-Key
+consumes:
+  - application/json
+produces:
+  - application/json
 
 definitions:
-  # This model should match output of api.ServeError handler, to ensure
-  # errors returned by go-swagger (like failed validation) use same
-  # format as general errors returned by our handlers.
-  # By default api.ServeError = github.com/go-openapi/errors.ServeError.
-  Error:
+  error:
+    description: |
+      This model should match output of errors returned by go-swagger
+      (like failed validation), to ensure our handlers use same format.
     type: object
     required:
       - code
       - message
     properties:
       code:
-        description: Either same as HTTP Status Code OR >= 600.
+        description: Either same as HTTP Status Code OR >= 600 with HTTP Status Code 422.
         type: integer
         format: int32
       message:
         type: string
-
-  Contact:
+  wallet:
+    description: Wallet with some amount of money.
+    #type: integer
+    #minimum: 0
+    type: array
+    items:
+      type: string
+  amount:
+    description: Non-negative amount of treasures/etc.
+    type: integer
+    minimum: 0
+  license:
+    description: License for digging.
     type: object
     required:
-      - name
+      - id
+      - digAllowed
+      - digUsed
     properties:
       id:
-        type: integer
-        format: int32
-        readOnly: true
-      name:
         type: string
-        minLength: 1
+      digAllowed:
+        $ref: '#/definitions/amount'
+      digUsed:
+        $ref: '#/definitions/amount'
+  licenseList:
+    description: List of issued licenses.
+    type: array
+    items:
+      $ref: '#/definitions/license'
+  area:
+    type: object
+    required:
+      - posX
+      - posY
+    properties:
+      posX:
+        type: integer
+        minimum: 0
+      posY:
+        type: integer
+        minimum: 0
+      sizeX:
+        type: integer
+        minimum: 1
+      sizeY:
+        type: integer
+        minimum: 1
+  report:
+    type: object
+    required:
+      - area
+      - amount
+    properties:
+      area:
+        $ref: '#/definitions/area'
+      amount:
+        $ref: '#/definitions/amount'
+      amountPerDepth:
+        description: Histogram, key is depth ("1", "2", …).
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/amount'
+  dig:
+    type: object
+    required:
+      - licenseID
+      - posX
+      - posY
+      - depth
+    properties:
+      licenseID:
+        description: ID of the license this request is attached to.
+        type: string
+      posX:
+        type: integer
+        minimum: 0
+      posY:
+        type: integer
+        minimum: 0
+      depth:
+        type: integer
+        minimum: 1
+  treasure:
+    description: Treasure ID.
+    type: string
+  treasureList:
+    description: List of treasures.
+    type: array
+    items:
+      $ref: '#/definitions/treasure'
 
 responses:
-  GenericError:
-    description: Generic error response.
+  error:
+    description: General errors using same model as used by go-swagger for validation errors.
     schema:
-      $ref: '#/definitions/Error'
-
-security:
-  - api_key: []
-consumes:
-  - application/json
-produces:
-  - application/json
+      $ref: '#/definitions/error'
+  balance:
+    description: Current balance.
+    schema:
+      $ref: '#/definitions/wallet'
+  licenseList:
+    description: List of issued licenses.
+    schema:
+      $ref: '#/definitions/licenseList'
+  license:
+    description: Issued license.
+    schema:
+      $ref: '#/definitions/license'
+  explore:
+    description: Report about found treasures.
+    schema:
+      $ref: '#/definitions/report'
+  dig:
+    description: List of treasures found.
+    schema:
+      $ref: '#/definitions/treasureList'
+  cash:
+    description: Payment for treasure.
+    schema:
+      $ref: '#/definitions/wallet'
 
 paths:
-  /contacts:
+  /balance:
     get:
-      operationId: listContacts
-      description: Return all contacts ordered by ID.
+      operationId: getBalance
+      description: Returns a current balance.
       responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Contact'
-        default: {$ref: '#/responses/GenericError'}
+        '200': { $ref: '#/responses/balance' }
+        default: { $ref: '#/responses/error' }
 
+  /licenses:
+    get:
+      operationId: listLicenses
+      description: Returns a list of issued licenses.
+      responses:
+        '200': { $ref: '#/responses/licenseList' }
+        default: { $ref: '#/responses/error' }
     post:
-      operationId: addContact
-      description: Add new contact.
+      operationId: issueLicense
+      description: Issue a new license.
       parameters:
-        - name: contact
+        - name: args
+          description: Amount of money to spend for a license.
           required: true
           in: body
           schema:
-            $ref: '#/definitions/Contact'
+            $ref: '#/definitions/wallet'
       responses:
-        '201':
-          description: Contact added.
+        '200': { $ref: '#/responses/license' }
+        default: { $ref: '#/responses/error' }
+
+  /explore:
+    post:
+      operationId: exploreArea
+      description: Returns amount of treasures in the provided area at full depth.
+      parameters:
+        - name: args
+          description: Area to be explored.
+          required: true
+          in: body
           schema:
-            $ref: '#/definitions/Contact'
-        default:
-          description: |
-            - 409.1000: contact already exists
+            $ref: '#/definitions/area'
+      responses:
+        '200': { $ref: '#/responses/explore' }
+        default: { $ref: '#/responses/error' }
+
+  /dig:
+    post:
+      operationId: dig
+      description: Dig at given point and depth, returns found treasures.
+      parameters:
+        - name: args
+          description: License, place and depth to dig.
+          required: true
+          in: body
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/dig'
+      responses:
+        '200': { $ref: '#/responses/dig' }
+        default: { $ref: '#/responses/error' }
+
+  /cash:
+    post:
+      operationId: cash
+      description: Exchange provided treasure for money.
+      parameters:
+        - name: args
+          description: Treasure for exchange.
+          required: true
+          in: body
+          schema:
+            $ref: '#/definitions/treasure'
+      responses:
+        '200': { $ref: '#/responses/cash' }
+        default: { $ref: '#/responses/error' }

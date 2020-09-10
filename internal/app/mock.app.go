@@ -32,34 +32,19 @@ func (m *MockAppl) EXPECT() *MockApplMockRecorder {
 	return m.recorder
 }
 
-// Contacts mocks base method
-func (m *MockAppl) Contacts(arg0 Ctx, arg1 Auth) ([]Contact, error) {
+// Balance mocks base method
+func (m *MockAppl) Balance(arg0 Ctx) ([]Coin, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Contacts", arg0, arg1)
-	ret0, _ := ret[0].([]Contact)
+	ret := m.ctrl.Call(m, "Balance", arg0)
+	ret0, _ := ret[0].([]Coin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Contacts indicates an expected call of Contacts
-func (mr *MockApplMockRecorder) Contacts(arg0, arg1 interface{}) *gomock.Call {
+// Balance indicates an expected call of Balance
+func (mr *MockApplMockRecorder) Balance(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Contacts", reflect.TypeOf((*MockAppl)(nil).Contacts), arg0, arg1)
-}
-
-// AddContact mocks base method
-func (m *MockAppl) AddContact(arg0 Ctx, arg1 Auth, name string) (*Contact, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddContact", arg0, arg1, name)
-	ret0, _ := ret[0].(*Contact)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AddContact indicates an expected call of AddContact
-func (mr *MockApplMockRecorder) AddContact(arg0, arg1, name interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddContact", reflect.TypeOf((*MockAppl)(nil).AddContact), arg0, arg1, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Balance", reflect.TypeOf((*MockAppl)(nil).Balance), arg0)
 }
 
 // MockRepo is a mock of Repo interface

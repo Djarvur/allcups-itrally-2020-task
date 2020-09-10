@@ -7,13 +7,10 @@ import (
 	"testing"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
-	oapiclient "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 	"github.com/prometheus/client_golang/prometheus"
@@ -30,18 +27,7 @@ func TestMain(m *testing.M) {
 
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
-	apiError401  = openapi.APIError(401, "unauthenticated for invalid credentials")
-	apiError403  = openapi.APIError(403, "only admin can make changes")
-	apiError500  = openapi.APIError(500, "internal error")
-	apiError1000 = openapi.APIError(1000, app.ErrContactExists.Error())
-	apiKeyAdmin  = oapiclient.APIKeyAuth("API-Key", "header", "admin")
-	apiKeyUser   = oapiclient.APIKeyAuth("API-Key", "header", "u1")
-	authAdmin    = app.Auth{UserID: "admin"}
-	authUser     = app.Auth{UserID: "user:u1"}
-	appContact1  = app.Contact{ID: 1, Name: "A"}
-	appContact2  = app.Contact{ID: 2, Name: "B"}
-	apiContact1  = &model.Contact{ID: 1, Name: swag.String("A")}
-	apiContact2  = &model.Contact{ID: 2, Name: swag.String("B")}
+	apiError500 = openapi.APIError(500, "internal error")
 )
 
 func testNewServer(t *check.C) (c *client.HighLoadCup2020, url string, mockAppl *app.MockAppl) {

@@ -23,8 +23,7 @@ type Ctx = context.Context
 
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
-	ctx   = context.Background()
-	auth1 = app.Auth{UserID: "1"}
+	ctx = context.Background()
 )
 
 func testNew(t *check.C) (*app.App, *app.MockRepo) {

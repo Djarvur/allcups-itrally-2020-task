@@ -19,9 +19,17 @@ func ErrPayload(err error) interface{} {
 	switch errDefault := err.(type) {
 	default:
 		return err
-	case *op.ListContactsDefault:
+	case *op.GetBalanceDefault:
 		return errDefault.Payload
-	case *op.AddContactDefault:
+	case *op.CashDefault:
+		return errDefault.Payload
+	case *op.DigDefault:
+		return errDefault.Payload
+	case *op.ExploreAreaDefault:
+		return errDefault.Payload
+	case *op.IssueLicenseDefault:
+		return errDefault.Payload
+	case *op.ListLicensesDefault:
 		return errDefault.Payload
 	}
 }

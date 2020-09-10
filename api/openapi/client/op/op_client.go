@@ -25,78 +25,216 @@ type Client struct {
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	AddContact(params *AddContactParams, authInfo runtime.ClientAuthInfoWriter) (*AddContactCreated, error)
+	Cash(params *CashParams) (*CashOK, error)
 
-	ListContacts(params *ListContactsParams, authInfo runtime.ClientAuthInfoWriter) (*ListContactsOK, error)
+	Dig(params *DigParams) (*DigOK, error)
+
+	ExploreArea(params *ExploreAreaParams) (*ExploreAreaOK, error)
+
+	GetBalance(params *GetBalanceParams) (*GetBalanceOK, error)
+
+	IssueLicense(params *IssueLicenseParams) (*IssueLicenseOK, error)
+
+	ListLicenses(params *ListLicensesParams) (*ListLicensesOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
 
 /*
-  AddContact Add new contact.
+  Cash Exchange provided treasure for money.
 */
-func (a *Client) AddContact(params *AddContactParams, authInfo runtime.ClientAuthInfoWriter) (*AddContactCreated, error) {
+func (a *Client) Cash(params *CashParams) (*CashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewAddContactParams()
+		params = NewCashParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "addContact",
+		ID:                 "cash",
 		Method:             "POST",
-		PathPattern:        "/contacts",
+		PathPattern:        "/cash",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &AddContactReader{formats: a.formats},
-		AuthInfo:           authInfo,
+		Reader:             &CashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*AddContactCreated)
+	success, ok := result.(*CashOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*AddContactDefault)
+	unexpectedSuccess := result.(*CashDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-  ListContacts Return all contacts ordered by ID.
+  Dig Dig at given point and depth, returns found treasures.
 */
-func (a *Client) ListContacts(params *ListContactsParams, authInfo runtime.ClientAuthInfoWriter) (*ListContactsOK, error) {
+func (a *Client) Dig(params *DigParams) (*DigOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewListContactsParams()
+		params = NewDigParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "listContacts",
-		Method:             "GET",
-		PathPattern:        "/contacts",
+		ID:                 "dig",
+		Method:             "POST",
+		PathPattern:        "/dig",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &ListContactsReader{formats: a.formats},
-		AuthInfo:           authInfo,
+		Reader:             &DigReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*ListContactsOK)
+	success, ok := result.(*DigOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*ListContactsDefault)
+	unexpectedSuccess := result.(*DigDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  ExploreArea Returns amount of treasures in the provided area at full depth.
+*/
+func (a *Client) ExploreArea(params *ExploreAreaParams) (*ExploreAreaOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewExploreAreaParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "exploreArea",
+		Method:             "POST",
+		PathPattern:        "/explore",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ExploreAreaReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ExploreAreaOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*ExploreAreaDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  GetBalance Returns a current balance.
+*/
+func (a *Client) GetBalance(params *GetBalanceParams) (*GetBalanceOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetBalanceParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getBalance",
+		Method:             "GET",
+		PathPattern:        "/balance",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetBalanceReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetBalanceOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetBalanceDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  IssueLicense Issue a new license.
+*/
+func (a *Client) IssueLicense(params *IssueLicenseParams) (*IssueLicenseOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewIssueLicenseParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "issueLicense",
+		Method:             "POST",
+		PathPattern:        "/licenses",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &IssueLicenseReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*IssueLicenseOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*IssueLicenseDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  ListLicenses Returns a list of issued licenses.
+*/
+func (a *Client) ListLicenses(params *ListLicensesParams) (*ListLicensesOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListLicensesParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "listLicenses",
+		Method:             "GET",
+		PathPattern:        "/licenses",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListLicensesReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListLicensesOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*ListLicensesDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

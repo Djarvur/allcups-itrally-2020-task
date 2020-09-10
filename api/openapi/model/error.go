@@ -15,12 +15,14 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Error error
+// Error This model should match output of errors returned by go-swagger
+// (like failed validation), to ensure our handlers use same format.
 //
-// swagger:model Error
+//
+// swagger:model error
 type Error struct {
 
-	// Either same as HTTP Status Code OR >= 600.
+	// Either same as HTTP Status Code OR >= 600 with HTTP Status Code 422.
 	// Required: true
 	Code *int32 `json:"code"`
 
@@ -33,7 +35,7 @@ type Error struct {
 func (m *Error) UnmarshalJSON(data []byte) error {
 	var props struct {
 
-		// Either same as HTTP Status Code OR >= 600.
+		// Either same as HTTP Status Code OR >= 600 with HTTP Status Code 422.
 		// Required: true
 		Code *int32 `json:"code"`
 

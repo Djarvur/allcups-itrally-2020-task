@@ -18,8 +18,6 @@ import (
 	"github.com/go-openapi/spec"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 )
 
 // NewHighLoadCup2020API creates a new HighLoadCup2020 instance
@@ -44,27 +42,29 @@ func NewHighLoadCup2020API(spec *loads.Document) *HighLoadCup2020API {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		AddContactHandler: AddContactHandlerFunc(func(params AddContactParams, principal *app.Auth) AddContactResponder {
-			return AddContactNotImplemented()
+		CashHandler: CashHandlerFunc(func(params CashParams) CashResponder {
+			return CashNotImplemented()
 		}),
-		ListContactsHandler: ListContactsHandlerFunc(func(params ListContactsParams, principal *app.Auth) ListContactsResponder {
-			return ListContactsNotImplemented()
+		DigHandler: DigHandlerFunc(func(params DigParams) DigResponder {
+			return DigNotImplemented()
 		}),
-
-		// Applies when the "API-Key" header is set
-		APIKeyAuth: func(token string) (*app.Auth, error) {
-			return nil, errors.NotImplemented("api key auth (api_key) API-Key from header param [API-Key] has not yet been implemented")
-		},
-		// default authorizer is authorized meaning no requests are blocked
-		APIAuthorizer: security.Authorized(),
+		ExploreAreaHandler: ExploreAreaHandlerFunc(func(params ExploreAreaParams) ExploreAreaResponder {
+			return ExploreAreaNotImplemented()
+		}),
+		GetBalanceHandler: GetBalanceHandlerFunc(func(params GetBalanceParams) GetBalanceResponder {
+			return GetBalanceNotImplemented()
+		}),
+		IssueLicenseHandler: IssueLicenseHandlerFunc(func(params IssueLicenseParams) IssueLicenseResponder {
+			return IssueLicenseNotImplemented()
+		}),
+		ListLicensesHandler: ListLicensesHandlerFunc(func(params ListLicensesParams) ListLicensesResponder {
+			return ListLicensesNotImplemented()
+		}),
 	}
 }
 
 /*HighLoadCup2020API # IT RALLY 2020 HighLoad Cup
-## List of all custom errors
-First number is HTTP Status code, second is value of "code" field in returned JSON object, text description may or may not match "message" field in returned JSON object.
-- 409.1000: contact already exists
-*/
+ */
 type HighLoadCup2020API struct {
 	spec            *loads.Document
 	context         *middleware.Context
@@ -95,17 +95,18 @@ type HighLoadCup2020API struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
-	// APIKeyAuth registers a function that takes a token and returns a principal
-	// it performs authentication based on an api key API-Key provided in the header
-	APIKeyAuth func(string) (*app.Auth, error)
-
-	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
-	APIAuthorizer runtime.Authorizer
-
-	// AddContactHandler sets the operation handler for the add contact operation
-	AddContactHandler AddContactHandler
-	// ListContactsHandler sets the operation handler for the list contacts operation
-	ListContactsHandler ListContactsHandler
+	// CashHandler sets the operation handler for the cash operation
+	CashHandler CashHandler
+	// DigHandler sets the operation handler for the dig operation
+	DigHandler DigHandler
+	// ExploreAreaHandler sets the operation handler for the explore area operation
+	ExploreAreaHandler ExploreAreaHandler
+	// GetBalanceHandler sets the operation handler for the get balance operation
+	GetBalanceHandler GetBalanceHandler
+	// IssueLicenseHandler sets the operation handler for the issue license operation
+	IssueLicenseHandler IssueLicenseHandler
+	// ListLicensesHandler sets the operation handler for the list licenses operation
+	ListLicensesHandler ListLicensesHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -182,15 +183,23 @@ func (o *HighLoadCup2020API) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.APIKeyAuth == nil {
-		unregistered = append(unregistered, "APIKeyAuth")
+	if o.CashHandler == nil {
+		unregistered = append(unregistered, "CashHandler")
 	}
-
-	if o.AddContactHandler == nil {
-		unregistered = append(unregistered, "AddContactHandler")
+	if o.DigHandler == nil {
+		unregistered = append(unregistered, "DigHandler")
 	}
-	if o.ListContactsHandler == nil {
-		unregistered = append(unregistered, "ListContactsHandler")
+	if o.ExploreAreaHandler == nil {
+		unregistered = append(unregistered, "ExploreAreaHandler")
+	}
+	if o.GetBalanceHandler == nil {
+		unregistered = append(unregistered, "GetBalanceHandler")
+	}
+	if o.IssueLicenseHandler == nil {
+		unregistered = append(unregistered, "IssueLicenseHandler")
+	}
+	if o.ListLicensesHandler == nil {
+		unregistered = append(unregistered, "ListLicensesHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -207,23 +216,12 @@ func (o *HighLoadCup2020API) ServeErrorFor(operationID string) func(http.Respons
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
 func (o *HighLoadCup2020API) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
-	result := make(map[string]runtime.Authenticator)
-	for name := range schemes {
-		switch name {
-		case "api_key":
-			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
-				return o.APIKeyAuth(token)
-			})
-
-		}
-	}
-	return result
+	return nil
 }
 
 // Authorizer returns the registered authorizer
 func (o *HighLoadCup2020API) Authorizer() runtime.Authorizer {
-	return o.APIAuthorizer
+	return nil
 }
 
 // ConsumersFor gets the consumers for the specified media types.
@@ -294,11 +292,27 @@ func (o *HighLoadCup2020API) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/contacts"] = NewAddContact(o.context, o.AddContactHandler)
+	o.handlers["POST"]["/cash"] = NewCash(o.context, o.CashHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/dig"] = NewDig(o.context, o.DigHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/explore"] = NewExploreArea(o.context, o.ExploreAreaHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/contacts"] = NewListContacts(o.context, o.ListContactsHandler)
+	o.handlers["GET"]["/balance"] = NewGetBalance(o.context, o.GetBalanceHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/licenses"] = NewIssueLicense(o.context, o.IssueLicenseHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/licenses"] = NewListLicenses(o.context, o.ListLicensesHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP
