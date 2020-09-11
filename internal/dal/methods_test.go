@@ -1,38 +1,42 @@
 package dal_test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/dal"
 	"github.com/powerman/check"
 )
 
-func TestContacts(tt *testing.T) {
+func TestStartTime(tt *testing.T) {
 	t := check.T(tt)
-	r, err := dal.New(ctx)
+	cfg := dal.Config{
+		ResultDir: t.TempDir(),
+		WorkDir:   t.TempDir(),
+	}
+	r, err := dal.New(ctx, cfg)
 	t.Nil(err)
 
-	db, err := r.Contacts(ctx)
+	start, err := r.LoadStartTime()
 	t.Nil(err)
-	t.Zero(db)
+	t.DeepEqual(start, new(time.Time))
 
-	c := &app.Contact{Name: "A"}
-	err = r.AddContact(ctx, c)
+	prev := time.Date(2020, 1, 2, 3, 4, 5, 6, time.UTC)
+	t.Nil(r.SaveStartTime(prev))
+
+	start, err = r.LoadStartTime()
 	t.Nil(err)
-	t.Equal(c.ID, 1)
+	t.DeepEqual(start, &prev)
 
-	c = &app.Contact{Name: "A"}
-	err = r.AddContact(ctx, c)
-	t.Err(err, app.ErrContactExists)
-	t.Zero(c.ID)
+	t.Nil(os.Chmod(filepath.Join(cfg.WorkDir, "start.time"), 0o000))
+	start, err = r.LoadStartTime()
+	t.Match(err, "permission denied")
+	t.Nil(start)
 
-	c = &app.Contact{Name: "B"}
-	err = r.AddContact(ctx, c)
-	t.Nil(err)
-	t.Equal(c.ID, 2)
-
-	db, err = r.Contacts(ctx)
-	t.Nil(err)
-	t.Len(db, 2)
+	t.Nil(os.Chmod(cfg.WorkDir, 0o500))
+	defer os.Chmod(cfg.WorkDir, 0o700)
+	err = r.SaveStartTime(prev)
+	t.Match(err, "permission denied")
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
@@ -108,6 +109,21 @@ func makeAccessLog(basePath string) middlewareFunc {
 
 func handleCORS(next http.Handler) http.Handler {
 	return cors.AllowAll().Handler(next)
+}
+
+func makeAppStart(appl app.Appl) middlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			err := appl.Start(time.Now())
+			if err != nil {
+				_, log := fromRequest(r)
+				log.PrintErr("failed to app.Start", "err", err)
+				middlewareError(w, 500, "internal error")
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // MiddlewareError is not a middleware, it's a helper for returning errors

@@ -7,6 +7,7 @@ package app
 import (
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+	time "time"
 )
 
 // MockAppl is a mock of Appl interface
@@ -30,6 +31,20 @@ func NewMockAppl(ctrl *gomock.Controller) *MockAppl {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockAppl) EXPECT() *MockApplMockRecorder {
 	return m.recorder
+}
+
+// Start mocks base method
+func (m *MockAppl) Start(arg0 time.Time) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Start", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Start indicates an expected call of Start
+func (mr *MockApplMockRecorder) Start(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockAppl)(nil).Start), arg0)
 }
 
 // Balance mocks base method
@@ -70,31 +85,31 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 	return m.recorder
 }
 
-// Contacts mocks base method
-func (m *MockRepo) Contacts(arg0 Ctx) ([]Contact, error) {
+// LoadStartTime mocks base method
+func (m *MockRepo) LoadStartTime() (*time.Time, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Contacts", arg0)
-	ret0, _ := ret[0].([]Contact)
+	ret := m.ctrl.Call(m, "LoadStartTime")
+	ret0, _ := ret[0].(*time.Time)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Contacts indicates an expected call of Contacts
-func (mr *MockRepoMockRecorder) Contacts(arg0 interface{}) *gomock.Call {
+// LoadStartTime indicates an expected call of LoadStartTime
+func (mr *MockRepoMockRecorder) LoadStartTime() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Contacts", reflect.TypeOf((*MockRepo)(nil).Contacts), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadStartTime", reflect.TypeOf((*MockRepo)(nil).LoadStartTime))
 }
 
-// AddContact mocks base method
-func (m *MockRepo) AddContact(arg0 Ctx, arg1 *Contact) error {
+// SaveStartTime mocks base method
+func (m *MockRepo) SaveStartTime(t time.Time) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddContact", arg0, arg1)
+	ret := m.ctrl.Call(m, "SaveStartTime", t)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// AddContact indicates an expected call of AddContact
-func (mr *MockRepoMockRecorder) AddContact(arg0, arg1 interface{}) *gomock.Call {
+// SaveStartTime indicates an expected call of SaveStartTime
+func (mr *MockRepoMockRecorder) SaveStartTime(t interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddContact", reflect.TypeOf((*MockRepo)(nil).AddContact), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveStartTime", reflect.TypeOf((*MockRepo)(nil).SaveStartTime), t)
 }

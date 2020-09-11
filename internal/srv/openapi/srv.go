@@ -77,7 +77,8 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	// The middleware executes after serving /swagger.json and routing,
 	// but before authentication, binding and validation.
 	middlewares := func(handler http.Handler) http.Handler {
-		return handler
+		appStart := makeAppStart(srv.app)
+		return appStart(handler)
 	}
 	server.SetHandler(globalMiddlewares(api.Serve(middlewares)))
 

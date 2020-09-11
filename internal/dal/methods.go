@@ -1,31 +1,40 @@
 package dal
 
 import (
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/powerman/structlog"
+	"errors"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
 )
 
-func (r *Repo) Contacts(_ Ctx) ([]app.Contact, error) {
-	r.Lock()
-	defer r.Unlock() //nolint:gocritic // False positive (unnecessaryDefer).
+const fnStartTime = "start.time"
 
-	return r.db, nil
+func (r *Repo) LoadStartTime() (*time.Time, error) {
+	t := new(time.Time)
+	path := filepath.Join(r.cfg.WorkDir, fnStartTime)
+	buf, err := ioutil.ReadFile(path) //nolint:gosec // False positive.
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		err = nil
+	case err == nil:
+		err = t.UnmarshalText(buf)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
 }
 
-func (r *Repo) AddContact(ctx Ctx, c *app.Contact) error {
-	log := structlog.FromContext(ctx, nil)
-	r.Lock()
-	defer r.Unlock()
-
-	for i := range r.db {
-		if r.db[i].Name == c.Name {
-			return app.ErrContactExists
-		}
+func (r *Repo) SaveStartTime(t time.Time) error {
+	path := filepath.Join(r.cfg.WorkDir, fnStartTime)
+	buf, err := t.MarshalText()
+	if err != nil {
+		return err
 	}
-
-	r.lastID++
-	c.ID = r.lastID
-	r.db = append(r.db, *c)
-	log.Debug("contact added")
-	return nil
+	err = ioutil.WriteFile(path+".tmp", buf, 0o600)
+	if err == nil {
+		err = os.Rename(path+".tmp", path)
+	}
+	return err
 }
