@@ -14,7 +14,7 @@ func TestNew(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	t.Cleanup(ctrl.Finish)
+	defer ctrl.Finish()
 
 	mockRepo := app.NewMockRepo(ctrl)
 	cfg := app.Config{
