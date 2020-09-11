@@ -3,6 +3,7 @@ package app_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
@@ -27,10 +28,28 @@ var (
 )
 
 func testNew(t *check.C) (*app.App, *app.MockRepo) {
+	t.Helper()
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
 	mockRepo := app.NewMockRepo(ctrl)
-	a := app.New(mockRepo)
+	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
+
+	a, err := app.New(mockRepo, app.Config{
+		Duration: 60 * def.TestSecond,
+	})
+	t.Must(t.Nil(err))
 	return a, mockRepo
+}
+
+func waitErr(t *check.C, errc <-chan error, wait time.Duration, wantErr error) {
+	t.Helper()
+	now := time.Now()
+	select {
+	case err := <-errc:
+		t.Between(time.Since(now), wait-wait/4, wait+wait/4)
+		t.Err(err, wantErr)
+	case <-time.After(def.TestTimeout):
+		t.FailNow()
+	}
 }

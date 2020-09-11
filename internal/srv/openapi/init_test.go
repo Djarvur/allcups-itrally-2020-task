@@ -35,6 +35,7 @@ func testNewServer(t *check.C) (c *client.HighLoadCup2020, url string, mockAppl 
 	ctrl := gomock.NewController(t)
 
 	mockAppl = app.NewMockAppl(ctrl)
+	mockAppl.EXPECT().Start(gomock.Any()).Return(nil).AnyTimes()
 
 	server, err := openapi.NewServer(mockAppl, openapi.Config{
 		APIKeyAdmin: "admin",

@@ -57,19 +57,25 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	if s.appl == nil {
-		s.appl = app.New(s.repo)
+		s.appl, err = app.New(s.repo, app.Config{
+			Duration: s.cfg.Duration,
+		})
+	}
+	if err != nil {
+		return log.Err("failed to app.New", "err", err)
 	}
 	s.srv, err = openapi.NewServer(s.appl, openapi.Config{
 		APIKeyAdmin: s.cfg.APIKeyAdmin,
 		Addr:        s.cfg.Addr,
 	})
 	if err != nil {
-		return err
+		return log.Err("failed to openapi.NewServer", "err", err)
 	}
 
 	err = concurrent.Serve(ctxShutdown, shutdown,
 		s.serveMetrics,
 		s.serveOpenAPI,
+		s.appl.Wait,
 	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)
@@ -78,7 +84,10 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 }
 
 func (s *service) connectRepo(ctx Ctx) (interface{}, error) {
-	return dal.New(ctx)
+	return dal.New(ctx, dal.Config{
+		ResultDir: s.cfg.ResultDir,
+		WorkDir:   s.cfg.WorkDir,
+	})
 }
 
 func (s *service) serveMetrics(ctx Ctx) error {

@@ -16,6 +16,8 @@ func Test(t *testing.T) {
 		Addr:        netx.NewAddr(def.Hostname, 8000),
 		Duration:    10 * time.Minute,
 		MetricsAddr: netx.NewAddr(def.Hostname, 9000),
+		ResultDir:   "/data",
+		WorkDir:     "/tmp",
 	}
 
 	t.Run("required", func(tt *testing.T) {
@@ -34,6 +36,8 @@ func Test(t *testing.T) {
 		constraint(t, "HLCUP2020_ADDR_PORT", "x", `^AddrPort .* invalid syntax`)
 		constraint(t, "HLCUP2020_DURATION", "x", `^Duration .* invalid duration`)
 		constraint(t, "HLCUP2020_METRICS_ADDR_PORT", "x", `^MetricsAddrPort .* invalid syntax`)
+		constraint(t, "HLCUP2020_RESULT_DIR", "", `^ResultDir .* empty`)
+		constraint(t, "HLCUP2020_WORK_DIR", "", `^WorkDir .* empty`)
 	})
 	t.Run("env", func(tt *testing.T) {
 		t := check.T(tt)
@@ -42,12 +46,16 @@ func Test(t *testing.T) {
 		os.Setenv("HLCUP2020_ADDR_PORT", "8003")
 		os.Setenv("HLCUP2020_DURATION", "3s")
 		os.Setenv("HLCUP2020_METRICS_ADDR_PORT", "9003")
+		os.Setenv("HLCUP2020_RESULT_DIR", "/data/3")
+		os.Setenv("HLCUP2020_WORK_DIR", "/work/3")
 		c, err := testGetServe()
 		t.Nil(err)
 		want.APIKeyAdmin = "admin3"
 		want.Addr = netx.NewAddr("localhost3", 8003)
 		want.Duration = 3 * time.Second
 		want.MetricsAddr = netx.NewAddr("localhost3", 9003)
+		want.ResultDir = "/data/3"
+		want.WorkDir = "/work/3"
 		t.DeepEqual(c, want)
 	})
 	t.Run("flag", func(tt *testing.T) {

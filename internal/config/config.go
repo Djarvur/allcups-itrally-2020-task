@@ -29,11 +29,15 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	AddrPort        appcfg.Port           `env:"ADDR_PORT"`
 	Duration        appcfg.Duration       `env:"DURATION"`
 	MetricsAddrPort appcfg.Port           `env:"METRICS_ADDR_PORT"`
+	ResultDir       appcfg.NotEmptyString `env:"RESULT_DIR"`
+	WorkDir         appcfg.NotEmptyString `env:"WORK_DIR"`
 }{ // Defaults, if any:
 	AddrHost:        appcfg.MustNotEmptyString(def.Hostname),
 	AddrPort:        appcfg.MustPort("8000"),
 	Duration:        appcfg.MustDuration("10m"),
 	MetricsAddrPort: appcfg.MustPort("9000"),
+	ResultDir:       appcfg.MustNotEmptyString("/data"),
+	WorkDir:         appcfg.MustNotEmptyString("/tmp"),
 }
 
 // FlagSets for all CLI subcommands which use flags to set config values.
@@ -69,6 +73,8 @@ type ServeConfig struct {
 	Addr        netx.Addr
 	Duration    time.Duration
 	MetricsAddr netx.Addr
+	ResultDir   string
+	WorkDir     string
 }
 
 // GetServe validates and returns configuration for subcommand.
@@ -80,6 +86,8 @@ func GetServe() (c *ServeConfig, err error) {
 		Addr:        netx.NewAddr(all.AddrHost.Value(&err), all.AddrPort.Value(&err)),
 		Duration:    all.Duration.Value(&err),
 		MetricsAddr: netx.NewAddr(all.AddrHost.Value(&err), all.MetricsAddrPort.Value(&err)),
+		ResultDir:   all.ResultDir.Value(&err),
+		WorkDir:     all.WorkDir.Value(&err),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.Serve, all)

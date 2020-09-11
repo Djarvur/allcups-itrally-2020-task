@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e -o pipefail
+
+test -d /data/log || install -d -o log -g nogroup /data/log
+echo 'e*' | install -o log -g nogroup -m 444 /dev/stdin /data/log/config
+
+exec chpst -u log svlogd -tt -b 16384 /data/log/

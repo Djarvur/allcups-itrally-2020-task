@@ -3,22 +3,22 @@ package dal
 
 import (
 	"context"
-	"sync"
-
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 )
 
 // Ctx is a synonym for convenience.
 type Ctx = context.Context
 
+type Config struct {
+	WorkDir   string
+	ResultDir string
+}
+
 // Repo provides access to storage.
 type Repo struct {
-	sync.Mutex
-	lastID int
-	db     []app.Contact
+	cfg Config
 }
 
 // New creates and returns new Repo.
-func New(_ Ctx) (*Repo, error) {
-	return &Repo{}, nil
+func New(_ Ctx, cfg Config) (*Repo, error) {
+	return &Repo{cfg: cfg}, nil
 }
