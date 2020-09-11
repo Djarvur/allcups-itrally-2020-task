@@ -20,9 +20,9 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.15.1
- 
+
       - uses: actions/checkout@v2
- 
+
       - name: Setup
         run: |
           env | grep _VER | sort > /tmp/tools.ver
@@ -40,7 +40,7 @@ jobs:
           restore-keys: |
             v3-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-
             v3-${{ runner.os }}-
- 
+
       - name: Install tools
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
@@ -50,10 +50,10 @@ jobs:
             curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum
           swagger version | tee /dev/stderr | grep -wq v$GOSWAGGER_VER ||
             curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v${GOSWAGGER_VER}/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
- 
+
       - name: Ensure API spec match auto-generated code
         run: |
           go generate ./api/...
           git add . && git status --short && git diff-index --quiet HEAD
- 
+
       - run: scripts/test
