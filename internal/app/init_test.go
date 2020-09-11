@@ -27,10 +27,9 @@ var (
 	ctx = context.Background()
 )
 
-func testNew(t *check.C) (*app.App, *app.MockRepo) {
+func testNew(t *check.C) (func(), *app.App, *app.MockRepo) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
-	t.Cleanup(ctrl.Finish)
 
 	mockRepo := app.NewMockRepo(ctrl)
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
@@ -39,7 +38,7 @@ func testNew(t *check.C) (*app.App, *app.MockRepo) {
 		Duration: 60 * def.TestSecond,
 	})
 	t.Must(t.Nil(err))
-	return a, mockRepo
+	return ctrl.Finish, a, mockRepo
 }
 
 func waitErr(t *check.C, errc <-chan error, wait time.Duration, wantErr error) {

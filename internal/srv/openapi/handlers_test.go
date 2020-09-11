@@ -15,7 +15,8 @@ import (
 func TestGetBalance(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp := testNewServer(t)
+	defer cleanup()
 	params := op.NewGetBalanceParams()
 
 	mockApp.EXPECT().Balance(gomock.Any()).Return(nil, io.EOF)

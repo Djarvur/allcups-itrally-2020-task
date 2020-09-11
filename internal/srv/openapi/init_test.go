@@ -30,7 +30,7 @@ var (
 	apiError500 = openapi.APIError(500, "internal error")
 )
 
-func testNewServer(t *check.C) (c *client.HighLoadCup2020, url string, mockAppl *app.MockAppl) {
+func testNewServer(t *check.C) (cleanup func(), c *client.HighLoadCup2020, url string, mockAppl *app.MockAppl) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
 
@@ -46,12 +46,12 @@ func testNewServer(t *check.C) (c *client.HighLoadCup2020, url string, mockAppl 
 	errc := make(chan error, 1)
 	go func() { errc <- server.Serve() }()
 
-	t.Cleanup(func() {
+	cleanup = func() {
 		t.Helper()
 		t.Nil(server.Shutdown(), "server.Shutdown")
 		t.Nil(<-errc, "server.Serve")
 		ctrl.Finish()
-	})
+	}
 
 	ln, err := server.HTTPListener()
 	t.Must(t.Nil(err, "server.HTTPListener"))
@@ -70,5 +70,5 @@ func testNewServer(t *check.C) (c *client.HighLoadCup2020, url string, mockAppl 
 	_, err = (&http.Client{}).Do(req)
 	t.Must(t.Nil(err, "connect to service"))
 
-	return c, url, mockAppl
+	return cleanup, c, url, mockAppl
 }

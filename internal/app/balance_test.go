@@ -8,7 +8,8 @@ import (
 
 func TestBalance(tt *testing.T) {
 	t := check.T(tt)
-	a, _ := testNew(t)
+	cleanup, a, _ := testNew(t)
+	defer cleanup()
 
 	t.TODO().NotPanic(func() { a.Balance(ctx) })
 }

@@ -14,7 +14,8 @@ import (
 func TestWait(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	a, mockRepo := testNew(t)
+	cleanup, a, mockRepo := testNew(t)
+	defer cleanup()
 
 	{ // ctxShutdown before a.Start().
 		ctx, shutdown := context.WithCancel(ctx)
