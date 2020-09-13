@@ -22,7 +22,7 @@ jobs:
       GOLANGCI_LINT_VER: '1.31.0'
       GOTESTSUM_VER: '0.5.3'
       GOSWAGGER_VER: '0.25.0'
-      EXAMPLE_APIKEY_ADMIN: 'admin'
+      HLCUP2020_APIKEY_ADMIN: 'admin'
     steps:
       - uses: actions/setup-go@v2
         with:
