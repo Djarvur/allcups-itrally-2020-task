@@ -7,6 +7,8 @@ setup_env: &setup_env
     command: |
       env | sort > /tmp/env.old
 
+      export HADOLINT_VER=1.18.0
+      export SHELLCHECK_VER=0.7.1
       export GOLANGCI_LINT_VER=1.31.0
       export GOTESTSUM_VER=0.5.3
       export GOSWAGGER_VER=0.25.0
@@ -17,8 +19,8 @@ setup_env: &setup_env
 
       test -d ~/.ssh || install -m 0700 -d ~/.ssh
       test -f ~/.ssh/config || install -m 0600 /dev/null ~/.ssh/config
-      test -d /run/.ssh && sudo sh -c "cp /run/.ssh/* $HOME/.ssh/; chown -R circleci:circleci $HOME/.ssh" || true # For scripts/test-ci.
-      test -d ~/.cache && sudo chown -R circleci:circleci ~/go ~/.cache || true # For scripts/test-ci.
+      test -d /run/.ssh && sudo sh -c "cp /run/.ssh/* $HOME/.ssh/; chown -R circleci:circleci $HOME/.ssh" || true # For scripts/test-ci-circle.
+      test -d ~/.cache && sudo chown -R circleci:circleci ~/go ~/.cache || true # For scripts/test-ci-circle.
       echo -e 'Host *\n\tStrictHostKeyChecking accept-new' >> ~/.ssh/config
       git config --global url.ssh://git@github.com/.insteadOf https://github.com/
 
@@ -39,9 +41,15 @@ jobs:
             - v5-{{ checksum "/tmp/tools.ver" }}-
       - run:
           name: Install tools
+          environment:
+            GO111MODULE: "on"
           command: |
-            cd /
-            golangci-lint --version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
+            cd /tmp # Protect go.mod for modifications by `go get`.
+            hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||
+              curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
+            shellcheck --version | tee /dev/stderr | grep -wq $SHELLCHECK_VER ||
+              curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
+            golangci-lint version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
               curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GOLANGCI_LINT_VER
             gotestsum --version | tee /dev/stderr | grep -wq $GOTESTSUM_VER ||
               curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum

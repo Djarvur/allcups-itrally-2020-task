@@ -2,6 +2,6 @@
 package api
 
 //go:generate rm -rf model restapi client
-//go:generate swagger generate server --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order --principal github.com/Djarvur/allcups-itrally-2020-task/internal/app.Auth --exclude-main
-//go:generate swagger generate client --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order --principal github.com/Djarvur/allcups-itrally-2020-task/internal/app.Auth
+//go:generate swagger generate server --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order --exclude-main
+//go:generate swagger generate client --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order
 //go:generate find restapi -maxdepth 1 -name "configure_*.go" -exec sed -i -e "/go:generate/d" {} ;
