@@ -5,6 +5,16 @@
 Service implementing the task for IT RALLY 2020 HighLoad Cup (runs on All Cups platform).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Development](#development)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Usage](#usage)
+    - [Cheatsheet](#cheatsheet)
+- [Deploy](#deploy)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Development
