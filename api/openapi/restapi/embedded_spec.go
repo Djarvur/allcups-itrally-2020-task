@@ -31,7 +31,7 @@ func init() {
   "info": {
     "description": "# IT RALLY 2020 HighLoad Cup\n",
     "title": "HighLoad Cup 2020",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "basePath": "/",
   "paths": {
@@ -194,6 +194,25 @@ func init() {
         }
       }
     },
+    "balance": {
+      "description": "Current balance and wallet with up to 1000 coins.",
+      "type": "object",
+      "required": [
+        "balance",
+        "wallet"
+      ],
+      "properties": {
+        "balance": {
+          "type": "integer",
+          "format": "uint32",
+          "x-order": 0
+        },
+        "wallet": {
+          "x-order": 1,
+          "$ref": "#/definitions/wallet"
+        }
+      }
+    },
     "dig": {
       "type": "object",
       "required": [
@@ -310,10 +329,13 @@ func init() {
       }
     },
     "wallet": {
-      "description": "Wallet with some amount of money.",
+      "description": "Wallet with some coins.",
       "type": "array",
+      "maxItems": 1000,
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "integer",
+        "format": "uint32"
       }
     }
   },
@@ -321,7 +343,7 @@ func init() {
     "balance": {
       "description": "Current balance.",
       "schema": {
-        "$ref": "#/definitions/wallet"
+        "$ref": "#/definitions/balance"
       }
     },
     "cash": {
@@ -376,7 +398,7 @@ func init() {
   "info": {
     "description": "# IT RALLY 2020 HighLoad Cup\n",
     "title": "HighLoad Cup 2020",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "basePath": "/",
   "paths": {
@@ -388,7 +410,7 @@ func init() {
           "200": {
             "description": "Current balance.",
             "schema": {
-              "$ref": "#/definitions/wallet"
+              "$ref": "#/definitions/balance"
             }
           },
           "default": {
@@ -578,6 +600,25 @@ func init() {
         }
       }
     },
+    "balance": {
+      "description": "Current balance and wallet with up to 1000 coins.",
+      "type": "object",
+      "required": [
+        "balance",
+        "wallet"
+      ],
+      "properties": {
+        "balance": {
+          "type": "integer",
+          "format": "uint32",
+          "x-order": 0
+        },
+        "wallet": {
+          "x-order": 1,
+          "$ref": "#/definitions/wallet"
+        }
+      }
+    },
     "dig": {
       "type": "object",
       "required": [
@@ -696,10 +737,13 @@ func init() {
       }
     },
     "wallet": {
-      "description": "Wallet with some amount of money.",
+      "description": "Wallet with some coins.",
       "type": "array",
+      "maxItems": 1000,
+      "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "integer",
+        "format": "uint32"
       }
     }
   },
@@ -707,7 +751,7 @@ func init() {
     "balance": {
       "description": "Current balance.",
       "schema": {
-        "$ref": "#/definitions/wallet"
+        "$ref": "#/definitions/balance"
       }
     },
     "cash": {

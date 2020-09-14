@@ -51,21 +51,23 @@ func NewGetBalanceOK() *GetBalanceOK {
 Current balance.
 */
 type GetBalanceOK struct {
-	Payload model.Wallet
+	Payload *model.Balance
 }
 
 func (o *GetBalanceOK) Error() string {
 	return fmt.Sprintf("[GET /balance][%d] getBalanceOK  %+v", 200, o.Payload)
 }
 
-func (o *GetBalanceOK) GetPayload() model.Wallet {
+func (o *GetBalanceOK) GetPayload() *model.Balance {
 	return o.Payload
 }
 
 func (o *GetBalanceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(model.Balance)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

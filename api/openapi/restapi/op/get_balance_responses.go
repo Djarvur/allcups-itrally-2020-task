@@ -26,7 +26,7 @@ type GetBalanceOK struct {
 	/*
 	  In: Body
 	*/
-	Payload model.Wallet `json:"body,omitempty"`
+	Payload *model.Balance `json:"body,omitempty"`
 }
 
 // NewGetBalanceOK creates GetBalanceOK with default headers values
@@ -36,13 +36,13 @@ func NewGetBalanceOK() *GetBalanceOK {
 }
 
 // WithPayload adds the payload to the get balance o k response
-func (o *GetBalanceOK) WithPayload(payload model.Wallet) *GetBalanceOK {
+func (o *GetBalanceOK) WithPayload(payload *model.Balance) *GetBalanceOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get balance o k response
-func (o *GetBalanceOK) SetPayload(payload model.Wallet) {
+func (o *GetBalanceOK) SetPayload(payload *model.Balance) {
 	o.Payload = payload
 }
 
@@ -50,14 +50,11 @@ func (o *GetBalanceOK) SetPayload(payload model.Wallet) {
 func (o *GetBalanceOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	payload := o.Payload
-	if payload == nil {
-		// return empty array
-		payload = model.Wallet{}
-	}
-
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
 	}
 }
 

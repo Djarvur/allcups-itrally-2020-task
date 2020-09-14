@@ -29,7 +29,7 @@ type Appl interface {
 	Start(time.Time) error
 	// Balance returns current balance.
 	// Errors: none.
-	Balance(Ctx) ([]Coin, error)
+	Balance(Ctx) (balance int, wallet []Coin, err error)
 }
 
 // Repo provides data storage.
@@ -43,8 +43,8 @@ type Repo interface {
 }
 
 type (
-	// Coin is an unique coin.
-	Coin string
+	// Coin is an unique coin ID.
+	Coin int
 	// Contact describes record in address book.
 	Contact struct {
 		ID   int
