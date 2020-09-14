@@ -48,12 +48,13 @@ func (mr *MockApplMockRecorder) Start(arg0 interface{}) *gomock.Call {
 }
 
 // Balance mocks base method
-func (m *MockAppl) Balance(arg0 Ctx) ([]Coin, error) {
+func (m *MockAppl) Balance(arg0 Ctx) (int, []Coin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Balance", arg0)
-	ret0, _ := ret[0].([]Coin)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].([]Coin)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // Balance indicates an expected call of Balance

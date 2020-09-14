@@ -76,6 +76,6 @@ func TestSmoke(tt *testing.T) {
 		params := op.NewGetBalanceParams()
 		res, err := openapiClient.Op.GetBalance(params)
 		t.TODO().Nil(err)
-		t.TODO().DeepEqual(res, &op.GetBalanceOK{Payload: model.Wallet{}})
+		t.TODO().DeepEqual(res, &op.GetBalanceOK{Payload: &model.Balance{}})
 	}
 }

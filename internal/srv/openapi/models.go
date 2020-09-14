@@ -8,7 +8,7 @@ import (
 func apiWallet(vs []app.Coin) model.Wallet {
 	ms := make(model.Wallet, len(vs))
 	for i := range vs {
-		ms[i] = string(vs[i])
+		ms[i] = uint32(vs[i])
 	}
 	return ms
 }

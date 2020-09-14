@@ -8,6 +8,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
+	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 )
@@ -19,17 +20,17 @@ func TestGetBalance(tt *testing.T) {
 	defer cleanup()
 	params := op.NewGetBalanceParams()
 
-	mockApp.EXPECT().Balance(gomock.Any()).Return(nil, io.EOF)
-	mockApp.EXPECT().Balance(gomock.Any()).Return(nil, nil)
-	mockApp.EXPECT().Balance(gomock.Any()).Return([]app.Coin{"coin1", "coin2"}, nil)
+	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, io.EOF)
+	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, nil)
+	mockApp.EXPECT().Balance(gomock.Any()).Return(42, []app.Coin{1, 2}, nil)
 
 	testCases := []struct {
-		want    model.Wallet
+		want    *model.Balance
 		wantErr *model.Error
 	}{
-		{nil, apiError500},
-		{model.Wallet{}, nil},
-		{model.Wallet{"coin1", "coin2"}, nil},
+		{&model.Balance{}, apiError500},
+		{&model.Balance{Balance: swag.Uint32(0), Wallet: model.Wallet{}}, nil},
+		{&model.Balance{Balance: swag.Uint32(42), Wallet: model.Wallet{1, 2}}, nil},
 	}
 	for _, tc := range testCases {
 		tc := tc
