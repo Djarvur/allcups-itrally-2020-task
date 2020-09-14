@@ -16,8 +16,8 @@ func Test(t *testing.T) {
 		Addr:        netx.NewAddr(def.Hostname, 8000),
 		Duration:    10 * time.Minute,
 		MetricsAddr: netx.NewAddr(def.Hostname, 9000),
-		ResultDir:   "/data",
-		WorkDir:     "/tmp",
+		ResultDir:   "var/data",
+		WorkDir:     "var",
 	}
 
 	t.Run("required", func(tt *testing.T) {

@@ -5,7 +5,14 @@
 # **/name   - exclude path (* doesn't match /) to file/dir "name"  in any dir including project root
 # na/**/me  - exclude path (* doesn't match /) to file/dir "na/me", "na/*/me", "na/*/*/me", …
 # !name     - include previously excluded path …
+
+# Created by scripts/*.
 /.circleci/config-local.yml
-/bin/
-/env.sh
 /cover.out
+/bin/
+
+# Used to configure and test/run app locally.
+/env.sh
+/var/**
+!/var/data/
+!/var/data/.keep
