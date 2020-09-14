@@ -36,8 +36,8 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	AddrPort:        appcfg.MustPort("8000"),
 	Duration:        appcfg.MustDuration("10m"),
 	MetricsAddrPort: appcfg.MustPort("9000"),
-	ResultDir:       appcfg.MustNotEmptyString("/data"),
-	WorkDir:         appcfg.MustNotEmptyString("/tmp"),
+	ResultDir:       appcfg.MustNotEmptyString("var/data"),
+	WorkDir:         appcfg.MustNotEmptyString("var"),
 }
 
 // FlagSets for all CLI subcommands which use flags to set config values.
