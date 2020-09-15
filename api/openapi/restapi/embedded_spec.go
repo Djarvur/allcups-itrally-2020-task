@@ -281,7 +281,6 @@ func init() {
         },
         "id": {
           "type": "integer",
-          "format": "uint32",
           "x-order": 0
         }
       }
@@ -690,7 +689,6 @@ func init() {
         },
         "id": {
           "type": "integer",
-          "format": "uint32",
           "x-order": 0
         }
       }
