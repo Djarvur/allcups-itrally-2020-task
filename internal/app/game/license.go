@@ -5,20 +5,11 @@ import (
 	"sync"
 )
 
-const maxDigAllowed = 100
-
 type licenses struct {
 	maxActive      int
 	mu             sync.Mutex
 	nextID         int
 	activeLicenses map[int]*License
-}
-
-// License defines amount of allowed dig calls.
-type License struct {
-	ID         int
-	DigAllowed int
-	DigUsed    int
 }
 
 func newLicenses(maxActive int) *licenses {
