@@ -280,7 +280,8 @@ func init() {
           "$ref": "#/definitions/amount"
         },
         "id": {
-          "type": "string",
+          "type": "integer",
+          "format": "uint32",
           "x-order": 0
         }
       }
@@ -688,7 +689,8 @@ func init() {
           "$ref": "#/definitions/amount"
         },
         "id": {
-          "type": "string",
+          "type": "integer",
+          "format": "uint32",
           "x-order": 0
         }
       }

@@ -62,7 +62,7 @@ definitions:
       - digUsed
     properties:
       id:
-        type: string
+        type: integer
       digAllowed:
         $ref: '#/definitions/amount'
       digUsed:
