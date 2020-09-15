@@ -22,7 +22,7 @@ type License struct {
 
 	// id
 	// Required: true
-	ID *string `json:"id"`
+	ID *int64 `json:"id"`
 
 	// dig allowed
 	// Required: true
@@ -39,7 +39,7 @@ func (m *License) UnmarshalJSON(data []byte) error {
 
 		// id
 		// Required: true
-		ID *string `json:"id"`
+		ID *int64 `json:"id"`
 
 		// dig allowed
 		// Required: true
