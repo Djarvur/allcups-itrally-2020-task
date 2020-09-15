@@ -1,15 +1,5 @@
 package game
 
-// Config contains game configuration.
-type Config struct {
-	Seed              int64
-	MaxActiveLicenses int
-	Density           int // One treasure per Density cells.
-	SizeX             int
-	SizeY             int
-	Depth             uint8
-}
-
 func (cfg Config) treasures() int {
 	return cfg.area() * int(cfg.Depth) / cfg.Density
 }

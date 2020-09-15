@@ -5,8 +5,6 @@ import (
 	"sync"
 )
 
-const maxWallet = 1000
-
 type bank struct {
 	mu         sync.Mutex
 	balance    int
@@ -24,7 +22,7 @@ func (b *bank) getBalance() (balance int, wallet []int) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	walletSize := maxWallet
+	walletSize := maxWalletSize
 	if b.balance < walletSize {
 		walletSize = b.balance
 	}
@@ -50,7 +48,7 @@ func (b *bank) earn(amount int) (wallet []int, _ error) {
 	defer b.mu.Unlock()
 
 	if !(amount >= 1 && amount+b.balance > b.balance && amount+b.balance <= len(b.coinIssued)) {
-		return nil, fmt.Errorf("%w: %d (balance=%d, overall coins=%d)", ErrWrongAmount, amount, b.balance, len(b.coinIssued))
+		return nil, fmt.Errorf("%w: %d (balance=%d, overall coins=%d)", errWrongAmount, amount, b.balance, len(b.coinIssued))
 	}
 
 	wallet = make([]int, amount)
@@ -72,15 +70,15 @@ func (b *bank) spend(wallet []int) (err error) {
 	defer b.mu.Unlock()
 
 	if len(wallet) > b.balance {
-		return ErrNotEnoughMoney
+		return fmt.Errorf("%w: too many coins in the wallet", ErrBogusCoin)
 	}
 	for i := range wallet {
 		coin := wallet[i]
 		switch {
 		case coin < 0 || coin >= len(b.coinIssued):
-			err = ErrCoinNotExists
+			err = ErrBogusCoin
 		case !b.coinIssued[coin]:
-			err = fmt.Errorf("%w: %d", ErrCoinNotIssued, coin)
+			err = fmt.Errorf("%w: %d", ErrBogusCoin, coin)
 		}
 		if err != nil {
 			for j := 0; j < i; j++ {

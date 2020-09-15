@@ -5,21 +5,6 @@ import (
 	"sync"
 )
 
-// Area describes rectangle.
-type Area struct {
-	X     int // From 0.
-	Y     int // From 0.
-	SizeX int // From 1.
-	SizeY int // From 1.
-}
-
-// Coord describes single cell.
-type Coord struct {
-	X     int   // From 0.
-	Y     int   // From 0.
-	Depth uint8 // From 1.
-}
-
 type field struct {
 	cfg       Config
 	mu        sync.RWMutex
@@ -78,9 +63,9 @@ func (f *field) countTreasures(area Area, depth uint8) (int, error) { //nolint:g
 	lastX, lastY := area.X+area.SizeX-1, area.Y+area.SizeY-1
 	switch {
 	case area.X < 0 || area.SizeX < 1 || lastX < area.X || lastX >= f.cfg.SizeX:
-		return 0, fmt.Errorf("%w: X %d-%d outside 0-%d", ErrAreaCoord, area.X, lastX, f.cfg.SizeX-1)
+		return 0, fmt.Errorf("%w: X %d-%d outside 0-%d", ErrWrongCoord, area.X, lastX, f.cfg.SizeX-1)
 	case area.Y < 0 || area.SizeY < 1 || lastY < area.Y || lastY >= f.cfg.SizeY:
-		return 0, fmt.Errorf("%w: Y %d-%d outside 0-%d", ErrAreaCoord, area.Y, lastY, f.cfg.SizeY-1)
+		return 0, fmt.Errorf("%w: Y %d-%d outside 0-%d", ErrWrongCoord, area.Y, lastY, f.cfg.SizeY-1)
 	case depth < 1 || depth > f.cfg.Depth:
 		return 0, fmt.Errorf("%w: %d outside 1-%d", ErrWrongDepth, depth, f.cfg.Depth)
 	}
