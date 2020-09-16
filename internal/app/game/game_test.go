@@ -39,13 +39,13 @@ func TestSmoke(tt *testing.T) {
 	t.Nil(err)
 	t.Equal(count, 0)
 
-	lic1, err := g.IssueLicense(2)
+	lic1, err := g.IssueLicense(nil)
 	t.Nil(err)
-	t.DeepEqual(lic1, &game.License{ID: 0, DigAllowed: 2})
-	lic2, err := g.IssueLicense(3)
+	t.DeepEqual(lic1, &game.License{ID: 0, DigAllowed: 3})
+	lic2, err := g.IssueLicense(nil)
 	t.Nil(err)
 	t.DeepEqual(lic2, &game.License{ID: 1, DigAllowed: 3})
-	lic3, err := g.IssueLicense(1)
+	lic3, err := g.IssueLicense(nil)
 	t.Err(err, game.ErrActiveLicenseLimit)
 	t.Nil(lic3)
 
@@ -58,7 +58,7 @@ func TestSmoke(tt *testing.T) {
 	wallet, err := g.Cash(game.Coord{X: 0, Y: 0, Depth: 2})
 	t.Nil(err)
 	t.Len(wallet, 3)
-	t.Len(g.Licenses(), 1)
+	t.Len(g.Licenses(), 2)
 
 	found, err = g.Dig(lic2.ID, game.Coord{X: 0, Y: 1, Depth: 2})
 	t.Err(err, game.ErrWrongDepth)
@@ -72,7 +72,7 @@ func TestSmoke(tt *testing.T) {
 	wallet, err = g.Cash(game.Coord{X: 0, Y: 1, Depth: 2})
 	t.Nil(err)
 	t.Len(wallet, 4)
-	t.Len(g.Licenses(), 0)
+	t.Len(g.Licenses(), 1)
 
 	found, err = g.Dig(lic2.ID, game.Coord{X: 2, Y: 0, Depth: 1})
 	t.Err(err, game.ErrNoSuchLicense)
@@ -81,7 +81,9 @@ func TestSmoke(tt *testing.T) {
 	t.Err(err, game.ErrNotDigged)
 	t.Nil(wallet)
 
-	t.Nil(g.Spend([]int{0, 2}))
+	lic3, err = g.IssueLicense([]int{0, 2})
+	t.Nil(err)
+	t.DeepEqual(lic3, &game.License{ID: 2, DigAllowed: 5})
 	balance, wallet := g.Balance()
 	t.Equal(balance, 5)
 	t.DeepEqual(wallet, []int{6, 5, 4, 3, 1})
