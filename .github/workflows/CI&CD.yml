@@ -112,4 +112,6 @@ jobs:
             IMAGE_TAG="ghcr.io/${GITHUB_REPOSITORY,,*}:$TAG"
             docker tag "$(basename $(go list -m))" "$IMAGE_TAG"
             docker push "$IMAGE_TAG"
+            echo "DEBUG: tagged as '$IMAGE_TAG'"
+            docker image ls
           done
