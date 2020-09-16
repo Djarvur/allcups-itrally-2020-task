@@ -182,6 +182,9 @@ func (g *game) Cash(pos Coord) (wallet []int, err error) {
 	min, max := treasureCostAt(pos.Depth)
 	amount := min + g.prng.Intn(max-min+1)
 
+	if amount <= 0 {
+		return nil, nil
+	}
 	return g.bank.earn(amount)
 }
 

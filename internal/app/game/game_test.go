@@ -38,6 +38,9 @@ func TestSmoke(tt *testing.T) {
 	count, err = g.CountTreasures(game.Area{X: 0, Y: 0, SizeX: 2, SizeY: 2}, 1)
 	t.Nil(err)
 	t.Equal(count, 0)
+	count, err = g.CountTreasures(game.Area{X: 0, Y: 1, SizeX: 2, SizeY: 2}, 1)
+	t.Err(err, game.ErrWrongCoord)
+	t.Equal(count, 0)
 
 	lic1, err := g.IssueLicense(nil)
 	t.Nil(err)
@@ -49,7 +52,11 @@ func TestSmoke(tt *testing.T) {
 	t.Err(err, game.ErrActiveLicenseLimit)
 	t.Nil(lic3)
 
-	found, err := g.Dig(lic1.ID, game.Coord{X: 0, Y: 0, Depth: 1})
+	found, err := g.Dig(lic1.ID, game.Coord{X: 2, Y: 2, Depth: 1})
+	t.Err(err, game.ErrWrongCoord)
+	t.False(found)
+
+	found, err = g.Dig(lic1.ID, game.Coord{X: 0, Y: 0, Depth: 1})
 	t.Nil(err)
 	t.False(found)
 	found, err = g.Dig(lic1.ID, game.Coord{X: 0, Y: 0, Depth: 2})
@@ -58,7 +65,7 @@ func TestSmoke(tt *testing.T) {
 	wallet, err := g.Cash(game.Coord{X: 0, Y: 0, Depth: 2})
 	t.Nil(err)
 	t.Len(wallet, 3)
-	t.Len(g.Licenses(), 2)
+	t.Len(g.Licenses(), 1)
 
 	found, err = g.Dig(lic2.ID, game.Coord{X: 0, Y: 1, Depth: 2})
 	t.Err(err, game.ErrWrongDepth)
@@ -72,7 +79,10 @@ func TestSmoke(tt *testing.T) {
 	wallet, err = g.Cash(game.Coord{X: 0, Y: 1, Depth: 2})
 	t.Nil(err)
 	t.Len(wallet, 4)
-	t.Len(g.Licenses(), 1)
+	t.Len(g.Licenses(), 0)
+	wallet, err = g.Cash(game.Coord{X: 0, Y: 1, Depth: 2})
+	t.Err(err, game.ErrAlreadyCached)
+	t.Nil(wallet)
 
 	found, err = g.Dig(lic2.ID, game.Coord{X: 2, Y: 0, Depth: 1})
 	t.Err(err, game.ErrNoSuchLicense)
@@ -87,4 +97,14 @@ func TestSmoke(tt *testing.T) {
 	balance, wallet := g.Balance()
 	t.Equal(balance, 5)
 	t.DeepEqual(wallet, []int{6, 5, 4, 3, 1})
+
+	lic3, err = g.IssueLicense([]int{1, 3, 4, 5, 6, 6})
+	t.Err(err, game.ErrBogusCoin)
+	t.Nil(lic3)
+	lic3, err = g.IssueLicense([]int{1, 2, 3})
+	t.Err(err, game.ErrBogusCoin)
+	t.Nil(lic3)
+	lic3, err = g.IssueLicense([]int{1, 3, 3})
+	t.Err(err, game.ErrBogusCoin)
+	t.Nil(lic3)
 }
