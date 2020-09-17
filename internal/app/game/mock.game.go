@@ -62,10 +62,10 @@ func (mr *MockGameMockRecorder) Licenses() *gomock.Call {
 }
 
 // IssueLicense mocks base method
-func (m *MockGame) IssueLicense(wallet []int) (*License, error) {
+func (m *MockGame) IssueLicense(wallet []int) (License, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IssueLicense", wallet)
-	ret0, _ := ret[0].(*License)
+	ret0, _ := ret[0].(License)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

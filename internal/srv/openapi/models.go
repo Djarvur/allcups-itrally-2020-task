@@ -29,7 +29,7 @@ func apiBalance(balance int, wallet []int) *model.Balance {
 	}
 }
 
-func apiLicense(v *game.License) *model.License {
+func apiLicense(v game.License) *model.License {
 	return &model.License{
 		ID:         swag.Int64(int64(v.ID)),
 		DigAllowed: model.Amount(v.DigAllowed),
@@ -40,7 +40,7 @@ func apiLicense(v *game.License) *model.License {
 func apiLicenseList(vs []game.License) model.LicenseList {
 	ms := make(model.LicenseList, len(vs))
 	for i := range vs {
-		ms[i] = apiLicense(&vs[i])
+		ms[i] = apiLicense(vs[i])
 	}
 	return ms
 }

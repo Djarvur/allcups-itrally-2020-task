@@ -80,10 +80,10 @@ func (mr *MockApplMockRecorder) Licenses(arg0 interface{}) *gomock.Call {
 }
 
 // IssueLicense mocks base method
-func (m *MockAppl) IssueLicense(arg0 Ctx, wallet []int) (*game.License, error) {
+func (m *MockAppl) IssueLicense(arg0 Ctx, wallet []int) (game.License, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IssueLicense", arg0, wallet)
-	ret0, _ := ret[0].(*game.License)
+	ret0, _ := ret[0].(game.License)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

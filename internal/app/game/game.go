@@ -21,7 +21,7 @@ const (
 // Errors.
 var (
 	ErrActiveLicenseLimit = errors.New("no more active licenses allowed")
-	ErrAlreadyCached      = errors.New("already cashed")
+	ErrNoThreasure        = errors.New("no treasure")
 	ErrBogusCoin          = errors.New("bogus coin")
 	ErrNoSuchLicense      = errors.New("no such license")
 	ErrNotDigged          = errors.New("treasure is not digged")
@@ -40,7 +40,7 @@ type Game interface {
 	Licenses() []License
 	// IssueLicense creates and returns a new license with given digAllowed.
 	// Errors: ErrActiveLicenseLimit, ErrBogusCoin.
-	IssueLicense(wallet []int) (*License, error)
+	IssueLicense(wallet []int) (License, error)
 	// CountTreasures returns amount of not-digged-yet treasures in the area
 	// at depth.
 	// Errors: ErrWrongCoord, ErrWrongDepth.
@@ -146,16 +146,16 @@ func (g *game) Licenses() []License {
 	return g.licenses.active()
 }
 
-func (g *game) IssueLicense(wallet []int) (*License, error) {
+func (g *game) IssueLicense(wallet []int) (l License, err error) {
 	digAllowed := g.licensePrice(len(wallet))
 	license, err := g.licenses.beginIssue(digAllowed)
 	if err != nil {
-		return nil, err
+		return l, err
 	}
 	err = g.bank.spend(wallet)
 	if err != nil {
 		g.licenses.rollbackIssue(license.ID)
-		return nil, err
+		return l, err
 	}
 	g.licenses.commitIssue(license.ID)
 	return license, nil

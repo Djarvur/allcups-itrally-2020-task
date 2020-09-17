@@ -21,74 +21,74 @@ func newLicenses(maxActive int) *licenses {
 	}
 }
 
-func (l *licenses) active() []License {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (ls *licenses) active() []License {
+	ls.mu.Lock()
+	defer ls.mu.Unlock()
 
-	active := make([]License, 0, len(l.licenses))
-	for id := range l.licenses {
-		if l.isActive[id] {
-			active = append(active, *l.licenses[id])
+	active := make([]License, 0, len(ls.licenses))
+	for id := range ls.licenses {
+		if ls.isActive[id] {
+			active = append(active, *ls.licenses[id])
 		}
 	}
 	return active
 }
 
-func (l *licenses) beginIssue(digAllowed int) (*License, error) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (ls *licenses) beginIssue(digAllowed int) (l License, _ error) {
+	ls.mu.Lock()
+	defer ls.mu.Unlock()
 
 	if digAllowed < 1 || digAllowed > maxDigAllowed {
 		panic(fmt.Sprintf("digAllowed=%d must be between 1 and %d", digAllowed, maxDigAllowed))
 	}
-	if len(l.licenses) >= l.maxActive {
-		return nil, ErrActiveLicenseLimit
+	if len(ls.licenses) >= ls.maxActive {
+		return l, ErrActiveLicenseLimit
 	}
 
-	license := &License{
-		ID:         l.nextID,
+	l = License{
+		ID:         ls.nextID,
 		DigAllowed: digAllowed,
 	}
-	l.licenses[l.nextID] = license
-	l.nextID++
-	return license, nil
+	ls.licenses[ls.nextID] = &l
+	ls.nextID++
+	return l, nil
 }
 
-func (l *licenses) mustBegunIssue(id int) {
-	if _, ok := l.isActive[id]; ok {
+func (ls *licenses) mustBegunIssue(id int) {
+	if _, ok := ls.isActive[id]; ok {
 		panic("never here")
-	} else if l.licenses[id] == nil {
+	} else if ls.licenses[id] == nil {
 		panic("never here")
 	}
 }
 
-func (l *licenses) commitIssue(id int) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (ls *licenses) commitIssue(id int) {
+	ls.mu.Lock()
+	defer ls.mu.Unlock()
 
-	l.mustBegunIssue(id)
-	l.isActive[id] = true
+	ls.mustBegunIssue(id)
+	ls.isActive[id] = true
 }
 
-func (l *licenses) rollbackIssue(id int) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (ls *licenses) rollbackIssue(id int) {
+	ls.mu.Lock()
+	defer ls.mu.Unlock()
 
-	l.mustBegunIssue(id)
-	delete(l.licenses, id)
+	ls.mustBegunIssue(id)
+	delete(ls.licenses, id)
 }
 
-func (l *licenses) use(id int) error {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (ls *licenses) use(id int) error {
+	ls.mu.Lock()
+	defer ls.mu.Unlock()
 
-	if _, ok := l.isActive[id]; !ok {
+	if _, ok := ls.isActive[id]; !ok {
 		return ErrNoSuchLicense
 	}
-	l.licenses[id].DigUsed++
-	if l.licenses[id].DigUsed >= l.licenses[id].DigAllowed {
-		delete(l.licenses, id)
-		delete(l.isActive, id)
+	ls.licenses[id].DigUsed++
+	if ls.licenses[id].DigUsed >= ls.licenses[id].DigAllowed {
+		delete(ls.licenses, id)
+		delete(ls.isActive, id)
 	}
 	return nil
 }
