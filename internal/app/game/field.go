@@ -23,16 +23,16 @@ func newField(cfg Config) *field {
 }
 
 func (f *field) areaOffset(x, y int) (int, error) {
-	if x >= f.cfg.SizeX {
+	if x < 0 || x >= f.cfg.SizeX {
 		return 0, fmt.Errorf("%w: x=%d >= %d", ErrWrongCoord, x, f.cfg.SizeX)
-	} else if y >= f.cfg.SizeY {
+	} else if y < 0 || y >= f.cfg.SizeY {
 		return 0, fmt.Errorf("%w: y=%d >= %d", ErrWrongCoord, y, f.cfg.SizeY)
 	}
 	return x + f.cfg.SizeX*y, nil
 }
 
 func (f *field) offset(pos Coord) (int, error) {
-	if pos.Depth > f.cfg.Depth {
+	if pos.Depth < 1 || pos.Depth > f.cfg.Depth {
 		return 0, fmt.Errorf("%w: depth=%d > %d", ErrWrongCoord, pos.Depth, f.cfg.Depth)
 	}
 	offset, err := f.areaOffset(pos.X, pos.Y)
@@ -119,7 +119,7 @@ func (f *field) cash(pos Coord) error {
 		return err
 	}
 	if !f.notCashed[offset] {
-		return ErrAlreadyCached
+		return ErrNoThreasure
 	}
 	if f.treasure[offset] {
 		return ErrNotDigged

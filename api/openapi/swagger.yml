@@ -203,7 +203,7 @@ paths:
           description: |
             - 409.1002: no more active licenses allowed
           schema:
-            $ref: '#/responses/error'
+            $ref: '#/definitions/error'
 
   /explore:
     post:
@@ -238,7 +238,7 @@ paths:
             - 422.1000: wrong coordinates
             - 422.1001: wrong depth
           schema:
-            $ref: '#/responses/error'
+            $ref: '#/definitions/error'
 
   /cash:
     post:
@@ -257,4 +257,4 @@ paths:
           description: |
             - 409.1003: treasure is not digged
           schema:
-            $ref: '#/responses/error'
+            $ref: '#/definitions/error'

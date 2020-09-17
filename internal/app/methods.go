@@ -15,7 +15,7 @@ func (a *App) Licenses(ctx Ctx) ([]game.License, error) {
 	return a.game.Licenses(), nil
 }
 
-func (a *App) IssueLicense(ctx Ctx, wallet []int) (*game.License, error) {
+func (a *App) IssueLicense(ctx Ctx, wallet []int) (game.License, error) {
 	return a.game.IssueLicense(wallet)
 }
 

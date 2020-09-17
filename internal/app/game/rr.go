@@ -1,10 +1,10 @@
 package game
 
 type rr struct {
-	start   int // 0..length-1
 	step    int // 1 or -1
 	length  int // 1..
 	current int // 0..length-1
+	count   int // 0..length
 }
 
 func newRR(start int, forward bool, length int) *rr {
@@ -16,10 +16,10 @@ func newRR(start int, forward bool, length int) *rr {
 		step = -1
 	}
 	return &rr{
-		start:   start,
 		step:    step,
 		length:  length,
 		current: start,
+		count:   0,
 	}
 }
 
@@ -32,7 +32,8 @@ func (r *rr) next() int {
 	} else if r.current < 0 {
 		r.current = r.length - 1
 	}
-	if r.current == r.start {
+	r.count++
+	if r.count > r.length {
 		panic("never here")
 	}
 	return r.current

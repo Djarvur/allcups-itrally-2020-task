@@ -21,15 +21,15 @@ func ErrPayload(err error) interface{} {
 		return err
 	case *op.GetBalanceDefault:
 		return errDefault.Payload
-	case *op.CashDefault:
-		return errDefault.Payload
-	case *op.DigDefault:
-		return errDefault.Payload
-	case *op.ExploreAreaDefault:
+	case *op.ListLicensesDefault:
 		return errDefault.Payload
 	case *op.IssueLicenseDefault:
 		return errDefault.Payload
-	case *op.ListLicensesDefault:
+	case *op.ExploreAreaDefault:
+		return errDefault.Payload
+	case *op.DigDefault:
+		return errDefault.Payload
+	case *op.CashDefault:
 		return errDefault.Payload
 	}
 }

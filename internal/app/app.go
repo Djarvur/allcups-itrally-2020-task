@@ -37,7 +37,7 @@ type Appl interface {
 	Licenses(Ctx) ([]game.License, error)
 	// IssueLicense creates and returns a new license with given digAllowed.
 	// Errors: game.ErrActiveLicenseLimit, game.ErrBogusCoin.
-	IssueLicense(_ Ctx, wallet []int) (*game.License, error)
+	IssueLicense(_ Ctx, wallet []int) (game.License, error)
 	// ExploreArea returns amount of not-digged-yet treasures in the
 	// area at depth.
 	// Errors: game.ErrWrongCoord.

@@ -91,8 +91,8 @@ func (srv *server) Cash(params op.CashParams) op.CashResponder {
 		return errCash(log, err, codeWrongCoord)
 	case errors.Is(err, game.ErrNotDigged):
 		return errCash(log, err, codeNotDigged)
-	case errors.Is(err, game.ErrAlreadyCached):
-		return errCash(log, err, codeGone)
+	case errors.Is(err, game.ErrNoThreasure):
+		return errCash(log, err, codeNotFound)
 	case err == nil:
 		return op.NewCashOK().WithPayload(apiWallet(wallet))
 	}

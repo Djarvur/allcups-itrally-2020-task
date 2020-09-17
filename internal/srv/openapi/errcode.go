@@ -35,7 +35,6 @@ var (
 	codePaymentRequired    = newErrCode(402, 0)
 	codeForbidden          = newErrCode(403, 0) //nolint:unused // TODO Weird false positive..?
 	codeNotFound           = newErrCode(404, 0) //nolint:unused // TODO Weird false positive..?
-	codeGone               = newErrCode(410, 0)
 	codeWrongCoord         = newErrCode(422, 1000)
 	codeWrongDepth         = newErrCode(422, 1001) //nolint:unused // TODO Weird false positive..?
 	codeActiveLicenseLimit = newErrCode(409, 1002)

@@ -74,7 +74,7 @@ type CashDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload interface{} `json:"body,omitempty"`
+	Payload *model.Error `json:"body,omitempty"`
 }
 
 // NewCashDefault creates CashDefault with default headers values
@@ -100,13 +100,13 @@ func (o *CashDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the cash default response
-func (o *CashDefault) WithPayload(payload interface{}) *CashDefault {
+func (o *CashDefault) WithPayload(payload *model.Error) *CashDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the cash default response
-func (o *CashDefault) SetPayload(payload interface{}) {
+func (o *CashDefault) SetPayload(payload *model.Error) {
 	o.Payload = payload
 }
 
@@ -114,9 +114,11 @@ func (o *CashDefault) SetPayload(payload interface{}) {
 func (o *CashDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(o._statusCode)
-	payload := o.Payload
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
 	}
 }
 
