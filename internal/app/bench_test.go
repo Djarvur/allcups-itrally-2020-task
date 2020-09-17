@@ -6,17 +6,7 @@ import (
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/powerman/check"
 )
-
-func TestBalance(tt *testing.T) {
-	t := check.T(tt)
-	cleanup, a, _ := testNew(t)
-	defer cleanup()
-
-	t.TODO().NotPanic(func() { a.Balance(ctx) })
-}
 
 func init() { rand.Seed(time.Now().UnixNano()) }
 

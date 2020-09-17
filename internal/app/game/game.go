@@ -121,6 +121,7 @@ func New(cfg Config) (Game, error) {
 		prng:     prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable game results.
 	}
 
+	skipped := 0
 	for i := 0; i < cfg.treasures(); i++ {
 		pos := Coord{
 			X:     g.prng.Intn(cfg.SizeX),
@@ -128,11 +129,12 @@ func New(cfg Config) (Game, error) {
 			Depth: uint8(g.prng.Intn(int(cfg.Depth)) + 1),
 		}
 		if !g.field.addTreasure(pos) {
-			g.log.Warn("skip adding duplicate treasure")
-		} else {
-			g.log.Info("added treasure", "pos", pos)
+			skipped++
+		} else if i < 10 { //nolint:gomnd // Debug.
+			g.log.Debug("buried one of first 10 treasures", "pos", pos)
 		}
 	}
+	g.log.Info("the treasures were buried", "all", cfg.treasures(), "skipped", skipped)
 	return g, nil
 }
 

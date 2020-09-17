@@ -6,7 +6,6 @@ import (
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/go-openapi/swag"
 	"github.com/golang/mock/gomock"
@@ -22,7 +21,7 @@ func TestGetBalance(tt *testing.T) {
 
 	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, io.EOF)
 	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, nil)
-	mockApp.EXPECT().Balance(gomock.Any()).Return(42, []app.Coin{1, 2}, nil)
+	mockApp.EXPECT().Balance(gomock.Any()).Return(42, []int{1, 2}, nil)
 
 	testCases := []struct {
 		want    *model.Balance

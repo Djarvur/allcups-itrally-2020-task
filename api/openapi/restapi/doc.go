@@ -3,12 +3,16 @@
 // Package restapi HighLoad Cup 2020
 //
 //  # IT RALLY 2020 HighLoad Cup
+//  - 422.1000: wrong coordinates
+//  - 422.1001: wrong depth
+//  - 409.1002: no more active licenses allowed
+//  - 409.1003: treasure is not digged
 //
 //  Schemes:
 //    http
 //  Host: localhost
 //  BasePath: /
-//  Version: 0.2.0
+//  Version: 0.3.0
 //
 //  Consumes:
 //    - application/json

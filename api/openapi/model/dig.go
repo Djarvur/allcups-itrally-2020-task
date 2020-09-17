@@ -22,7 +22,7 @@ type Dig struct {
 
 	// ID of the license this request is attached to.
 	// Required: true
-	LicenseID *string `json:"licenseID"`
+	LicenseID *int64 `json:"licenseID"`
 
 	// pos x
 	// Required: true
@@ -36,6 +36,7 @@ type Dig struct {
 
 	// depth
 	// Required: true
+	// Maximum: 100
 	// Minimum: 1
 	Depth *int64 `json:"depth"`
 }
@@ -46,7 +47,7 @@ func (m *Dig) UnmarshalJSON(data []byte) error {
 
 		// ID of the license this request is attached to.
 		// Required: true
-		LicenseID *string `json:"licenseID"`
+		LicenseID *int64 `json:"licenseID"`
 
 		// pos x
 		// Required: true
@@ -60,6 +61,7 @@ func (m *Dig) UnmarshalJSON(data []byte) error {
 
 		// depth
 		// Required: true
+		// Maximum: 100
 		// Minimum: 1
 		Depth *int64 `json:"depth"`
 	}
@@ -145,6 +147,10 @@ func (m *Dig) validateDepth(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("depth", "body", int64(*m.Depth), 1, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("depth", "body", int64(*m.Depth), 100, false); err != nil {
 		return err
 	}
 

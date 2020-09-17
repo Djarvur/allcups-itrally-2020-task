@@ -60,7 +60,8 @@ func (o *IssueLicenseOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 
 func (o *IssueLicenseOK) IssueLicenseResponder() {}
 
-/*IssueLicenseDefault General errors using same model as used by go-swagger for validation errors.
+/*IssueLicenseDefault - 409.1002: no more active licenses allowed
+
 
 swagger:response issueLicenseDefault
 */
@@ -70,7 +71,7 @@ type IssueLicenseDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *model.Error `json:"body,omitempty"`
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewIssueLicenseDefault creates IssueLicenseDefault with default headers values
@@ -96,13 +97,13 @@ func (o *IssueLicenseDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the issue license default response
-func (o *IssueLicenseDefault) WithPayload(payload *model.Error) *IssueLicenseDefault {
+func (o *IssueLicenseDefault) WithPayload(payload interface{}) *IssueLicenseDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the issue license default response
-func (o *IssueLicenseDefault) SetPayload(payload *model.Error) {
+func (o *IssueLicenseDefault) SetPayload(payload interface{}) {
 	o.Payload = payload
 }
 
@@ -110,11 +111,9 @@ func (o *IssueLicenseDefault) SetPayload(payload *model.Error) {
 func (o *IssueLicenseDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(o._statusCode)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
 	}
 }
 

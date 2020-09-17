@@ -2,9 +2,13 @@ swagger: '2.0'
 
 info:
   title: HighLoad Cup 2020
-  version: 0.2.0
+  version: 0.3.0
   description: |
     # IT RALLY 2020 HighLoad Cup
+    - 422.1000: wrong coordinates
+    - 422.1001: wrong depth
+    - 409.1002: no more active licenses allowed
+    - 409.1003: treasure is not digged
 basePath: /
 schemes:
   - http
@@ -115,7 +119,7 @@ definitions:
     properties:
       licenseID:
         description: ID of the license this request is attached to.
-        type: string
+        type: integer
       posX:
         type: integer
         minimum: 0
@@ -125,6 +129,7 @@ definitions:
       depth:
         type: integer
         minimum: 1
+        maximum: 100
   treasure:
     description: Treasure ID.
     type: string
@@ -192,7 +197,11 @@ paths:
             $ref: '#/definitions/wallet'
       responses:
         '200': { $ref: '#/responses/license' }
-        default: { $ref: '#/responses/error' }
+        default:
+          description: |
+            - 409.1002: no more active licenses allowed
+          schema:
+            $ref: '#/responses/error'
 
   /explore:
     post:
@@ -222,7 +231,12 @@ paths:
             $ref: '#/definitions/dig'
       responses:
         '200': { $ref: '#/responses/dig' }
-        default: { $ref: '#/responses/error' }
+        default:
+          description: |
+            - 422.1000: wrong coordinates
+            - 422.1001: wrong depth
+          schema:
+            $ref: '#/responses/error'
 
   /cash:
     post:
@@ -237,4 +251,8 @@ paths:
             $ref: '#/definitions/treasure'
       responses:
         '200': { $ref: '#/responses/cash' }
-        default: { $ref: '#/responses/error' }
+        default:
+          description: |
+            - 409.1003: treasure is not digged
+          schema:
+            $ref: '#/responses/error'

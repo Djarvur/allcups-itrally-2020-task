@@ -31,6 +31,9 @@ func (b *bank) getBalance() (balance int, wallet []int) {
 	// Search for issued coins by looking back from last issued coin
 	// because there is higher chance last issued coins wasn't spent yet.
 	next := b.nextCoin - 1
+	if next < 0 {
+		next = len(b.coinIssued) - 1
+	}
 	iter := newRR(next, false, len(b.coinIssued))
 	for i := range wallet {
 		for !b.coinIssued[next] {

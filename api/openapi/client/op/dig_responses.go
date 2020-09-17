@@ -81,12 +81,14 @@ func NewDigDefault(code int) *DigDefault {
 
 /*DigDefault handles this case with default header values.
 
-General errors using same model as used by go-swagger for validation errors.
+- 422.1000: wrong coordinates
+- 422.1001: wrong depth
+
 */
 type DigDefault struct {
 	_statusCode int
 
-	Payload *model.Error
+	Payload interface{}
 }
 
 // Code gets the status code for the dig default response
@@ -98,16 +100,14 @@ func (o *DigDefault) Error() string {
 	return fmt.Sprintf("[POST /dig][%d] dig default  %+v", o._statusCode, o.Payload)
 }
 
-func (o *DigDefault) GetPayload() *model.Error {
+func (o *DigDefault) GetPayload() interface{} {
 	return o.Payload
 }
 
 func (o *DigDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(model.Error)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
