@@ -75,7 +75,7 @@ type DigDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload interface{} `json:"body,omitempty"`
+	Payload *model.Error `json:"body,omitempty"`
 }
 
 // NewDigDefault creates DigDefault with default headers values
@@ -101,13 +101,13 @@ func (o *DigDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the dig default response
-func (o *DigDefault) WithPayload(payload interface{}) *DigDefault {
+func (o *DigDefault) WithPayload(payload *model.Error) *DigDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the dig default response
-func (o *DigDefault) SetPayload(payload interface{}) {
+func (o *DigDefault) SetPayload(payload *model.Error) {
 	o.Payload = payload
 }
 
@@ -115,9 +115,11 @@ func (o *DigDefault) SetPayload(payload interface{}) {
 func (o *DigDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(o._statusCode)
-	payload := o.Payload
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
 	}
 }
 

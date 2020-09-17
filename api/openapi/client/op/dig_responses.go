@@ -88,7 +88,7 @@ func NewDigDefault(code int) *DigDefault {
 type DigDefault struct {
 	_statusCode int
 
-	Payload interface{}
+	Payload *model.Error
 }
 
 // Code gets the status code for the dig default response
@@ -100,14 +100,16 @@ func (o *DigDefault) Error() string {
 	return fmt.Sprintf("[POST /dig][%d] dig default  %+v", o._statusCode, o.Payload)
 }
 
-func (o *DigDefault) GetPayload() interface{} {
+func (o *DigDefault) GetPayload() *model.Error {
 	return o.Payload
 }
 
 func (o *DigDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(model.Error)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

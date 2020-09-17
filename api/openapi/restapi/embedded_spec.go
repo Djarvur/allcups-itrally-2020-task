@@ -71,7 +71,7 @@ func init() {
           "default": {
             "description": "- 409.1003: treasure is not digged\n",
             "schema": {
-              "$ref": "#/responses/error"
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -99,7 +99,7 @@ func init() {
           "default": {
             "description": "- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n",
             "schema": {
-              "$ref": "#/responses/error"
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -164,7 +164,7 @@ func init() {
           "default": {
             "description": "- 409.1002: no more active licenses allowed\n",
             "schema": {
-              "$ref": "#/responses/error"
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -457,10 +457,7 @@ func init() {
           "default": {
             "description": "- 409.1003: treasure is not digged\n",
             "schema": {
-              "description": "General errors using same model as used by go-swagger for validation errors.",
-              "schema": {
-                "$ref": "#/definitions/error"
-              }
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -491,10 +488,7 @@ func init() {
           "default": {
             "description": "- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n",
             "schema": {
-              "description": "General errors using same model as used by go-swagger for validation errors.",
-              "schema": {
-                "$ref": "#/definitions/error"
-              }
+              "$ref": "#/definitions/error"
             }
           }
         }
@@ -574,10 +568,7 @@ func init() {
           "default": {
             "description": "- 409.1002: no more active licenses allowed\n",
             "schema": {
-              "description": "General errors using same model as used by go-swagger for validation errors.",
-              "schema": {
-                "$ref": "#/definitions/error"
-              }
+              "$ref": "#/definitions/error"
             }
           }
         }

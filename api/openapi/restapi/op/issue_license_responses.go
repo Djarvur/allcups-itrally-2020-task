@@ -71,7 +71,7 @@ type IssueLicenseDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload interface{} `json:"body,omitempty"`
+	Payload *model.Error `json:"body,omitempty"`
 }
 
 // NewIssueLicenseDefault creates IssueLicenseDefault with default headers values
@@ -97,13 +97,13 @@ func (o *IssueLicenseDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the issue license default response
-func (o *IssueLicenseDefault) WithPayload(payload interface{}) *IssueLicenseDefault {
+func (o *IssueLicenseDefault) WithPayload(payload *model.Error) *IssueLicenseDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the issue license default response
-func (o *IssueLicenseDefault) SetPayload(payload interface{}) {
+func (o *IssueLicenseDefault) SetPayload(payload *model.Error) {
 	o.Payload = payload
 }
 
@@ -111,9 +111,11 @@ func (o *IssueLicenseDefault) SetPayload(payload interface{}) {
 func (o *IssueLicenseDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(o._statusCode)
-	payload := o.Payload
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
 	}
 }
 

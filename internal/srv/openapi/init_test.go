@@ -27,7 +27,9 @@ func TestMain(m *testing.M) {
 
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
-	apiError500 = openapi.APIError(500, "internal error")
+	apiError402  = openapi.APIError(402, "bogus coin")
+	apiError500  = openapi.APIError(500, "internal error")
+	apiError1002 = openapi.APIError(1002, "no more active licenses allowed")
 )
 
 func testNewServer(t *check.C) (cleanup func(), c *client.HighLoadCup2020, url string, mockAppl *app.MockAppl) {

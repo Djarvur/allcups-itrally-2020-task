@@ -89,7 +89,7 @@ func NewIssueLicenseDefault(code int) *IssueLicenseDefault {
 type IssueLicenseDefault struct {
 	_statusCode int
 
-	Payload interface{}
+	Payload *model.Error
 }
 
 // Code gets the status code for the issue license default response
@@ -101,14 +101,16 @@ func (o *IssueLicenseDefault) Error() string {
 	return fmt.Sprintf("[POST /licenses][%d] issueLicense default  %+v", o._statusCode, o.Payload)
 }
 
-func (o *IssueLicenseDefault) GetPayload() interface{} {
+func (o *IssueLicenseDefault) GetPayload() *model.Error {
 	return o.Payload
 }
 
 func (o *IssueLicenseDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(model.Error)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
