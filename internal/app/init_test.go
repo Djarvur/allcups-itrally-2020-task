@@ -28,19 +28,21 @@ var (
 	ctx = context.Background()
 )
 
-func testNew(t *check.C) (func(), *app.App, *app.MockRepo) {
+func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
 
 	mockRepo := app.NewMockRepo(ctrl)
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
+	mockGame := game.NewMockGame(ctrl)
+	newGame := func(_ game.Config) (game.Game, error) { return mockGame, nil }
 
-	a, err := app.New(mockRepo, game.New, app.Config{
+	a, err := app.New(mockRepo, newGame, app.Config{
 		Duration: 60 * def.TestSecond,
 		Game:     app.Difficulty["test"],
 	})
 	t.Must(t.Nil(err))
-	return ctrl.Finish, a, mockRepo
+	return ctrl.Finish, a, mockRepo, mockGame
 }
 
 func waitErr(t *check.C, errc <-chan error, wait time.Duration, wantErr error) {
