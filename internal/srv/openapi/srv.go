@@ -24,9 +24,8 @@ type (
 	Log = *structlog.Logger
 	// Config contains configuration for OpenAPI server.
 	Config struct {
-		APIKeyAdmin string
-		Addr        netx.Addr
-		BasePath    string
+		Addr     netx.Addr
+		BasePath string
 	}
 	server struct {
 		app app.Appl

@@ -72,23 +72,24 @@ type (
 	}
 )
 
+// Difficulty contains predefined game difficulty levels.
 //nolint:gochecknoglobals,gomnd // Const.
-var (
-	GameLevelTest = game.Config{
+var Difficulty = map[string]game.Config{
+	"test": {
 		MaxActiveLicenses: 3,
 		Density:           4,
 		SizeX:             5,
 		SizeY:             5,
 		Depth:             10,
-	}
-	GameLevelNormal = game.Config{
+	},
+	"normal": {
 		MaxActiveLicenses: 3,
 		Density:           250,
-		SizeX:             3500, // game.New(3500x3500x10) took ~30sec. :(
+		SizeX:             3500,
 		SizeY:             3500,
 		Depth:             10,
-	}
-)
+	},
+}
 
 type Config struct {
 	Duration time.Duration
@@ -108,7 +109,7 @@ type App struct {
 type GameFactory func(game.Config) (game.Game, error)
 
 func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
-	if cfg.Game != GameLevelTest && cfg.Game.Seed == 0 {
+	if cfg.Game != Difficulty["test"] && cfg.Game.Seed == 0 {
 		cfg.Game.Seed = time.Now().UnixNano() // TODO Restore after crash?
 	}
 	g, err := newGame(cfg.Game)

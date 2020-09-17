@@ -37,7 +37,7 @@ func testNew(t *check.C) (func(), *app.App, *app.MockRepo) {
 
 	a, err := app.New(mockRepo, game.New, app.Config{
 		Duration: 60 * def.TestSecond,
-		Game:     app.GameLevelTest,
+		Game:     app.Difficulty["test"],
 	})
 	t.Must(t.Nil(err))
 	return ctrl.Finish, a, mockRepo

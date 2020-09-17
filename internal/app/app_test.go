@@ -20,7 +20,7 @@ func TestNew(tt *testing.T) {
 	mockRepo := app.NewMockRepo(ctrl)
 	cfg := app.Config{
 		Duration: time.Minute,
-		Game:     app.GameLevelTest,
+		Game:     app.Difficulty["test"],
 	}
 	start := time.Now()
 

@@ -10,6 +10,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/go-openapi/swag"
@@ -55,6 +56,8 @@ func TestSmoke(tt *testing.T) {
 	s := &service{cfg: cfg}
 	s.cfg.WorkDir = t.TempDir()
 	s.cfg.ResultDir = t.TempDir()
+	s.cfg.Game = app.Difficulty["normal"]
+	s.cfg.Game.Seed = 3
 
 	ctxStartup, cancel := context.WithTimeout(ctx, def.TestTimeout)
 	defer cancel()
