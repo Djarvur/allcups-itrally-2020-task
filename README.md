@@ -90,8 +90,9 @@ available networks, then you'll have to restart docker service or reboot.
 
 ## Deploy
 
-TODO
-
 ```
-docker run --rm ghcr.io/Djarvur/allcups-itrally-2020-task
+docker run --name=hlcup2020-task -i -t --rm \
+    -e HLCUP2020_DIFFICULTY=normal \
+    -v hlcup2020-task:/home/app/var/data \
+    docker.pkg.github.com/djarvur/allcups-itrally-2020-task/task:0.2.0
 ```
