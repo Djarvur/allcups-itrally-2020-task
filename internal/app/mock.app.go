@@ -5,6 +5,7 @@
 package app
 
 import (
+	game "github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 	time "time"
@@ -48,11 +49,11 @@ func (mr *MockApplMockRecorder) Start(arg0 interface{}) *gomock.Call {
 }
 
 // Balance mocks base method
-func (m *MockAppl) Balance(arg0 Ctx) (int, []Coin, error) {
+func (m *MockAppl) Balance(arg0 Ctx) (int, []int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Balance", arg0)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].([]Coin)
+	ret1, _ := ret[1].([]int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
@@ -61,6 +62,81 @@ func (m *MockAppl) Balance(arg0 Ctx) (int, []Coin, error) {
 func (mr *MockApplMockRecorder) Balance(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Balance", reflect.TypeOf((*MockAppl)(nil).Balance), arg0)
+}
+
+// Licenses mocks base method
+func (m *MockAppl) Licenses(arg0 Ctx) ([]game.License, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Licenses", arg0)
+	ret0, _ := ret[0].([]game.License)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Licenses indicates an expected call of Licenses
+func (mr *MockApplMockRecorder) Licenses(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Licenses", reflect.TypeOf((*MockAppl)(nil).Licenses), arg0)
+}
+
+// IssueLicense mocks base method
+func (m *MockAppl) IssueLicense(arg0 Ctx, wallet []int) (*game.License, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IssueLicense", arg0, wallet)
+	ret0, _ := ret[0].(*game.License)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IssueLicense indicates an expected call of IssueLicense
+func (mr *MockApplMockRecorder) IssueLicense(arg0, wallet interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IssueLicense", reflect.TypeOf((*MockAppl)(nil).IssueLicense), arg0, wallet)
+}
+
+// ExploreArea mocks base method
+func (m *MockAppl) ExploreArea(arg0 Ctx, area game.Area) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExploreArea", arg0, area)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExploreArea indicates an expected call of ExploreArea
+func (mr *MockApplMockRecorder) ExploreArea(arg0, area interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExploreArea", reflect.TypeOf((*MockAppl)(nil).ExploreArea), arg0, area)
+}
+
+// Dig mocks base method
+func (m *MockAppl) Dig(arg0 Ctx, licenseID int, pos game.Coord) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Dig", arg0, licenseID, pos)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Dig indicates an expected call of Dig
+func (mr *MockApplMockRecorder) Dig(arg0, licenseID, pos interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Dig", reflect.TypeOf((*MockAppl)(nil).Dig), arg0, licenseID, pos)
+}
+
+// Cash mocks base method
+func (m *MockAppl) Cash(arg0 Ctx, treasure string) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Cash", arg0, treasure)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Cash indicates an expected call of Cash
+func (mr *MockApplMockRecorder) Cash(arg0, treasure interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Cash", reflect.TypeOf((*MockAppl)(nil).Cash), arg0, treasure)
 }
 
 // MockRepo is a mock of Repo interface

@@ -83,12 +83,13 @@ func NewIssueLicenseDefault(code int) *IssueLicenseDefault {
 
 /*IssueLicenseDefault handles this case with default header values.
 
-General errors using same model as used by go-swagger for validation errors.
+- 409.1002: no more active licenses allowed
+
 */
 type IssueLicenseDefault struct {
 	_statusCode int
 
-	Payload *model.Error
+	Payload interface{}
 }
 
 // Code gets the status code for the issue license default response
@@ -100,16 +101,14 @@ func (o *IssueLicenseDefault) Error() string {
 	return fmt.Sprintf("[POST /licenses][%d] issueLicense default  %+v", o._statusCode, o.Payload)
 }
 
-func (o *IssueLicenseDefault) GetPayload() *model.Error {
+func (o *IssueLicenseDefault) GetPayload() interface{} {
 	return o.Payload
 }
 
 func (o *IssueLicenseDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(model.Error)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

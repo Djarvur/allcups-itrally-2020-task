@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
 // Ctx is a synonym for convenience.
@@ -27,9 +29,29 @@ type Appl interface {
 	// on every API call.
 	// Errors: none.
 	Start(time.Time) error
-	// Balance returns current balance.
+	// Balance returns current balance and up to 1000 issued coins.
 	// Errors: none.
-	Balance(Ctx) (balance int, wallet []Coin, err error)
+	Balance(Ctx) (balance int, wallet []int, err error)
+	// Licenses returns all active licenses.
+	// Errors: none.
+	Licenses(Ctx) ([]game.License, error)
+	// IssueLicense creates and returns a new license with given digAllowed.
+	// Errors: game.ErrActiveLicenseLimit, game.ErrBogusCoin.
+	IssueLicense(_ Ctx, wallet []int) (*game.License, error)
+	// ExploreArea returns amount of not-digged-yet treasures in the
+	// area at depth.
+	// Errors: game.ErrWrongCoord.
+	ExploreArea(_ Ctx, area game.Area) (int, error)
+	// Dig tries to dig at pos and returns if any treasure was found.
+	// The pos depth must be next to current (already digged) one.
+	// Also it increment amount of used dig calls in given active license.
+	// If amount of used dig calls became equal to amount of allowed dig calls
+	// then license will became inactive after the call.
+	// Errors: game.ErrNoSuchLicense, game.ErrWrongCoord, game.ErrWrongDepth.
+	Dig(_ Ctx, licenseID int, pos game.Coord) (treasure string, _ error)
+	// Cash returns coins earned for treasure as given pos.
+	// Errors: game.ErrWrongCoord, game.ErrNotDigged, game.ErrAlreadyCached.
+	Cash(_ Ctx, treasure string) (wallet []int, err error)
 }
 
 // Repo provides data storage.
@@ -43,8 +65,6 @@ type Repo interface {
 }
 
 type (
-	// Coin is an unique coin ID.
-	Coin int
 	// Contact describes record in address book.
 	Contact struct {
 		ID   int
@@ -52,22 +72,54 @@ type (
 	}
 )
 
+//nolint:gochecknoglobals,gomnd // Const.
+var (
+	GameLevelTest = game.Config{
+		MaxActiveLicenses: 3,
+		Density:           4,
+		SizeX:             5,
+		SizeY:             5,
+		Depth:             10,
+	}
+	GameLevelNormal = game.Config{
+		MaxActiveLicenses: 3,
+		Density:           250,
+		SizeX:             3500, // game.New(3500x3500x10) took ~30sec. :(
+		SizeY:             3500,
+		Depth:             10,
+	}
+)
+
 type Config struct {
 	Duration time.Duration
+	Game     game.Config
 }
 
 // App implements interface Appl.
 type App struct {
 	repo      Repo
 	cfg       Config
+	game      game.Game
 	started   chan time.Time
 	startOnce sync.Once
 }
 
-func New(repo Repo, cfg Config) (*App, error) {
+// GameFactory creates and returns new game.
+type GameFactory func(game.Config) (game.Game, error)
+
+func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
+	if cfg.Game != GameLevelTest && cfg.Game.Seed == 0 {
+		cfg.Game.Seed = time.Now().UnixNano() // TODO Restore after crash?
+	}
+	g, err := newGame(cfg.Game)
+	if err != nil {
+		return nil, fmt.Errorf("newGame: %w", err)
+	}
+
 	a := &App{
 		repo:    repo,
 		cfg:     cfg,
+		game:    g,
 		started: make(chan time.Time, 1),
 	}
 

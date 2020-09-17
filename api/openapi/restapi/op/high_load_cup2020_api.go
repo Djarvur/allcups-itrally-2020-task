@@ -64,7 +64,11 @@ func NewHighLoadCup2020API(spec *loads.Document) *HighLoadCup2020API {
 }
 
 /*HighLoadCup2020API # IT RALLY 2020 HighLoad Cup
- */
+- 422.1000: wrong coordinates
+- 422.1001: wrong depth
+- 409.1002: no more active licenses allowed
+- 409.1003: treasure is not digged
+*/
 type HighLoadCup2020API struct {
 	spec            *loads.Document
 	context         *middleware.Context

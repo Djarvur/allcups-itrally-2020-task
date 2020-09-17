@@ -63,7 +63,9 @@ func (o *DigOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer)
 
 func (o *DigOK) DigResponder() {}
 
-/*DigDefault General errors using same model as used by go-swagger for validation errors.
+/*DigDefault - 422.1000: wrong coordinates
+- 422.1001: wrong depth
+
 
 swagger:response digDefault
 */
@@ -73,7 +75,7 @@ type DigDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *model.Error `json:"body,omitempty"`
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewDigDefault creates DigDefault with default headers values
@@ -99,13 +101,13 @@ func (o *DigDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the dig default response
-func (o *DigDefault) WithPayload(payload *model.Error) *DigDefault {
+func (o *DigDefault) WithPayload(payload interface{}) *DigDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the dig default response
-func (o *DigDefault) SetPayload(payload *model.Error) {
+func (o *DigDefault) SetPayload(payload interface{}) {
 	o.Payload = payload
 }
 
@@ -113,11 +115,9 @@ func (o *DigDefault) SetPayload(payload *model.Error) {
 func (o *DigDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(o._statusCode)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
 	}
 }
 

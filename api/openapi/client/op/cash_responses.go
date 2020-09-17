@@ -81,12 +81,13 @@ func NewCashDefault(code int) *CashDefault {
 
 /*CashDefault handles this case with default header values.
 
-General errors using same model as used by go-swagger for validation errors.
+- 409.1003: treasure is not digged
+
 */
 type CashDefault struct {
 	_statusCode int
 
-	Payload *model.Error
+	Payload interface{}
 }
 
 // Code gets the status code for the cash default response
@@ -98,16 +99,14 @@ func (o *CashDefault) Error() string {
 	return fmt.Sprintf("[POST /cash][%d] cash default  %+v", o._statusCode, o.Payload)
 }
 
-func (o *CashDefault) GetPayload() *model.Error {
+func (o *CashDefault) GetPayload() interface{} {
 	return o.Payload
 }
 
 func (o *CashDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(model.Error)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 

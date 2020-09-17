@@ -12,6 +12,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
+	"github.com/go-openapi/swag"
 	"github.com/powerman/check"
 )
 
@@ -72,10 +73,72 @@ func TestSmoke(tt *testing.T) {
 		BasePath: client.DefaultBasePath,
 	})
 
+	var (
+		area = &model.Area{
+			PosX:  swag.Int64(1247),
+			PosY:  swag.Int64(1366),
+			SizeX: 1,
+			SizeY: 1,
+		}
+		treasure = model.Treasure(`{"X":1247,"Y":1366,"Depth":1}`)
+	)
+
 	{
 		params := op.NewGetBalanceParams()
 		res, err := openapiClient.Op.GetBalance(params)
-		t.TODO().Nil(err)
-		t.TODO().DeepEqual(res, &op.GetBalanceOK{Payload: &model.Balance{}})
+		t.Nil(err)
+		t.DeepEqual(res, &op.GetBalanceOK{Payload: &model.Balance{
+			Balance: swag.Uint32(0),
+			Wallet:  model.Wallet{},
+		}})
+	}
+	{
+		params := op.NewIssueLicenseParams().WithArgs(model.Wallet{})
+		res, err := openapiClient.Op.IssueLicense(params)
+		t.Nil(err)
+		t.DeepEqual(res, &op.IssueLicenseOK{Payload: &model.License{
+			ID:         swag.Int64(0),
+			DigAllowed: 3,
+			DigUsed:    0,
+		}})
+	}
+	{
+		params := op.NewExploreAreaParams().WithArgs(area)
+		res, err := openapiClient.Op.ExploreArea(params)
+		t.Nil(err)
+		t.DeepEqual(res, &op.ExploreAreaOK{Payload: &model.Report{
+			Area:           area,
+			Amount:         1,
+			AmountPerDepth: nil,
+		}})
+	}
+	{
+		params := op.NewDigParams().WithArgs(&model.Dig{
+			LicenseID: swag.Int64(0),
+			PosX:      area.PosX,
+			PosY:      area.PosY,
+			Depth:     swag.Int64(1),
+		})
+		res, err := openapiClient.Op.Dig(params)
+		t.Nil(err)
+		t.DeepEqual(res, &op.DigOK{Payload: model.TreasureList{treasure}})
+	}
+	{
+		params := op.NewCashParams().WithArgs(treasure)
+		res, err := openapiClient.Op.Cash(params)
+		t.Nil(err)
+		t.DeepEqual(res, &op.CashOK{Payload: model.Wallet{0}})
+	}
+	{
+		params := op.NewListLicensesParams()
+		res, err := openapiClient.Op.ListLicenses(params)
+		t.Nil(err)
+		t.DeepEqual(res, &op.ListLicensesOK{Payload: model.LicenseList{
+			&model.License{
+				ID:         swag.Int64(0),
+				DigAllowed: 3,
+				DigUsed:    1,
+			},
+		}})
 	}
 }

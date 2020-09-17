@@ -31,5 +31,13 @@ func newErrCode(statusCode int, extraCode int32) errCode {
 //
 //nolint:gochecknoglobals,gomnd // Const.
 var (
-	codeInternal = newErrCode(500, 0)
+	codeInternal           = newErrCode(500, 0)
+	codePaymentRequired    = newErrCode(402, 0)
+	codeForbidden          = newErrCode(403, 0) //nolint:unused // TODO Weird false positive..?
+	codeNotFound           = newErrCode(404, 0) //nolint:unused // TODO Weird false positive..?
+	codeGone               = newErrCode(410, 0)
+	codeWrongCoord         = newErrCode(422, 1000)
+	codeWrongDepth         = newErrCode(422, 1001) //nolint:unused // TODO Weird false positive..?
+	codeActiveLicenseLimit = newErrCode(409, 1002)
+	codeNotDigged          = newErrCode(409, 1003)
 )

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
@@ -34,8 +35,9 @@ func testNew(t *check.C) (func(), *app.App, *app.MockRepo) {
 	mockRepo := app.NewMockRepo(ctrl)
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
 
-	a, err := app.New(mockRepo, app.Config{
+	a, err := app.New(mockRepo, game.New, app.Config{
 		Duration: 60 * def.TestSecond,
+		Game:     app.GameLevelTest,
 	})
 	t.Must(t.Nil(err))
 	return ctrl.Finish, a, mockRepo

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/config"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/dal"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
@@ -57,8 +58,9 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	if s.appl == nil {
-		s.appl, err = app.New(s.repo, app.Config{
+		s.appl, err = app.New(s.repo, game.New, app.Config{
 			Duration: s.cfg.Duration,
+			Game:     app.GameLevelNormal,
 		})
 	}
 	if err != nil {

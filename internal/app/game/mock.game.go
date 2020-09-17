@@ -47,20 +47,6 @@ func (mr *MockGameMockRecorder) Balance() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Balance", reflect.TypeOf((*MockGame)(nil).Balance))
 }
 
-// Spend mocks base method
-func (m *MockGame) Spend(wallet []int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Spend", wallet)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Spend indicates an expected call of Spend
-func (mr *MockGameMockRecorder) Spend(wallet interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Spend", reflect.TypeOf((*MockGame)(nil).Spend), wallet)
-}
-
 // Licenses mocks base method
 func (m *MockGame) Licenses() []License {
 	m.ctrl.T.Helper()
@@ -76,18 +62,18 @@ func (mr *MockGameMockRecorder) Licenses() *gomock.Call {
 }
 
 // IssueLicense mocks base method
-func (m *MockGame) IssueLicense(digAllowed int) (*License, error) {
+func (m *MockGame) IssueLicense(wallet []int) (*License, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IssueLicense", digAllowed)
+	ret := m.ctrl.Call(m, "IssueLicense", wallet)
 	ret0, _ := ret[0].(*License)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IssueLicense indicates an expected call of IssueLicense
-func (mr *MockGameMockRecorder) IssueLicense(digAllowed interface{}) *gomock.Call {
+func (mr *MockGameMockRecorder) IssueLicense(wallet interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IssueLicense", reflect.TypeOf((*MockGame)(nil).IssueLicense), digAllowed)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IssueLicense", reflect.TypeOf((*MockGame)(nil).IssueLicense), wallet)
 }
 
 // CountTreasures mocks base method

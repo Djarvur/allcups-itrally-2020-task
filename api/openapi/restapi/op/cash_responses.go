@@ -63,7 +63,8 @@ func (o *CashOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer
 
 func (o *CashOK) CashResponder() {}
 
-/*CashDefault General errors using same model as used by go-swagger for validation errors.
+/*CashDefault - 409.1003: treasure is not digged
+
 
 swagger:response cashDefault
 */
@@ -73,7 +74,7 @@ type CashDefault struct {
 	/*
 	  In: Body
 	*/
-	Payload *model.Error `json:"body,omitempty"`
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewCashDefault creates CashDefault with default headers values
@@ -99,13 +100,13 @@ func (o *CashDefault) SetStatusCode(code int) {
 }
 
 // WithPayload adds the payload to the cash default response
-func (o *CashDefault) WithPayload(payload *model.Error) *CashDefault {
+func (o *CashDefault) WithPayload(payload interface{}) *CashDefault {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the cash default response
-func (o *CashDefault) SetPayload(payload *model.Error) {
+func (o *CashDefault) SetPayload(payload interface{}) {
 	o.Payload = payload
 }
 
@@ -113,11 +114,9 @@ func (o *CashDefault) SetPayload(payload *model.Error) {
 func (o *CashDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(o._statusCode)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
 	}
 }
 

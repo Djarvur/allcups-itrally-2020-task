@@ -29,9 +29,9 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# IT RALLY 2020 HighLoad Cup\n",
+    "description": "# IT RALLY 2020 HighLoad Cup\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
     "title": "HighLoad Cup 2020",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "basePath": "/",
   "paths": {
@@ -69,7 +69,10 @@ func init() {
             "$ref": "#/responses/cash"
           },
           "default": {
-            "$ref": "#/responses/error"
+            "description": "- 409.1003: treasure is not digged\n",
+            "schema": {
+              "$ref": "#/responses/error"
+            }
           }
         }
       }
@@ -94,7 +97,10 @@ func init() {
             "$ref": "#/responses/dig"
           },
           "default": {
-            "$ref": "#/responses/error"
+            "description": "- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n",
+            "schema": {
+              "$ref": "#/responses/error"
+            }
           }
         }
       }
@@ -156,7 +162,10 @@ func init() {
             "$ref": "#/responses/license"
           },
           "default": {
-            "$ref": "#/responses/error"
+            "description": "- 409.1002: no more active licenses allowed\n",
+            "schema": {
+              "$ref": "#/responses/error"
+            }
           }
         }
       }
@@ -224,12 +233,13 @@ func init() {
       "properties": {
         "depth": {
           "type": "integer",
+          "maximum": 100,
           "minimum": 1,
           "x-order": 3
         },
         "licenseID": {
           "description": "ID of the license this request is attached to.",
-          "type": "string",
+          "type": "integer",
           "x-order": 0
         },
         "posX": {
@@ -396,9 +406,9 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# IT RALLY 2020 HighLoad Cup\n",
+    "description": "# IT RALLY 2020 HighLoad Cup\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
     "title": "HighLoad Cup 2020",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "basePath": "/",
   "paths": {
@@ -445,9 +455,12 @@ func init() {
             }
           },
           "default": {
-            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "description": "- 409.1003: treasure is not digged\n",
             "schema": {
-              "$ref": "#/definitions/error"
+              "description": "General errors using same model as used by go-swagger for validation errors.",
+              "schema": {
+                "$ref": "#/definitions/error"
+              }
             }
           }
         }
@@ -476,9 +489,12 @@ func init() {
             }
           },
           "default": {
-            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "description": "- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n",
             "schema": {
-              "$ref": "#/definitions/error"
+              "description": "General errors using same model as used by go-swagger for validation errors.",
+              "schema": {
+                "$ref": "#/definitions/error"
+              }
             }
           }
         }
@@ -556,9 +572,12 @@ func init() {
             }
           },
           "default": {
-            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "description": "- 409.1002: no more active licenses allowed\n",
             "schema": {
-              "$ref": "#/definitions/error"
+              "description": "General errors using same model as used by go-swagger for validation errors.",
+              "schema": {
+                "$ref": "#/definitions/error"
+              }
             }
           }
         }
@@ -630,12 +649,13 @@ func init() {
       "properties": {
         "depth": {
           "type": "integer",
+          "maximum": 100,
           "minimum": 1,
           "x-order": 3
         },
         "licenseID": {
           "description": "ID of the license this request is attached to.",
-          "type": "string",
+          "type": "integer",
           "x-order": 0
         },
         "posX": {

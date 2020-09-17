@@ -36,14 +36,11 @@ var (
 type Game interface {
 	// Balance returns current balance and up to 1000 issued coins.
 	Balance() (balance int, wallet []int)
-	// Spend mark given coins as not issued (returns them into the bank).
-	// Errors: ErrBogusCoin.
-	Spend(wallet []int) error
 	// Licenses returns all active licenses.
 	Licenses() []License
 	// IssueLicense creates and returns a new license with given digAllowed.
-	// Errors: ErrActiveLicenseLimit.
-	IssueLicense(digAllowed int) (*License, error)
+	// Errors: ErrActiveLicenseLimit, ErrBogusCoin.
+	IssueLicense(wallet []int) (*License, error)
 	// CountTreasures returns amount of not-digged-yet treasures in the area
 	// at depth.
 	// Errors: ErrWrongCoord, ErrWrongDepth.
@@ -124,6 +121,7 @@ func New(cfg Config) (Game, error) {
 		prng:     prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable game results.
 	}
 
+	skipped := 0
 	for i := 0; i < cfg.treasures(); i++ {
 		pos := Coord{
 			X:     g.prng.Intn(cfg.SizeX),
@@ -131,11 +129,12 @@ func New(cfg Config) (Game, error) {
 			Depth: uint8(g.prng.Intn(int(cfg.Depth)) + 1),
 		}
 		if !g.field.addTreasure(pos) {
-			g.log.Warn("skip adding duplicate treasure")
-		} else {
-			g.log.Info("added treasure", "pos", pos)
+			skipped++
+		} else if i < 10 { //nolint:gomnd // Debug.
+			g.log.Debug("buried one of first 10 treasures", "pos", pos)
 		}
 	}
+	g.log.Info("the treasures were buried", "all", cfg.treasures(), "skipped", skipped)
 	return g, nil
 }
 
@@ -143,16 +142,23 @@ func (g *game) Balance() (balance int, wallet []int) {
 	return g.bank.getBalance()
 }
 
-func (g *game) Spend(wallet []int) error {
-	return g.bank.spend(wallet)
-}
-
 func (g *game) Licenses() []License {
 	return g.licenses.active()
 }
 
-func (g *game) IssueLicense(digAllowed int) (*License, error) {
-	return g.licenses.issue(digAllowed)
+func (g *game) IssueLicense(wallet []int) (*License, error) {
+	digAllowed := g.licensePrice(len(wallet))
+	license, err := g.licenses.beginIssue(digAllowed)
+	if err != nil {
+		return nil, err
+	}
+	err = g.bank.spend(wallet)
+	if err != nil {
+		g.licenses.rollbackIssue(license.ID)
+		return nil, err
+	}
+	g.licenses.commitIssue(license.ID)
+	return license, nil
 }
 
 func (g *game) CountTreasures(area Area, depth uint8) (int, error) {
@@ -178,9 +184,28 @@ func (g *game) Cash(pos Coord) (wallet []int, err error) {
 	min, max := treasureCostAt(pos.Depth)
 	amount := min + g.prng.Intn(max-min+1)
 
+	if amount <= 0 {
+		return nil, nil
+	}
 	return g.bank.earn(amount)
 }
 
 func treasureCostAt(depth uint8) (min, max int) {
 	return int(depth), int(depth * 2) //nolint:gomnd // TODO Balance?
+}
+
+func (g *game) licensePrice(coins int) (digAllowed int) {
+	//nolint:gomnd // TODO Balance?
+	switch {
+	case coins == 0:
+		return 3
+	case coins <= 5:
+		return 5
+	case coins <= 10:
+		return 10
+	case coins <= 20:
+		return 20 + g.prng.Intn(10)
+	default:
+		return 40 + g.prng.Intn(10)
+	}
 }

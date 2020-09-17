@@ -54,7 +54,12 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	api := op.NewHighLoadCup2020API(swaggerSpec)
 	api.Logger = structlog.New(structlog.KeyUnit, "swagger").Printf
 
-	api.GetBalanceHandler = op.GetBalanceHandlerFunc(srv.getBalance)
+	api.GetBalanceHandler = op.GetBalanceHandlerFunc(srv.GetBalance)
+	api.ListLicensesHandler = op.ListLicensesHandlerFunc(srv.ListLicenses)
+	api.IssueLicenseHandler = op.IssueLicenseHandlerFunc(srv.IssueLicense)
+	api.ExploreAreaHandler = op.ExploreAreaHandlerFunc(srv.ExploreArea)
+	api.DigHandler = op.DigHandlerFunc(srv.Dig)
+	api.CashHandler = op.CashHandlerFunc(srv.Cash)
 
 	server := restapi.NewServer(api)
 	server.Host = cfg.Addr.Host()
