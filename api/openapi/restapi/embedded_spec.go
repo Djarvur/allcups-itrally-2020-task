@@ -29,7 +29,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# IT RALLY 2020 HighLoad Cup\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
+    "description": "# IT RALLY 2020 HighLoad Cup\n## List of all custom errors\nFirst number is HTTP Status code, second is value of \"code\" field in returned JSON object, text description may or may not match \"message\" field in returned JSON object.\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
     "title": "HighLoad Cup 2020",
     "version": "0.3.0"
   },
@@ -406,7 +406,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# IT RALLY 2020 HighLoad Cup\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
+    "description": "# IT RALLY 2020 HighLoad Cup\n## List of all custom errors\nFirst number is HTTP Status code, second is value of \"code\" field in returned JSON object, text description may or may not match \"message\" field in returned JSON object.\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
     "title": "HighLoad Cup 2020",
     "version": "0.3.0"
   },
