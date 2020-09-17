@@ -30,7 +30,7 @@ jobs:
       - image: "cimg/go:1.15"
         environment:
           GOFLAGS: "-mod=readonly"
-          HLCUP2020_APIKEY_ADMIN: "admin"
+          HLCUP2020_DIFFICULTY: "test"
     steps:
       - checkout
       - *setup_env

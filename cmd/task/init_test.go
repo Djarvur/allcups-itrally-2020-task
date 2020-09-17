@@ -17,7 +17,6 @@ func TestMain(m *testing.M) {
 	app.InitMetrics(reg)
 	openapi.InitMetrics(reg, "test")
 	cfg = config.MustGetServeTest()
-	app.GameLevelNormal.Seed = 3
 	check.TestMain(m)
 }
 

@@ -10,6 +10,8 @@ package config
 import (
 	"time"
 
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/appcfg"
@@ -24,9 +26,9 @@ const envPrefix = "HLCUP2020_"
 // If microservice may runs in different ways (e.g. using CLI subcommands)
 // then these subcommands may use subset of these values.
 var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
-	APIKeyAdmin     appcfg.NotEmptyString `env:"APIKEY_ADMIN"`
 	AddrHost        appcfg.NotEmptyString `env:"ADDR_HOST"`
 	AddrPort        appcfg.Port           `env:"ADDR_PORT"`
+	Difficulty      appcfg.OneOfString    `env:"DIFFICULTY"`
 	Duration        appcfg.Duration       `env:"DURATION"`
 	MetricsAddrPort appcfg.Port           `env:"METRICS_ADDR_PORT"`
 	ResultDir       appcfg.NotEmptyString `env:"RESULT_DIR"`
@@ -34,6 +36,7 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 }{ // Defaults, if any:
 	AddrHost:        appcfg.MustNotEmptyString(def.Hostname),
 	AddrPort:        appcfg.MustPort("8000"),
+	Difficulty:      appcfg.NewOneOfString(difficulties()),
 	Duration:        appcfg.MustDuration("10m"),
 	MetricsAddrPort: appcfg.MustPort("9000"),
 	ResultDir:       appcfg.MustNotEmptyString("var/data"),
@@ -69,9 +72,9 @@ func Init(flagsets FlagSets) error {
 
 // ServeConfig contains configuration for subcommand.
 type ServeConfig struct {
-	APIKeyAdmin string
 	Addr        netx.Addr
 	Duration    time.Duration
+	Game        game.Config
 	MetricsAddr netx.Addr
 	ResultDir   string
 	WorkDir     string
@@ -82,9 +85,9 @@ func GetServe() (c *ServeConfig, err error) {
 	defer cleanup()
 
 	c = &ServeConfig{
-		APIKeyAdmin: all.APIKeyAdmin.Value(&err),
 		Addr:        netx.NewAddr(all.AddrHost.Value(&err), all.AddrPort.Value(&err)),
 		Duration:    all.Duration.Value(&err),
+		Game:        app.Difficulty[all.Difficulty.Value(&err)],
 		MetricsAddr: netx.NewAddr(all.AddrHost.Value(&err), all.MetricsAddrPort.Value(&err)),
 		ResultDir:   all.ResultDir.Value(&err),
 		WorkDir:     all.WorkDir.Value(&err),
@@ -99,4 +102,12 @@ func GetServe() (c *ServeConfig, err error) {
 // any of them will panic.
 func cleanup() {
 	all = nil
+}
+
+func difficulties() []string {
+	levels := make([]string, 0, len(app.Difficulty))
+	for level := range app.Difficulty {
+		levels = append(levels, level)
+	}
+	return levels
 }

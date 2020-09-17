@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/must"
 	"github.com/spf13/pflag"
@@ -18,6 +19,8 @@ func MustGetServeTest() *ServeConfig {
 	const host = "localhost"
 	cfg.Addr = netx.NewAddr(host, netx.UnusedTCPPort(host))
 	cfg.MetricsAddr = netx.NewAddr(host, 0)
+	cfg.Game = app.Difficulty["test"]
+	cfg.Game.Seed = 3
 
 	return cfg
 }

@@ -60,15 +60,14 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	if s.appl == nil {
 		s.appl, err = app.New(s.repo, game.New, app.Config{
 			Duration: s.cfg.Duration,
-			Game:     app.GameLevelNormal,
+			Game:     s.cfg.Game,
 		})
 	}
 	if err != nil {
 		return log.Err("failed to app.New", "err", err)
 	}
 	s.srv, err = openapi.NewServer(s.appl, openapi.Config{
-		APIKeyAdmin: s.cfg.APIKeyAdmin,
-		Addr:        s.cfg.Addr,
+		Addr: s.cfg.Addr,
 	})
 	if err != nil {
 		return log.Err("failed to openapi.NewServer", "err", err)

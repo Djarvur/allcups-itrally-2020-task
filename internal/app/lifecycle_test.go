@@ -38,7 +38,7 @@ func TestWait(tt *testing.T) {
 		mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
 		a, err := app.New(mockRepo, game.New, app.Config{
 			Duration: def.TestSecond,
-			Game:     app.GameLevelTest,
+			Game:     app.Difficulty["test"],
 		})
 		t.Must(t.Nil(err))
 		ctx, shutdown := context.WithCancel(ctx)

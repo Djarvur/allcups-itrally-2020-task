@@ -38,8 +38,7 @@ func testNewServer(t *check.C) (cleanup func(), c *client.HighLoadCup2020, url s
 	mockAppl.EXPECT().Start(gomock.Any()).Return(nil).AnyTimes()
 
 	server, err := openapi.NewServer(mockAppl, openapi.Config{
-		APIKeyAdmin: "admin",
-		Addr:        netx.NewAddr("localhost", 0),
+		Addr: netx.NewAddr("localhost", 0),
 	})
 	t.Must(t.Nil(err, "NewServer"))
 	t.Must(t.Nil(server.Listen(), "server.Listen"))
