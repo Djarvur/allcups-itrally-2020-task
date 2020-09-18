@@ -102,7 +102,6 @@ jobs:
       - name: Upload to GitHub Container Registry
         run: |
           docker login ghcr.io -u '${{ secrets.CR_USER }}' -p '${{ secrets.CR_PAT }}'
-          docker login docker.pkg.github.com -u '${{ secrets.CR_USER }}' -p '${{ secrets.CR_PAT }}'
           if echo "$GITHUB_REF" | grep -q '^refs/tags/v'; then
             TAGS="${GITHUB_REF/refs\/tags\/v}"
           else
@@ -111,9 +110,6 @@ jobs:
           fi
           for TAG in $TAGS; do
             IMAGE_TAG="ghcr.io/${GITHUB_REPOSITORY,,*}:$TAG"
-            IMAGE_TAG="docker.pkg.github.com/${GITHUB_REPOSITORY,,*}/task:$TAG"
             docker tag "$(basename $(go list -m))" "$IMAGE_TAG"
             docker push "$IMAGE_TAG"
-            echo "DEBUG: tagged as '$IMAGE_TAG'"
-            docker image ls
           done

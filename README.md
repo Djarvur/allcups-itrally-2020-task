@@ -94,5 +94,5 @@ available networks, then you'll have to restart docker service or reboot.
 docker run --name=hlcup2020-task -i -t --rm \
     -e HLCUP2020_DIFFICULTY=normal \
     -v hlcup2020-task:/home/app/var/data \
-    docker.pkg.github.com/djarvur/allcups-itrally-2020-task/task:0.2.0
+    ghcr.io/djarvur/allcups-itrally-2020-task:0.2.2
 ```
