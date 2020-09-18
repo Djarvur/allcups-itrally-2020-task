@@ -28,8 +28,13 @@ func TestMain(m *testing.M) {
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
 	apiError402  = openapi.APIError(402, "bogus coin")
+	apiError403  = openapi.APIError(403, "no such license")
+	apiError404  = openapi.APIError(404, "no treasure")
 	apiError500  = openapi.APIError(500, "internal error")
+	apiError1000 = openapi.APIError(1000, "wrong coordinates")
+	apiError1001 = openapi.APIError(1001, "wrong depth")
 	apiError1002 = openapi.APIError(1002, "no more active licenses allowed")
+	apiError1003 = openapi.APIError(1003, "treasure is not digged")
 )
 
 func testNewServer(t *check.C) (cleanup func(), c *client.HighLoadCup2020, url string, mockAppl *app.MockAppl) {

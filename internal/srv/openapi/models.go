@@ -62,7 +62,6 @@ func appCoord(m *model.Dig) game.Coord {
 	}
 }
 
-//nolint:unused // TODO Weird false positive..?
 func apiTreasureList(v string) model.TreasureList {
 	return model.TreasureList{model.Treasure(v)}
 }

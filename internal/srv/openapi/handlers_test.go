@@ -18,17 +18,16 @@ func TestGetBalance(tt *testing.T) {
 	t.Parallel()
 	cleanup, c, _, mockApp := testNewServer(t)
 	defer cleanup()
-	params := op.NewGetBalanceParams()
 
 	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, io.EOF)
 	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, nil)
 	mockApp.EXPECT().Balance(gomock.Any()).Return(42, []int{1, 2}, nil)
 
 	testCases := []struct {
-		want    *model.Balance
+		want    interface{}
 		wantErr *model.Error
 	}{
-		{&model.Balance{}, apiError500},
+		{nil, apiError500},
 		{&model.Balance{Balance: swag.Uint32(0), Wallet: model.Wallet{}}, nil},
 		{&model.Balance{Balance: swag.Uint32(42), Wallet: model.Wallet{1, 2}}, nil},
 	}
@@ -36,13 +35,12 @@ func TestGetBalance(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := c.Op.GetBalance(params)
-			if tc.wantErr == nil {
-				t.Nil(openapi.ErrPayload(err))
-				t.DeepEqual(res.Payload, tc.want)
+			res, err := c.Op.GetBalance(op.NewGetBalanceParams())
+			t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
+			if res == nil {
+				t.DeepEqual(nil, tc.want)
 			} else {
-				t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
-				t.Nil(res)
+				t.DeepEqual(res.Payload, tc.want)
 			}
 		})
 	}
@@ -53,7 +51,6 @@ func TestListLicenses(tt *testing.T) {
 	t.Parallel()
 	cleanup, c, _, mockApp := testNewServer(t)
 	defer cleanup()
-	params := op.NewListLicensesParams()
 
 	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, io.EOF)
 	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, nil)
@@ -63,10 +60,10 @@ func TestListLicenses(tt *testing.T) {
 	}, nil)
 
 	testCases := []struct {
-		want    model.LicenseList
+		want    interface{}
 		wantErr *model.Error
 	}{
-		{model.LicenseList{}, apiError500},
+		{nil, apiError500},
 		{model.LicenseList{}, nil},
 		{model.LicenseList{
 			&model.License{ID: swag.Int64(1), DigAllowed: 3, DigUsed: 0},
@@ -77,13 +74,12 @@ func TestListLicenses(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := c.Op.ListLicenses(params)
-			if tc.wantErr == nil {
-				t.Nil(openapi.ErrPayload(err))
-				t.DeepEqual(res.Payload, tc.want)
+			res, err := c.Op.ListLicenses(op.NewListLicensesParams())
+			t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
+			if res == nil {
+				t.DeepEqual(nil, tc.want)
 			} else {
-				t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
-				t.Nil(res)
+				t.DeepEqual(res.Payload, tc.want)
 			}
 		})
 	}
@@ -94,7 +90,6 @@ func TestIssueLicense(tt *testing.T) {
 	t.Parallel()
 	cleanup, c, _, mockApp := testNewServer(t)
 	defer cleanup()
-	params := op.NewIssueLicenseParams()
 
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{}).Return(game.License{}, io.EOF)
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{0}).Return(game.License{ID: 1, DigAllowed: 3, DigUsed: 2}, nil)
@@ -102,8 +97,8 @@ func TestIssueLicense(tt *testing.T) {
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{1, 2}).Return(game.License{}, game.ErrActiveLicenseLimit)
 
 	testCases := []struct {
-		wallet  model.Wallet
-		want    *model.License
+		args    model.Wallet
+		want    interface{}
 		wantErr *model.Error
 	}{
 		{model.Wallet{}, nil, apiError500},
@@ -115,14 +110,128 @@ func TestIssueLicense(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			params.Args = tc.wallet
-			res, err := c.Op.IssueLicense(params)
-			if tc.wantErr == nil {
-				t.Nil(openapi.ErrPayload(err))
-				t.DeepEqual(res.Payload, tc.want)
+			res, err := c.Op.IssueLicense(op.NewIssueLicenseParams().WithArgs(tc.args))
+			t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
+			if res == nil {
+				t.DeepEqual(nil, tc.want)
 			} else {
-				t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
-				t.Nil(res)
+				t.DeepEqual(res.Payload, tc.want)
+			}
+		})
+	}
+}
+
+func TestExploreArea(tt *testing.T) {
+	t := check.T(tt)
+	t.Parallel()
+	cleanup, c, _, mockApp := testNewServer(t)
+	defer cleanup()
+
+	mockApp.EXPECT().ExploreArea(gomock.Any(), game.Area{X: 0, Y: 0, SizeX: 1, SizeY: 1}).Return(0, io.EOF)
+	mockApp.EXPECT().ExploreArea(gomock.Any(), game.Area{X: 0, Y: 0, SizeX: 5, SizeY: 1}).Return(0, game.ErrWrongCoord)
+	mockApp.EXPECT().ExploreArea(gomock.Any(), game.Area{X: 1, Y: 2, SizeX: 3, SizeY: 4}).Return(5, nil)
+
+	testCases := []struct {
+		args    *model.Area
+		want    interface{}
+		wantErr *model.Error
+	}{
+		{&model.Area{PosX: swag.Int64(0), PosY: swag.Int64(0), SizeX: 1, SizeY: 1}, nil, apiError500},
+		{&model.Area{PosX: swag.Int64(0), PosY: swag.Int64(0), SizeX: 5, SizeY: 1}, nil, apiError1000},
+		{&model.Area{PosX: swag.Int64(1), PosY: swag.Int64(2), SizeX: 3, SizeY: 4}, &model.Report{Amount: 5}, nil},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run("", func(tt *testing.T) {
+			t := check.T(tt)
+			res, err := c.Op.ExploreArea(op.NewExploreAreaParams().WithArgs(tc.args))
+			t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
+			if tc.want != nil {
+				tc.want.(*model.Report).Area = tc.args
+			}
+			if res == nil {
+				t.DeepEqual(nil, tc.want)
+			} else {
+				t.DeepEqual(res.Payload, tc.want)
+			}
+		})
+	}
+}
+
+func TestDig(tt *testing.T) {
+	t := check.T(tt)
+	t.Parallel()
+	cleanup, c, _, mockApp := testNewServer(t)
+	defer cleanup()
+
+	mockApp.EXPECT().Dig(gomock.Any(), 0, game.Coord{X: 0, Y: 0, Depth: 1}).Return("", io.EOF)
+	mockApp.EXPECT().Dig(gomock.Any(), 9, game.Coord{X: 0, Y: 0, Depth: 1}).Return("", game.ErrNoSuchLicense)
+	mockApp.EXPECT().Dig(gomock.Any(), 0, game.Coord{X: 9, Y: 0, Depth: 1}).Return("", game.ErrWrongCoord)
+	mockApp.EXPECT().Dig(gomock.Any(), 0, game.Coord{X: 0, Y: 0, Depth: 9}).Return("", game.ErrWrongDepth)
+	mockApp.EXPECT().Dig(gomock.Any(), 1, game.Coord{X: 1, Y: 1, Depth: 1}).Return("", nil)
+	mockApp.EXPECT().Dig(gomock.Any(), 2, game.Coord{X: 1, Y: 1, Depth: 2}).Return("treasure1", nil)
+
+	n := swag.Int64
+	testCases := []struct {
+		args    *model.Dig
+		want    interface{}
+		wantErr *model.Error
+	}{
+		{&model.Dig{LicenseID: n(0), PosX: n(0), PosY: n(0), Depth: n(1)}, nil, apiError500},
+		{&model.Dig{LicenseID: n(9), PosX: n(0), PosY: n(0), Depth: n(1)}, nil, apiError403},
+		{&model.Dig{LicenseID: n(0), PosX: n(9), PosY: n(0), Depth: n(1)}, nil, apiError1000},
+		{&model.Dig{LicenseID: n(0), PosX: n(0), PosY: n(0), Depth: n(9)}, nil, apiError1001},
+		{&model.Dig{LicenseID: n(1), PosX: n(1), PosY: n(1), Depth: n(1)}, nil, apiError404},
+		{&model.Dig{LicenseID: n(2), PosX: n(1), PosY: n(1), Depth: n(2)}, model.TreasureList{"treasure1"}, nil},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run("", func(tt *testing.T) {
+			t := check.T(tt)
+			res, err := c.Op.Dig(op.NewDigParams().WithArgs(tc.args))
+			t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
+			if res == nil {
+				t.DeepEqual(nil, tc.want)
+			} else {
+				t.DeepEqual(res.Payload, tc.want)
+			}
+		})
+	}
+}
+
+func TestCash(tt *testing.T) {
+	t := check.T(tt)
+	t.Parallel()
+	cleanup, c, _, mockApp := testNewServer(t)
+	defer cleanup()
+
+	mockApp.EXPECT().Cash(gomock.Any(), "").Return(nil, io.EOF)
+	mockApp.EXPECT().Cash(gomock.Any(), "bad").Return(nil, game.ErrWrongCoord)
+	mockApp.EXPECT().Cash(gomock.Any(), "treasure9").Return(nil, game.ErrNotDigged)
+	mockApp.EXPECT().Cash(gomock.Any(), "empty").Return(nil, game.ErrNoThreasure)
+	mockApp.EXPECT().Cash(gomock.Any(), "treasure1").Return([]int{0, 1}, nil)
+
+	testCases := []struct {
+		args    model.Treasure
+		want    interface{}
+		wantErr *model.Error
+	}{
+		{"", nil, apiError500},
+		{"bad", nil, apiError1000},
+		{"treasure9", nil, apiError1003},
+		{"empty", nil, apiError404},
+		{"treasure1", model.Wallet{0, 1}, nil},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run("", func(tt *testing.T) {
+			t := check.T(tt)
+			res, err := c.Op.Cash(op.NewCashParams().WithArgs(tc.args))
+			t.DeepEqual(openapi.ErrPayload(err), tc.wantErr)
+			if res == nil {
+				t.DeepEqual(nil, tc.want)
+			} else {
+				t.DeepEqual(res.Payload, tc.want)
 			}
 		})
 	}
