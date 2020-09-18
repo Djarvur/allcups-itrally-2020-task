@@ -16,7 +16,7 @@ import (
 func TestGetBalance(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
 	mockApp.EXPECT().Balance(gomock.Any()).Return(0, nil, io.EOF)
@@ -49,7 +49,7 @@ func TestGetBalance(tt *testing.T) {
 func TestListLicenses(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
 	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, io.EOF)
@@ -88,7 +88,7 @@ func TestListLicenses(tt *testing.T) {
 func TestIssueLicense(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{}).Return(game.License{}, io.EOF)
@@ -124,7 +124,7 @@ func TestIssueLicense(tt *testing.T) {
 func TestExploreArea(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
 	mockApp.EXPECT().ExploreArea(gomock.Any(), game.Area{X: 0, Y: 0, SizeX: 1, SizeY: 1}).Return(0, io.EOF)
@@ -161,7 +161,7 @@ func TestExploreArea(tt *testing.T) {
 func TestDig(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
 	mockApp.EXPECT().Dig(gomock.Any(), 0, game.Coord{X: 0, Y: 0, Depth: 1}).Return("", io.EOF)
@@ -202,7 +202,7 @@ func TestDig(tt *testing.T) {
 func TestCash(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockApp := testNewServer(t)
+	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
 	mockApp.EXPECT().Cash(gomock.Any(), "").Return(nil, io.EOF)

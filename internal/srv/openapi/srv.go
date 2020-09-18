@@ -4,11 +4,13 @@ package openapi
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
@@ -89,5 +91,7 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 func fromRequest(r *http.Request) (Ctx, Log) {
 	ctx := r.Context()
 	log := structlog.FromContext(ctx, nil)
+	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
+	ctx = def.NewContextWithRemoteIP(ctx, remoteIP)
 	return ctx, log
 }
