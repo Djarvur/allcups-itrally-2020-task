@@ -1,7 +1,6 @@
 package openapi
 
 import (
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/go-openapi/swag"
 )
@@ -14,22 +13,14 @@ func APIError(code int32, msg string) *model.Error {
 	}
 }
 
-// ErrPayload returns err.Payload or err for unknown errors.
+// ErrPayload returns err.Payload or *model.Error(nil) or err for unknown errors.
 func ErrPayload(err error) interface{} {
-	switch errDefault := err.(type) {
+	switch errDefault, ok := err.(interface{ GetPayload() *model.Error }); true {
+	case ok:
+		return errDefault.GetPayload()
+	case err == nil:
+		return (*model.Error)(nil)
 	default:
 		return err
-	case *op.GetBalanceDefault:
-		return errDefault.Payload
-	case *op.ListLicensesDefault:
-		return errDefault.Payload
-	case *op.IssueLicenseDefault:
-		return errDefault.Payload
-	case *op.ExploreAreaDefault:
-		return errDefault.Payload
-	case *op.DigDefault:
-		return errDefault.Payload
-	case *op.CashDefault:
-		return errDefault.Payload
 	}
 }

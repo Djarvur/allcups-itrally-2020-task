@@ -46,7 +46,7 @@ func (srv *server) IssueLicense(params op.IssueLicenseParams) op.IssueLicenseRes
 }
 
 func (srv *server) ExploreArea(params op.ExploreAreaParams) op.ExploreAreaResponder {
-	ctx, log := fromRequest(params.HTTPRequest) //nolint:staticcheck // TODO Weird false positive..?
+	ctx, log := fromRequest(params.HTTPRequest)
 	count, err := srv.app.ExploreArea(ctx, appArea(params.Args))
 	switch {
 	default:
@@ -62,7 +62,7 @@ func (srv *server) ExploreArea(params op.ExploreAreaParams) op.ExploreAreaRespon
 }
 
 func (srv *server) Dig(params op.DigParams) op.DigResponder {
-	ctx, log := fromRequest(params.HTTPRequest) //nolint:staticcheck // TODO Weird false positive..?
+	ctx, log := fromRequest(params.HTTPRequest)
 	coord := appCoord(params.Args)
 	treasure, err := srv.app.Dig(ctx, int(*params.Args.LicenseID), coord)
 	switch {
@@ -75,7 +75,7 @@ func (srv *server) Dig(params op.DigParams) op.DigResponder {
 	case errors.Is(err, game.ErrWrongDepth):
 		return errDig(log, err, codeWrongDepth)
 	case err == nil && treasure == "":
-		return errDig(log, err, codeNotFound)
+		return errDig(log, game.ErrNoThreasure, codeNotFound)
 	case err == nil:
 		return op.NewDigOK().WithPayload(apiTreasureList(treasure))
 	}

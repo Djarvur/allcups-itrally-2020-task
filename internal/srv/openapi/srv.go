@@ -4,12 +4,13 @@ package openapi
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
-	"path"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
@@ -65,18 +66,14 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	server.Port = cfg.Addr.Port()
 
 	// The middleware executes before anything.
+	api.UseSwaggerUI()
 	globalMiddlewares := func(handler http.Handler) http.Handler {
 		xffmw, _ := xff.Default()
 		logger := makeLogger(cfg.BasePath)
 		accesslog := makeAccessLog(cfg.BasePath)
-		redocOpts := middleware.RedocOpts{
-			BasePath: cfg.BasePath,
-			SpecURL:  path.Join(cfg.BasePath, "/swagger.json"),
-		}
 		return noCache(xffmw.Handler(logger(recovery(accesslog(
 			middleware.Spec(cfg.BasePath, restapi.FlatSwaggerJSON,
-				middleware.Redoc(redocOpts,
-					handleCORS(handler))))))))
+				cors(handler)))))))
 	}
 	// The middleware executes after serving /swagger.json and routing,
 	// but before authentication, binding and validation.
@@ -94,5 +91,7 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 func fromRequest(r *http.Request) (Ctx, Log) {
 	ctx := r.Context()
 	log := structlog.FromContext(ctx, nil)
+	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
+	ctx = def.NewContextWithRemoteIP(ctx, remoteIP)
 	return ctx, log
 }

@@ -33,10 +33,10 @@ func newErrCode(statusCode int, extraCode int32) errCode {
 var (
 	codeInternal           = newErrCode(500, 0)
 	codePaymentRequired    = newErrCode(402, 0)
-	codeForbidden          = newErrCode(403, 0) //nolint:unused // TODO Weird false positive..?
-	codeNotFound           = newErrCode(404, 0) //nolint:unused // TODO Weird false positive..?
+	codeForbidden          = newErrCode(403, 0)
+	codeNotFound           = newErrCode(404, 0)
 	codeWrongCoord         = newErrCode(422, 1000)
-	codeWrongDepth         = newErrCode(422, 1001) //nolint:unused // TODO Weird false positive..?
+	codeWrongDepth         = newErrCode(422, 1001)
 	codeActiveLicenseLimit = newErrCode(409, 1002)
 	codeNotDigged          = newErrCode(409, 1003)
 )
