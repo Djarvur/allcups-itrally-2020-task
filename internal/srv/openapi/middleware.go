@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/cors"
+	corspkg "github.com/rs/cors"
 )
 
 type middlewareFunc func(http.Handler) http.Handler
@@ -107,8 +107,8 @@ func makeAccessLog(basePath string) middlewareFunc {
 	}
 }
 
-func handleCORS(next http.Handler) http.Handler {
-	return cors.AllowAll().Handler(next)
+func cors(next http.Handler) http.Handler {
+	return corspkg.AllowAll().Handler(next)
 }
 
 func makeAppStart(appl app.Appl) middlewareFunc {
