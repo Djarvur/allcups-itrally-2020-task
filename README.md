@@ -72,29 +72,17 @@ convenience only.
       control the project.
     - Access project at host/port(s) defined in `env.sh`.
 
-#### Cheatsheet
-
-```sh
-dc up -d --remove-orphans               # (re)start all project's services
-dc logs -f -t                           # view logs of all services
-dc logs -f SERVICENAME                  # view logs of some service
-dc ps                                   # status of all services
-dc restart SERVICENAME
-dc exec SERVICENAME COMMAND             # run command in given container
-dc stop && dc rm -f                     # stop the project
-docker volume rm PROJECT_SERVICENAME    # remove some service's data
-```
-
-It's recommended to avoid `docker-compose down` - this command will also
-remove docker's network for the project, and next `dc up -d` will create a
-new network… repeat this many enough times and docker will exhaust
-available networks, then you'll have to restart docker service or reboot.
+As this project isn't a real service but a _one-shot task_ which is
+supposed to handle single user for a fixed period of time and then finish,
+if you'll use `dc up` to start it while development then you should use
+`dc up --force-recreate` to ensure each time it'll start with clean state.
+An alternative is to just run `bin/task` or use `docker run`.
 
 ## Deploy
 
 ```
-docker run --name=hlcup2020-task -i -t --rm \
+docker run --name=hlcup2020_task -i -t --rm \
     -e HLCUP2020_DIFFICULTY=normal \
     -v hlcup2020-task:/home/app/var/data \
-    ghcr.io/djarvur/allcups-itrally-2020-task:0.2.2
+    ghcr.io/djarvur/allcups-itrally-2020-task:0.2.4
 ```
