@@ -54,6 +54,9 @@ func NewHighLoadCup2020API(spec *loads.Document) *HighLoadCup2020API {
 		GetBalanceHandler: GetBalanceHandlerFunc(func(params GetBalanceParams) GetBalanceResponder {
 			return GetBalanceNotImplemented()
 		}),
+		HealthCheckHandler: HealthCheckHandlerFunc(func(params HealthCheckParams) HealthCheckResponder {
+			return HealthCheckNotImplemented()
+		}),
 		IssueLicenseHandler: IssueLicenseHandlerFunc(func(params IssueLicenseParams) IssueLicenseResponder {
 			return IssueLicenseNotImplemented()
 		}),
@@ -109,6 +112,8 @@ type HighLoadCup2020API struct {
 	ExploreAreaHandler ExploreAreaHandler
 	// GetBalanceHandler sets the operation handler for the get balance operation
 	GetBalanceHandler GetBalanceHandler
+	// HealthCheckHandler sets the operation handler for the health check operation
+	HealthCheckHandler HealthCheckHandler
 	// IssueLicenseHandler sets the operation handler for the issue license operation
 	IssueLicenseHandler IssueLicenseHandler
 	// ListLicensesHandler sets the operation handler for the list licenses operation
@@ -200,6 +205,9 @@ func (o *HighLoadCup2020API) Validate() error {
 	}
 	if o.GetBalanceHandler == nil {
 		unregistered = append(unregistered, "GetBalanceHandler")
+	}
+	if o.HealthCheckHandler == nil {
+		unregistered = append(unregistered, "HealthCheckHandler")
 	}
 	if o.IssueLicenseHandler == nil {
 		unregistered = append(unregistered, "IssueLicenseHandler")
@@ -311,6 +319,10 @@ func (o *HighLoadCup2020API) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/balance"] = NewGetBalance(o.context, o.GetBalanceHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/health-check"] = NewHealthCheck(o.context, o.HealthCheckHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

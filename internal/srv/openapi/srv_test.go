@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"math"
 	"net/http"
 	"path"
 	"regexp"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/go-openapi/loads"
@@ -22,7 +22,7 @@ import (
 
 type Ctx = context.Context
 
-const testEndpoint = "/balance"
+var healthCheckEndpoint = new(op.HealthCheckURL).String()
 
 func fetch(t *check.C, url string, headers ...string) *http.Response {
 	t.Helper()
@@ -45,9 +45,9 @@ func TestServeNoCache(tt *testing.T) {
 	cleanup, _, tsURL, mockAppl, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
-	mockAppl.EXPECT().Balance(gomock.Any()).Return(0, nil, nil)
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).Return(nil, nil)
 
-	resp := fetch(t, tsURL+testEndpoint)
+	resp := fetch(t, tsURL+healthCheckEndpoint)
 	t.Equal(resp.StatusCode, 200)
 	t.Equal(resp.Header.Get("Expires"), "0")
 	t.Equal(resp.Header.Get("Cache-Control"), "no-cache, no-store, must-revalidate")
@@ -61,15 +61,15 @@ func TestServeXFF(tt *testing.T) {
 	defer cleanup()
 
 	var remoteIP string
-	mockAppl.EXPECT().Balance(gomock.Any()).DoAndReturn(func(ctx Ctx) (int, []int, error) {
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).DoAndReturn(func(ctx Ctx) (interface{}, error) {
 		remoteIP = def.FromContext(ctx)
-		return 0, nil, nil
+		return nil, nil
 	}).Times(2)
 
-	resp := fetch(t, tsURL+testEndpoint)
+	resp := fetch(t, tsURL+healthCheckEndpoint)
 	t.Equal(resp.StatusCode, 200)
 	t.Equal(remoteIP, "127.0.0.1")
-	resp = fetch(t, tsURL+testEndpoint, "X-Forwarded-For", "192.168.1.1, 1.2.3.4, 4.3.2.1")
+	resp = fetch(t, tsURL+healthCheckEndpoint, "X-Forwarded-For", "192.168.1.1, 1.2.3.4, 4.3.2.1")
 	t.Equal(resp.StatusCode, 200)
 	t.Equal(remoteIP, "1.2.3.4")
 }
@@ -85,18 +85,18 @@ func TestServeLogger(t *testing.T) {
 			defer cleanup()
 
 			var log *structlog.Logger
-			mockAppl.EXPECT().Balance(gomock.Any()).DoAndReturn(func(ctx Ctx) (int, []int, error) {
+			mockAppl.EXPECT().HealthCheck(gomock.Any()).DoAndReturn(func(ctx Ctx) (interface{}, error) {
 				log = structlog.FromContext(ctx, nil)
-				return 0, nil, nil
+				return nil, nil
 			})
 
-			t.Log(tsURL + path.Join(basePath, testEndpoint))
-			resp := fetch(t, tsURL+path.Join(basePath, testEndpoint))
+			t.Log(tsURL + path.Join(basePath, healthCheckEndpoint))
+			resp := fetch(t, tsURL+path.Join(basePath, healthCheckEndpoint))
 			t.Equal(resp.StatusCode, 200)
 			var buf bytes.Buffer
 			log.SetOutput(&buf)
 			log.Info("test")
-			t.Match(buf.String(), ": 127.0.0.1:\\d+ +GET +"+testEndpoint+": `test`")
+			t.Match(buf.String(), ": 127.0.0.1:\\d+ +GET +"+healthCheckEndpoint+": `test`")
 		})
 	}
 }
@@ -107,11 +107,11 @@ func TestServeRecover(tt *testing.T) {
 	cleanup, _, tsURL, mockAppl, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
-	mockAppl.EXPECT().Balance(gomock.Any()).DoAndReturn(func(ctx Ctx) (int, []int, error) {
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).DoAndReturn(func(ctx Ctx) (interface{}, error) {
 		panic("boom")
 	})
 
-	resp := fetch(t, tsURL+testEndpoint)
+	resp := fetch(t, tsURL+healthCheckEndpoint)
 	t.Equal(resp.StatusCode, 500)
 }
 
@@ -125,17 +125,13 @@ func TestServeRecoverNetError(tt *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), def.TestTimeout)
 	cancelled := make(chan struct{})
 
-	mockAppl.EXPECT().Balance(gomock.Any()).DoAndReturn(func(ctx Ctx) (int, []int, error) {
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).DoAndReturn(func(ctx Ctx) (interface{}, error) {
 		cancel()
 		<-cancelled
-		wallet := make([]int, 1000) // Overflow 8KB output buffer when sending response.
-		for i := range wallet {
-			wallet[i] = math.MaxUint32
-		}
-		return 100500, wallet, nil
+		return make([]byte, 10000), nil // Overflow 8KB output buffer when sending response.
 	})
 
-	req, err := http.NewRequestWithContext(ctx, "GET", tsURL+testEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", tsURL+healthCheckEndpoint, nil)
 	t.Must(t.Nil(err))
 	resp, err := c.Do(req)
 	t.Must(t.Err(err, context.Canceled))
@@ -157,9 +153,9 @@ func TestServeAccessLog(tt *testing.T) {
 	defer cleanup()
 	reAccessLog := regexp.MustCompile("`handled`|`failed to handle`|`panic`")
 
-	mockAppl.EXPECT().Balance(gomock.Any()).Return(0, nil, nil)
-	mockAppl.EXPECT().Balance(gomock.Any()).Return(0, nil, io.EOF)
-	mockAppl.EXPECT().Balance(gomock.Any()).DoAndReturn(func(ctx Ctx) (int, []int, error) {
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).Return(nil, nil)
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).Return(nil, io.EOF)
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).DoAndReturn(func(ctx Ctx) (interface{}, error) {
 		panic("boom")
 	})
 
@@ -167,15 +163,15 @@ func TestServeAccessLog(tt *testing.T) {
 		want    int
 		wantMsg string
 	}{
-		{200, "200 GET +" + testEndpoint + ": `handled`"},
-		{500, "500 GET +" + testEndpoint + ": `failed to handle`"},
-		{500, "500 GET +" + testEndpoint + ": `panic`"},
+		{200, "200 GET +" + healthCheckEndpoint + ": `handled`"},
+		{500, "500 GET +" + healthCheckEndpoint + ": `failed to handle`"},
+		{500, "500 GET +" + healthCheckEndpoint + ": `panic`"},
 	}
 	for _, tc := range tests {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			resp := fetch(t, tsURL+testEndpoint)
+			resp := fetch(t, tsURL+healthCheckEndpoint)
 			t.Equal(resp.StatusCode, tc.want)
 			var msg string
 			for !reAccessLog.MatchString(msg) {
@@ -232,9 +228,9 @@ func TestServeCORS(tt *testing.T) {
 	cleanup, _, tsURL, mockAppl, _ := testNewServer(t, openapi.Config{})
 	defer cleanup()
 
-	mockAppl.EXPECT().Balance(gomock.Any()).Return(0, nil, nil)
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).Return(nil, nil)
 
-	resp := fetch(t, tsURL+testEndpoint, "Origin", "google.com")
+	resp := fetch(t, tsURL+healthCheckEndpoint, "Origin", "google.com")
 	t.Equal(resp.StatusCode, 200)
 	t.Equal(resp.Header.Get("Access-Control-Allow-Origin"), "*")
 }

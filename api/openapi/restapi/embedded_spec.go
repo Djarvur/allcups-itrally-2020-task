@@ -130,6 +130,25 @@ func init() {
         }
       }
     },
+    "/health-check": {
+      "get": {
+        "security": [],
+        "description": "Returns 200 if service works okay.",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Extra details about service status, if any.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "default": {
+            "$ref": "#/responses/error"
+          }
+        }
+      }
+    },
     "/licenses": {
       "get": {
         "description": "Returns a list of issued licenses.",
@@ -514,6 +533,28 @@ func init() {
             "description": "Report about found treasures.",
             "schema": {
               "$ref": "#/definitions/report"
+            }
+          },
+          "default": {
+            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    },
+    "/health-check": {
+      "get": {
+        "security": [],
+        "description": "Returns 200 if service works okay.",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Extra details about service status, if any.",
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
             }
           },
           "default": {

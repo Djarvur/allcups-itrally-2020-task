@@ -34,6 +34,21 @@ func (m *MockAppl) EXPECT() *MockApplMockRecorder {
 	return m.recorder
 }
 
+// HealthCheck mocks base method
+func (m *MockAppl) HealthCheck(arg0 Ctx) (interface{}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck
+func (mr *MockApplMockRecorder) HealthCheck(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockAppl)(nil).HealthCheck), arg0)
+}
+
 // Start mocks base method
 func (m *MockAppl) Start(arg0 time.Time) error {
 	m.ctrl.T.Helper()

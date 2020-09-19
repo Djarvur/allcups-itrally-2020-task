@@ -172,6 +172,19 @@ responses:
       $ref: '#/definitions/wallet'
 
 paths:
+  /health-check:
+    get:
+      operationId: healthCheck
+      description: Returns 200 if service works okay.
+      security: []
+      responses:
+        '200':
+          description: Extra details about service status, if any.
+          schema:
+            type: object
+            additionalProperties: true
+        default: {$ref: '#/responses/error'}
+
   /balance:
     get:
       operationId: getBalance

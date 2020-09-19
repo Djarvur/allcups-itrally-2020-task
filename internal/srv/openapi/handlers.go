@@ -8,6 +8,17 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
+func (srv *server) HealthCheck(params op.HealthCheckParams) op.HealthCheckResponder {
+	ctx, log := fromRequest(params.HTTPRequest)
+	status, err := srv.app.HealthCheck(ctx)
+	switch {
+	default:
+		return errHealthCheck(log, err, codeInternal)
+	case err == nil:
+		return op.NewHealthCheckOK().WithPayload(status)
+	}
+}
+
 func (srv *server) GetBalance(params op.GetBalanceParams) op.GetBalanceResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
 	balance, wallet, err := srv.app.Balance(ctx)
