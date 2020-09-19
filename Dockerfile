@@ -9,5 +9,8 @@ VOLUME $VOLUME_DIR
 
 WORKDIR /home/app
 
+HEALTHCHECK --interval=5s --timeout=5s \
+    CMD wget -q -O - http://$HOSTNAME:8000/health-check || exit 1
+
 COPY . .
 RUN ln -nsf "$PWD"/init/* /etc/service/

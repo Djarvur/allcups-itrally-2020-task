@@ -33,6 +33,8 @@ type ClientService interface {
 
 	GetBalance(params *GetBalanceParams) (*GetBalanceOK, error)
 
+	HealthCheck(params *HealthCheckParams) (*HealthCheckOK, error)
+
 	IssueLicense(params *IssueLicenseParams) (*IssueLicenseOK, error)
 
 	ListLicenses(params *ListLicensesParams) (*ListLicensesOK, error)
@@ -169,6 +171,39 @@ func (a *Client) GetBalance(params *GetBalanceParams) (*GetBalanceOK, error) {
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*GetBalanceDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  HealthCheck Returns 200 if service works okay.
+*/
+func (a *Client) HealthCheck(params *HealthCheckParams) (*HealthCheckOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewHealthCheckParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "healthCheck",
+		Method:             "GET",
+		PathPattern:        "/health-check",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &HealthCheckReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*HealthCheckOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*HealthCheckDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

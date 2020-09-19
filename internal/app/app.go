@@ -23,6 +23,10 @@ var (
 
 // Appl provides application features (use cases) service.
 type Appl interface {
+	// HealthCheck returns error if service is unhealthy or current
+	// status otherwise.
+	// Errors: none.
+	HealthCheck(Ctx) (interface{}, error)
 	// Start must be called before any other method to ensure task
 	// will be available for cfg.Duration since given time. Second and
 	// following calls will have no effect, so it's safe to call Start
@@ -135,4 +139,8 @@ func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
 		return nil, fmt.Errorf("SaveStartTime: %w", err)
 	}
 	return a, nil
+}
+
+func (a *App) HealthCheck(_ Ctx) (interface{}, error) {
+	return "OK", nil
 }

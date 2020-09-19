@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/felixge/httpsnoop"
@@ -113,15 +114,20 @@ func cors(next http.Handler) http.Handler {
 	return corspkg.AllowAll().Handler(next)
 }
 
-func makeAppStart(appl app.Appl) middlewareFunc {
+func makeAppStart(basePath string, appl app.Appl) middlewareFunc {
+	healthCheckURL := new(op.HealthCheckURL).WithBasePath(basePath).String()
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			err := appl.Start(time.Now())
-			if err != nil {
-				_, log := fromRequest(r)
-				log.PrintErr("failed to app.Start", "err", err)
-				middlewareError(w, 500, "internal error")
-				return
+			switch r.URL.Path {
+			case healthCheckURL:
+			default:
+				err := appl.Start(time.Now())
+				if err != nil {
+					_, log := fromRequest(r)
+					log.PrintErr("failed to app.Start", "err", err)
+					middlewareError(w, 500, "internal error")
+					return
+				}
 			}
 			next.ServeHTTP(w, r)
 		})

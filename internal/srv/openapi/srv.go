@@ -54,6 +54,7 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	api := op.NewHighLoadCup2020API(swaggerSpec)
 	api.Logger = structlog.New(structlog.KeyUnit, "swagger").Printf
 
+	api.HealthCheckHandler = op.HealthCheckHandlerFunc(srv.HealthCheck)
 	api.GetBalanceHandler = op.GetBalanceHandlerFunc(srv.GetBalance)
 	api.ListLicensesHandler = op.ListLicensesHandlerFunc(srv.ListLicenses)
 	api.IssueLicenseHandler = op.IssueLicenseHandlerFunc(srv.IssueLicense)
@@ -78,7 +79,7 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	// The middleware executes after serving /swagger.json and routing,
 	// but before authentication, binding and validation.
 	middlewares := func(handler http.Handler) http.Handler {
-		appStart := makeAppStart(srv.app)
+		appStart := makeAppStart(cfg.BasePath, srv.app)
 		return appStart(handler)
 	}
 	server.SetHandler(globalMiddlewares(api.Serve(middlewares)))
@@ -90,8 +91,8 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 
 func fromRequest(r *http.Request) (Ctx, Log) {
 	ctx := r.Context()
-	log := structlog.FromContext(ctx, nil)
 	remoteIP, _, _ := net.SplitHostPort(r.RemoteAddr)
 	ctx = def.NewContextWithRemoteIP(ctx, remoteIP)
+	log := structlog.FromContext(ctx, nil)
 	return ctx, log
 }

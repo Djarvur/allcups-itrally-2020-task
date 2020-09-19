@@ -55,6 +55,11 @@ func configureAPI(api *op.HighLoadCup2020API) http.Handler {
 			return op.GetBalanceNotImplemented()
 		})
 	}
+	if api.HealthCheckHandler == nil {
+		api.HealthCheckHandler = op.HealthCheckHandlerFunc(func(params op.HealthCheckParams) op.HealthCheckResponder {
+			return op.HealthCheckNotImplemented()
+		})
+	}
 	if api.IssueLicenseHandler == nil {
 		api.IssueLicenseHandler = op.IssueLicenseHandlerFunc(func(params op.IssueLicenseParams) op.IssueLicenseResponder {
 			return op.IssueLicenseNotImplemented()

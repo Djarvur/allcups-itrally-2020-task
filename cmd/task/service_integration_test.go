@@ -87,8 +87,7 @@ func TestSmoke(tt *testing.T) {
 	)
 
 	{
-		params := op.NewGetBalanceParams()
-		res, err := openapiClient.Op.GetBalance(params)
+		res, err := openapiClient.Op.GetBalance(op.NewGetBalanceParams())
 		t.Nil(err)
 		t.DeepEqual(res, &op.GetBalanceOK{Payload: &model.Balance{
 			Balance: swag.Uint32(0),
@@ -96,8 +95,8 @@ func TestSmoke(tt *testing.T) {
 		}})
 	}
 	{
-		params := op.NewIssueLicenseParams().WithArgs(model.Wallet{})
-		res, err := openapiClient.Op.IssueLicense(params)
+		args := model.Wallet{}
+		res, err := openapiClient.Op.IssueLicense(op.NewIssueLicenseParams().WithArgs(args))
 		t.Nil(err)
 		t.DeepEqual(res, &op.IssueLicenseOK{Payload: &model.License{
 			ID:         swag.Int64(0),
@@ -106,8 +105,8 @@ func TestSmoke(tt *testing.T) {
 		}})
 	}
 	{
-		params := op.NewExploreAreaParams().WithArgs(area)
-		res, err := openapiClient.Op.ExploreArea(params)
+		args := area
+		res, err := openapiClient.Op.ExploreArea(op.NewExploreAreaParams().WithArgs(args))
 		t.Nil(err)
 		t.DeepEqual(res, &op.ExploreAreaOK{Payload: &model.Report{
 			Area:           area,
@@ -116,25 +115,24 @@ func TestSmoke(tt *testing.T) {
 		}})
 	}
 	{
-		params := op.NewDigParams().WithArgs(&model.Dig{
+		args := &model.Dig{
 			LicenseID: swag.Int64(0),
 			PosX:      area.PosX,
 			PosY:      area.PosY,
 			Depth:     swag.Int64(1),
-		})
-		res, err := openapiClient.Op.Dig(params)
+		}
+		res, err := openapiClient.Op.Dig(op.NewDigParams().WithArgs(args))
 		t.Nil(err)
 		t.DeepEqual(res, &op.DigOK{Payload: model.TreasureList{treasure}})
 	}
 	{
-		params := op.NewCashParams().WithArgs(treasure)
-		res, err := openapiClient.Op.Cash(params)
+		args := treasure
+		res, err := openapiClient.Op.Cash(op.NewCashParams().WithArgs(args))
 		t.Nil(err)
 		t.DeepEqual(res, &op.CashOK{Payload: model.Wallet{0}})
 	}
 	{
-		params := op.NewListLicensesParams()
-		res, err := openapiClient.Op.ListLicenses(params)
+		res, err := openapiClient.Op.ListLicenses(op.NewListLicensesParams())
 		t.Nil(err)
 		t.DeepEqual(res, &op.ListLicensesOK{Payload: model.LicenseList{
 			&model.License{

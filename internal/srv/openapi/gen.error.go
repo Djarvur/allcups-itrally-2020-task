@@ -67,6 +67,24 @@ func errExploreArea(log Log, err error, code errCode) op.ExploreAreaResponder {
 	})
 }
 
+func errGetBalance(log Log, err error, code errCode) op.GetBalanceResponder {
+	if code.status < http.StatusInternalServerError {
+		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	} else {
+		log.PrintErr("server error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
+	}
+
+	msg := err.Error()
+	if code.status == http.StatusInternalServerError { // Do no expose details about internal errors.
+		msg = "internal error" //nolint:goconst // Duplicated by go:generate.
+	}
+
+	return op.NewGetBalanceDefault(code.status).WithPayload(&model.Error{
+		Code:    swag.Int32(code.extra),
+		Message: swag.String(msg),
+	})
+}
+
 func errIssueLicense(log Log, err error, code errCode) op.IssueLicenseResponder {
 	if code.status < http.StatusInternalServerError {
 		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
