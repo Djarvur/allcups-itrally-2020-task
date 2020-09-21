@@ -35,7 +35,7 @@ func (o *ExploreAreaURL) SetBasePath(bp string) {
 func (o *ExploreAreaURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	_path := "/explore"
+	var _path = "/explore"
 
 	_basePath := o._basePath
 	if _basePath == "" {

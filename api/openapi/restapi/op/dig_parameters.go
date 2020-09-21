@@ -19,6 +19,7 @@ import (
 // NewDigParams creates a new DigParams object
 // no default values defined in spec.
 func NewDigParams() DigParams {
+
 	return DigParams{}
 }
 

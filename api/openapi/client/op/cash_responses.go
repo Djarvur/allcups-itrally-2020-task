@@ -63,6 +63,7 @@ func (o *CashOK) GetPayload() model.Wallet {
 }
 
 func (o *CashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
@@ -103,6 +104,7 @@ func (o *CashDefault) GetPayload() *model.Error {
 }
 
 func (o *CashDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Error)
 
 	// response payload

@@ -44,7 +44,7 @@ func (o *GetBalance) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if rCtx != nil {
 		r = rCtx
 	}
-	Params := NewGetBalanceParams()
+	var Params = NewGetBalanceParams()
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -54,4 +54,5 @@ func (o *GetBalance) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	res := o.Handler.Handle(Params) // actually handle the request
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
+
 }

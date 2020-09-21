@@ -31,6 +31,7 @@ type CashOK struct {
 
 // NewCashOK creates CashOK with default headers values
 func NewCashOK() *CashOK {
+
 	return &CashOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *CashOK) SetPayload(payload model.Wallet) {
 
 // WriteResponse to the client
 func (o *CashOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
@@ -110,6 +112,7 @@ func (o *CashDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *CashDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload

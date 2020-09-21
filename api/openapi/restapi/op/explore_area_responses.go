@@ -31,6 +31,7 @@ type ExploreAreaOK struct {
 
 // NewExploreAreaOK creates ExploreAreaOK with default headers values
 func NewExploreAreaOK() *ExploreAreaOK {
+
 	return &ExploreAreaOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *ExploreAreaOK) SetPayload(payload *model.Report) {
 
 // WriteResponse to the client
 func (o *ExploreAreaOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	if o.Payload != nil {
 		payload := o.Payload
@@ -106,6 +108,7 @@ func (o *ExploreAreaDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *ExploreAreaDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload

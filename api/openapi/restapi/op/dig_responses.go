@@ -31,6 +31,7 @@ type DigOK struct {
 
 // NewDigOK creates DigOK with default headers values
 func NewDigOK() *DigOK {
+
 	return &DigOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *DigOK) SetPayload(payload model.TreasureList) {
 
 // WriteResponse to the client
 func (o *DigOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
@@ -111,6 +113,7 @@ func (o *DigDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *DigDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload

@@ -63,6 +63,7 @@ func (o *GetBalanceOK) GetPayload() *model.Balance {
 }
 
 func (o *GetBalanceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Balance)
 
 	// response payload
@@ -104,6 +105,7 @@ func (o *GetBalanceDefault) GetPayload() *model.Error {
 }
 
 func (o *GetBalanceDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Error)
 
 	// response payload

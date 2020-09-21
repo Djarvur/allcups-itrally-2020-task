@@ -19,6 +19,7 @@ import (
 // NewListLicensesParams creates a new ListLicensesParams object
 // with the default values initialized.
 func NewListLicensesParams() *ListLicensesParams {
+
 	return &ListLicensesParams{
 
 		timeout: cr.DefaultTimeout,
@@ -28,6 +29,7 @@ func NewListLicensesParams() *ListLicensesParams {
 // NewListLicensesParamsWithTimeout creates a new ListLicensesParams object
 // with the default values initialized, and the ability to set a timeout on a request
 func NewListLicensesParamsWithTimeout(timeout time.Duration) *ListLicensesParams {
+
 	return &ListLicensesParams{
 
 		timeout: timeout,
@@ -37,6 +39,7 @@ func NewListLicensesParamsWithTimeout(timeout time.Duration) *ListLicensesParams
 // NewListLicensesParamsWithContext creates a new ListLicensesParams object
 // with the default values initialized, and the ability to set a context for a request
 func NewListLicensesParamsWithContext(ctx context.Context) *ListLicensesParams {
+
 	return &ListLicensesParams{
 
 		Context: ctx,
@@ -46,6 +49,7 @@ func NewListLicensesParamsWithContext(ctx context.Context) *ListLicensesParams {
 // NewListLicensesParamsWithHTTPClient creates a new ListLicensesParams object
 // with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewListLicensesParamsWithHTTPClient(client *http.Client) *ListLicensesParams {
+
 	return &ListLicensesParams{
 		HTTPClient: client,
 	}
@@ -95,6 +99,7 @@ func (o *ListLicensesParams) SetHTTPClient(client *http.Client) {
 
 // WriteToRequest writes these params to a swagger request
 func (o *ListLicensesParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
+
 	if err := r.SetTimeout(o.timeout); err != nil {
 		return err
 	}

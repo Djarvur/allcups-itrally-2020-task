@@ -5,12 +5,10 @@
 package app
 
 import (
+	game "github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
+	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 	time "time"
-
-	gomock "github.com/golang/mock/gomock"
-
-	game "github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
 // MockAppl is a mock of Appl interface

@@ -31,6 +31,7 @@ type HealthCheckOK struct {
 
 // NewHealthCheckOK creates HealthCheckOK with default headers values
 func NewHealthCheckOK() *HealthCheckOK {
+
 	return &HealthCheckOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *HealthCheckOK) SetPayload(payload interface{}) {
 
 // WriteResponse to the client
 func (o *HealthCheckOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if err := producer.Produce(rw, payload); err != nil {
@@ -104,6 +106,7 @@ func (o *HealthCheckDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *HealthCheckDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload

@@ -31,6 +31,7 @@ type GetBalanceOK struct {
 
 // NewGetBalanceOK creates GetBalanceOK with default headers values
 func NewGetBalanceOK() *GetBalanceOK {
+
 	return &GetBalanceOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *GetBalanceOK) SetPayload(payload *model.Balance) {
 
 // WriteResponse to the client
 func (o *GetBalanceOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	if o.Payload != nil {
 		payload := o.Payload
@@ -106,6 +108,7 @@ func (o *GetBalanceDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *GetBalanceDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload

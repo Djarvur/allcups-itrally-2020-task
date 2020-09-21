@@ -19,6 +19,7 @@ import (
 // NewGetBalanceParams creates a new GetBalanceParams object
 // with the default values initialized.
 func NewGetBalanceParams() *GetBalanceParams {
+
 	return &GetBalanceParams{
 
 		timeout: cr.DefaultTimeout,
@@ -28,6 +29,7 @@ func NewGetBalanceParams() *GetBalanceParams {
 // NewGetBalanceParamsWithTimeout creates a new GetBalanceParams object
 // with the default values initialized, and the ability to set a timeout on a request
 func NewGetBalanceParamsWithTimeout(timeout time.Duration) *GetBalanceParams {
+
 	return &GetBalanceParams{
 
 		timeout: timeout,
@@ -37,6 +39,7 @@ func NewGetBalanceParamsWithTimeout(timeout time.Duration) *GetBalanceParams {
 // NewGetBalanceParamsWithContext creates a new GetBalanceParams object
 // with the default values initialized, and the ability to set a context for a request
 func NewGetBalanceParamsWithContext(ctx context.Context) *GetBalanceParams {
+
 	return &GetBalanceParams{
 
 		Context: ctx,
@@ -46,6 +49,7 @@ func NewGetBalanceParamsWithContext(ctx context.Context) *GetBalanceParams {
 // NewGetBalanceParamsWithHTTPClient creates a new GetBalanceParams object
 // with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewGetBalanceParamsWithHTTPClient(client *http.Client) *GetBalanceParams {
+
 	return &GetBalanceParams{
 		HTTPClient: client,
 	}
@@ -95,6 +99,7 @@ func (o *GetBalanceParams) SetHTTPClient(client *http.Client) {
 
 // WriteToRequest writes these params to a swagger request
 func (o *GetBalanceParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
+
 	if err := r.SetTimeout(o.timeout); err != nil {
 		return err
 	}

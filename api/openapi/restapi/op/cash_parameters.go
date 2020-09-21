@@ -19,6 +19,7 @@ import (
 // NewCashParams creates a new CashParams object
 // no default values defined in spec.
 func NewCashParams() CashParams {
+
 	return CashParams{}
 }
 

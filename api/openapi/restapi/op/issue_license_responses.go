@@ -31,6 +31,7 @@ type IssueLicenseOK struct {
 
 // NewIssueLicenseOK creates IssueLicenseOK with default headers values
 func NewIssueLicenseOK() *IssueLicenseOK {
+
 	return &IssueLicenseOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *IssueLicenseOK) SetPayload(payload *model.License) {
 
 // WriteResponse to the client
 func (o *IssueLicenseOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	if o.Payload != nil {
 		payload := o.Payload
@@ -107,6 +109,7 @@ func (o *IssueLicenseDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *IssueLicenseDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload

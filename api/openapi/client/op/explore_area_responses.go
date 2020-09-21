@@ -63,6 +63,7 @@ func (o *ExploreAreaOK) GetPayload() *model.Report {
 }
 
 func (o *ExploreAreaOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Report)
 
 	// response payload
@@ -104,6 +105,7 @@ func (o *ExploreAreaDefault) GetPayload() *model.Error {
 }
 
 func (o *ExploreAreaDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Error)
 
 	// response payload

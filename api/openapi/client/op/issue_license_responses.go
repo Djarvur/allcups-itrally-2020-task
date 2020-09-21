@@ -63,6 +63,7 @@ func (o *IssueLicenseOK) GetPayload() *model.License {
 }
 
 func (o *IssueLicenseOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.License)
 
 	// response payload
@@ -105,6 +106,7 @@ func (o *IssueLicenseDefault) GetPayload() *model.Error {
 }
 
 func (o *IssueLicenseDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Error)
 
 	// response payload

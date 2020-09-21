@@ -63,6 +63,7 @@ func (o *DigOK) GetPayload() model.TreasureList {
 }
 
 func (o *DigOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
@@ -104,6 +105,7 @@ func (o *DigDefault) GetPayload() *model.Error {
 }
 
 func (o *DigDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
 	o.Payload = new(model.Error)
 
 	// response payload

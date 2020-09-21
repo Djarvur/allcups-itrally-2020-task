@@ -31,6 +31,7 @@ type ListLicensesOK struct {
 
 // NewListLicensesOK creates ListLicensesOK with default headers values
 func NewListLicensesOK() *ListLicensesOK {
+
 	return &ListLicensesOK{}
 }
 
@@ -47,6 +48,7 @@ func (o *ListLicensesOK) SetPayload(payload model.LicenseList) {
 
 // WriteResponse to the client
 func (o *ListLicensesOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
@@ -109,6 +111,7 @@ func (o *ListLicensesDefault) SetPayload(payload *model.Error) {
 
 // WriteResponse to the client
 func (o *ListLicensesDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
 	rw.WriteHeader(o._statusCode)
 	if o.Payload != nil {
 		payload := o.Payload
