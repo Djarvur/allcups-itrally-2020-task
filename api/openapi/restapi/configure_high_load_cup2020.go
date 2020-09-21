@@ -12,7 +12,6 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 )
 
-
 func configureFlags(api *op.HighLoadCup2020API) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }

@@ -15,7 +15,6 @@ import (
 // NewGetBalanceParams creates a new GetBalanceParams object
 // no default values defined in spec.
 func NewGetBalanceParams() GetBalanceParams {
-
 	return GetBalanceParams{}
 }
 

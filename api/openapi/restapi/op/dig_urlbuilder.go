@@ -35,7 +35,7 @@ func (o *DigURL) SetBasePath(bp string) {
 func (o *DigURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/dig"
+	_path := "/dig"
 
 	_basePath := o._basePath
 	if _basePath == "" {

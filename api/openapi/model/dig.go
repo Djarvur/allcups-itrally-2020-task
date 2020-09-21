@@ -106,7 +106,6 @@ func (m *Dig) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Dig) validateLicenseID(formats strfmt.Registry) error {
-
 	if err := validate.Required("licenseID", "body", m.LicenseID); err != nil {
 		return err
 	}
@@ -115,7 +114,6 @@ func (m *Dig) validateLicenseID(formats strfmt.Registry) error {
 }
 
 func (m *Dig) validatePosX(formats strfmt.Registry) error {
-
 	if err := validate.Required("posX", "body", m.PosX); err != nil {
 		return err
 	}
@@ -128,7 +126,6 @@ func (m *Dig) validatePosX(formats strfmt.Registry) error {
 }
 
 func (m *Dig) validatePosY(formats strfmt.Registry) error {
-
 	if err := validate.Required("posY", "body", m.PosY); err != nil {
 		return err
 	}
@@ -141,7 +138,6 @@ func (m *Dig) validatePosY(formats strfmt.Registry) error {
 }
 
 func (m *Dig) validateDepth(formats strfmt.Registry) error {
-
 	if err := validate.Required("depth", "body", m.Depth); err != nil {
 		return err
 	}

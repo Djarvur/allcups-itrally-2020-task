@@ -35,7 +35,7 @@ func (o *CashURL) SetBasePath(bp string) {
 func (o *CashURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/cash"
+	_path := "/cash"
 
 	_basePath := o._basePath
 	if _basePath == "" {

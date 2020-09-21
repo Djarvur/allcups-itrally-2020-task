@@ -63,7 +63,6 @@ func (o *ListLicensesOK) GetPayload() model.LicenseList {
 }
 
 func (o *ListLicensesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
@@ -103,7 +102,6 @@ func (o *ListLicensesDefault) GetPayload() *model.Error {
 }
 
 func (o *ListLicensesDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
 	o.Payload = new(model.Error)
 
 	// response payload

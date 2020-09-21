@@ -19,7 +19,6 @@ import (
 // NewIssueLicenseParams creates a new IssueLicenseParams object
 // no default values defined in spec.
 func NewIssueLicenseParams() IssueLicenseParams {
-
 	return IssueLicenseParams{}
 }
 

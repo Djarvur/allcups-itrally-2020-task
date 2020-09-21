@@ -10,14 +10,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/go-openapi/loads"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 	"github.com/powerman/structlog"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 type Ctx = context.Context

@@ -5,13 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 	"github.com/prometheus/client_golang/prometheus"
 	_ "github.com/smartystreets/goconvey/convey"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 func TestMain(m *testing.M) {

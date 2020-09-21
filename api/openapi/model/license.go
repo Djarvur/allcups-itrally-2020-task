@@ -85,7 +85,6 @@ func (m *License) Validate(formats strfmt.Registry) error {
 }
 
 func (m *License) validateID(formats strfmt.Registry) error {
-
 	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
@@ -94,7 +93,6 @@ func (m *License) validateID(formats strfmt.Registry) error {
 }
 
 func (m *License) validateDigAllowed(formats strfmt.Registry) error {
-
 	if err := m.DigAllowed.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("digAllowed")
@@ -106,7 +104,6 @@ func (m *License) validateDigAllowed(formats strfmt.Registry) error {
 }
 
 func (m *License) validateDigUsed(formats strfmt.Registry) error {
-
 	if err := m.DigUsed.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("digUsed")

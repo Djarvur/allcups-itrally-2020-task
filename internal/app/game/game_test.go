@@ -5,8 +5,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/powerman/check"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
 type C = game.Config

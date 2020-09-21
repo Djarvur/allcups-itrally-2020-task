@@ -6,10 +6,11 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 )
 
 // Default high load cup2020 HTTP client.

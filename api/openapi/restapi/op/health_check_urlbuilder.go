@@ -35,7 +35,7 @@ func (o *HealthCheckURL) SetBasePath(bp string) {
 func (o *HealthCheckURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/health-check"
+	_path := "/health-check"
 
 	_basePath := o._basePath
 	if _basePath == "" {

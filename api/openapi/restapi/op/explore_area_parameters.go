@@ -19,7 +19,6 @@ import (
 // NewExploreAreaParams creates a new ExploreAreaParams object
 // no default values defined in spec.
 func NewExploreAreaParams() ExploreAreaParams {
-
 	return ExploreAreaParams{}
 }
 

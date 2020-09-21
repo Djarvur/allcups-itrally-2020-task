@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/powerman/check"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
-	"github.com/powerman/check"
 )
 
 func Test(t *testing.T) {

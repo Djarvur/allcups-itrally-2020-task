@@ -74,7 +74,6 @@ func (m *Error) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Error) validateCode(formats strfmt.Registry) error {
-
 	if err := validate.Required("code", "body", m.Code); err != nil {
 		return err
 	}
@@ -83,7 +82,6 @@ func (m *Error) validateCode(formats strfmt.Registry) error {
 }
 
 func (m *Error) validateMessage(formats strfmt.Registry) error {
-
 	if err := validate.Required("message", "body", m.Message); err != nil {
 		return err
 	}

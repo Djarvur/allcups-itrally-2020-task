@@ -83,7 +83,6 @@ func (m *Report) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Report) validateArea(formats strfmt.Registry) error {
-
 	if err := validate.Required("area", "body", m.Area); err != nil {
 		return err
 	}
@@ -101,7 +100,6 @@ func (m *Report) validateArea(formats strfmt.Registry) error {
 }
 
 func (m *Report) validateAmount(formats strfmt.Registry) error {
-
 	if err := m.Amount.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("amount")
@@ -113,19 +111,16 @@ func (m *Report) validateAmount(formats strfmt.Registry) error {
 }
 
 func (m *Report) validateAmountPerDepth(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AmountPerDepth) { // not required
 		return nil
 	}
 
 	for k := range m.AmountPerDepth {
-
 		if val, ok := m.AmountPerDepth[k]; ok {
 			if err := val.Validate(formats); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	return nil

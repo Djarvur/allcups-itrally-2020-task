@@ -15,7 +15,6 @@ import (
 // NewListLicensesParams creates a new ListLicensesParams object
 // no default values defined in spec.
 func NewListLicensesParams() ListLicensesParams {
-
 	return ListLicensesParams{}
 }
 

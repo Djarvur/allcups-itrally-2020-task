@@ -72,7 +72,6 @@ func (m *Balance) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Balance) validateBalance(formats strfmt.Registry) error {
-
 	if err := validate.Required("balance", "body", m.Balance); err != nil {
 		return err
 	}
@@ -81,7 +80,6 @@ func (m *Balance) validateBalance(formats strfmt.Registry) error {
 }
 
 func (m *Balance) validateWallet(formats strfmt.Registry) error {
-
 	if err := validate.Required("wallet", "body", m.Wallet); err != nil {
 		return err
 	}

@@ -1,8 +1,9 @@
 package openapi
 
 import (
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/go-openapi/swag"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 )
 
 // APIError returns model.Error with given code and msg.

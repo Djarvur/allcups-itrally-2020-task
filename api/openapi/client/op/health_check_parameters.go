@@ -19,7 +19,6 @@ import (
 // NewHealthCheckParams creates a new HealthCheckParams object
 // with the default values initialized.
 func NewHealthCheckParams() *HealthCheckParams {
-
 	return &HealthCheckParams{
 
 		timeout: cr.DefaultTimeout,
@@ -29,7 +28,6 @@ func NewHealthCheckParams() *HealthCheckParams {
 // NewHealthCheckParamsWithTimeout creates a new HealthCheckParams object
 // with the default values initialized, and the ability to set a timeout on a request
 func NewHealthCheckParamsWithTimeout(timeout time.Duration) *HealthCheckParams {
-
 	return &HealthCheckParams{
 
 		timeout: timeout,
@@ -39,7 +37,6 @@ func NewHealthCheckParamsWithTimeout(timeout time.Duration) *HealthCheckParams {
 // NewHealthCheckParamsWithContext creates a new HealthCheckParams object
 // with the default values initialized, and the ability to set a context for a request
 func NewHealthCheckParamsWithContext(ctx context.Context) *HealthCheckParams {
-
 	return &HealthCheckParams{
 
 		Context: ctx,
@@ -49,7 +46,6 @@ func NewHealthCheckParamsWithContext(ctx context.Context) *HealthCheckParams {
 // NewHealthCheckParamsWithHTTPClient creates a new HealthCheckParams object
 // with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewHealthCheckParamsWithHTTPClient(client *http.Client) *HealthCheckParams {
-
 	return &HealthCheckParams{
 		HTTPClient: client,
 	}
@@ -99,7 +95,6 @@ func (o *HealthCheckParams) SetHTTPClient(client *http.Client) {
 
 // WriteToRequest writes these params to a swagger request
 func (o *HealthCheckParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
-
 	if err := r.SetTimeout(o.timeout); err != nil {
 		return err
 	}

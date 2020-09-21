@@ -3,8 +3,9 @@ package main
 import (
 	"runtime"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 func initMetrics(reg *prometheus.Registry, namespace string) {

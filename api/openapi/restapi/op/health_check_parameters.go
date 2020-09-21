@@ -15,7 +15,6 @@ import (
 // NewHealthCheckParams creates a new HealthCheckParams object
 // no default values defined in spec.
 func NewHealthCheckParams() HealthCheckParams {
-
 	return HealthCheckParams{}
 }
 

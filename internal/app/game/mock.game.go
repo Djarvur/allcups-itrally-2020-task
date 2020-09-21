@@ -5,8 +5,9 @@
 package game
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockGame is a mock of Game interface

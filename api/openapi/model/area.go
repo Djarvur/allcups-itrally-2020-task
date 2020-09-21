@@ -102,7 +102,6 @@ func (m *Area) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Area) validatePosX(formats strfmt.Registry) error {
-
 	if err := validate.Required("posX", "body", m.PosX); err != nil {
 		return err
 	}
@@ -115,7 +114,6 @@ func (m *Area) validatePosX(formats strfmt.Registry) error {
 }
 
 func (m *Area) validatePosY(formats strfmt.Registry) error {
-
 	if err := validate.Required("posY", "body", m.PosY); err != nil {
 		return err
 	}
@@ -128,7 +126,6 @@ func (m *Area) validatePosY(formats strfmt.Registry) error {
 }
 
 func (m *Area) validateSizeX(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.SizeX) { // not required
 		return nil
 	}
@@ -141,7 +138,6 @@ func (m *Area) validateSizeX(formats strfmt.Registry) error {
 }
 
 func (m *Area) validateSizeY(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.SizeY) { // not required
 		return nil
 	}

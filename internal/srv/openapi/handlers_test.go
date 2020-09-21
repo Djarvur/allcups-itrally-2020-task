@@ -4,13 +4,14 @@ import (
 	"io"
 	"testing"
 
+	"github.com/go-openapi/swag"
+	"github.com/golang/mock/gomock"
+	"github.com/powerman/check"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
-	"github.com/go-openapi/swag"
-	"github.com/golang/mock/gomock"
-	"github.com/powerman/check"
 )
 
 func TestHealthCheck(tt *testing.T) {

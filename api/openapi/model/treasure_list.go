@@ -22,14 +22,12 @@ func (m TreasureList) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {
-
 		if err := m[i].Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName(strconv.Itoa(i))
 			}
 			return err
 		}
-
 	}
 
 	if len(res) > 0 {

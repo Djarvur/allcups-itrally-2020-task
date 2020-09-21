@@ -4,8 +4,9 @@ import (
 	"io"
 	"testing"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/powerman/check"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
 func TestBalance(tt *testing.T) {

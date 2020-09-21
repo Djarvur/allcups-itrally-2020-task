@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/must"
 	"github.com/spf13/pflag"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 )
 
 // MustGetServeTest returns config suitable for use in tests.
