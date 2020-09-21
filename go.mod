@@ -13,7 +13,7 @@ require (
 	github.com/go-openapi/validate v0.19.11
 	github.com/golang/mock v1.4.4
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/lestrrat-go/jwx v1.0.4
+	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/powerman/appcfg v0.5.0
 	github.com/powerman/check v1.2.1
 	github.com/powerman/getenv v0.1.0
