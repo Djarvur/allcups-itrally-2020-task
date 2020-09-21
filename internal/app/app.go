@@ -5,10 +5,15 @@ package app
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"fmt"
+	"io"
 	"sync"
 	"time"
+
+	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/powerman/must"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
@@ -107,6 +112,7 @@ type App struct {
 	game      game.Game
 	started   chan time.Time
 	startOnce sync.Once
+	key       jwk.SymmetricKey
 }
 
 // GameFactory creates and returns new game.
@@ -126,7 +132,13 @@ func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
 		cfg:     cfg,
 		game:    g,
 		started: make(chan time.Time, 1),
+		key:     jwk.NewSymmetricKey(),
 	}
+
+	buf := make([]byte, 16)
+	_, err = io.ReadFull(rand.Reader, buf)
+	must.NoErr(err)
+	must.NoErr(a.key.FromRaw(buf))
 
 	t, err := a.repo.LoadStartTime()
 	if err != nil {

@@ -8,16 +8,17 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
 	_ "github.com/smartystreets/goconvey/convey"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 )
 
 func TestMain(m *testing.M) {

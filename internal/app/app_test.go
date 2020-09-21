@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
 func TestNew(tt *testing.T) {

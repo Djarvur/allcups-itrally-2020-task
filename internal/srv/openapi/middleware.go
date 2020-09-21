@@ -9,15 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/felixge/httpsnoop"
 	"github.com/go-openapi/swag"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
 	corspkg "github.com/rs/cors"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 type middlewareFunc func(http.Handler) http.Handler

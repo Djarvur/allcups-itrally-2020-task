@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/internal/dal"
 	"github.com/powerman/check"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/dal"
 )
 
 func TestStartTime(tt *testing.T) {

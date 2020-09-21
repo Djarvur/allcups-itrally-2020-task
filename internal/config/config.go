@@ -10,12 +10,13 @@ package config
 import (
 	"time"
 
+	"github.com/powerman/appcfg"
+	"github.com/spf13/pflag"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
-	"github.com/powerman/appcfg"
-	"github.com/spf13/pflag"
 )
 
 // EnvPrefix defines common prefix for environment variables.

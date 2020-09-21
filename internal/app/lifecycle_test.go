@@ -5,11 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/powerman/check"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
-	"github.com/golang/mock/gomock"
-	"github.com/powerman/check"
 )
 
 func TestWait(tt *testing.T) {

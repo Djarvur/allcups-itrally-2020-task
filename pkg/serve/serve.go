@@ -7,12 +7,13 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 	"github.com/powerman/must"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 )
 
 // Ctx is a synonym for convenience.

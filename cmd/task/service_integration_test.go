@@ -7,14 +7,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-openapi/swag"
+	"github.com/powerman/check"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
-	"github.com/go-openapi/swag"
-	"github.com/powerman/check"
 )
 
 func TestTaskDuration(tt *testing.T) {
@@ -83,7 +84,7 @@ func TestSmoke(tt *testing.T) {
 			SizeX: 1,
 			SizeY: 1,
 		}
-		treasure = model.Treasure(`{"X":1247,"Y":1366,"Depth":1}`)
+		treasure model.Treasure
 	)
 
 	{
@@ -123,7 +124,9 @@ func TestSmoke(tt *testing.T) {
 		}
 		res, err := openapiClient.Op.Dig(op.NewDigParams().WithArgs(args))
 		t.Nil(err)
-		t.DeepEqual(res, &op.DigOK{Payload: model.TreasureList{treasure}})
+		t.NotNil(res)
+		t.Len(res.Payload, 1)
+		treasure = res.Payload[0]
 	}
 	{
 		args := treasure

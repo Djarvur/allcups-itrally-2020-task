@@ -3,9 +3,10 @@ package openapi
 import (
 	"strconv"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/go-openapi/loads"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 )
 
 // Metric contains general metrics for OpenAPI methods.

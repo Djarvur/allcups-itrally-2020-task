@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/powerman/check"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/config"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
-	"github.com/powerman/check"
 )
 
 func TestMain(m *testing.M) {

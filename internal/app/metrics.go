@@ -1,8 +1,9 @@
 package app
 
 import (
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 //nolint:gochecknoglobals // Metrics are global anyway.

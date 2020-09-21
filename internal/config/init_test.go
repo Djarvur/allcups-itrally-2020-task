@@ -4,10 +4,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/powerman/check"
 	_ "github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/pflag"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 var (

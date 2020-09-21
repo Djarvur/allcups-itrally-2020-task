@@ -10,11 +10,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/cobrax"
-	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/powerman/appcfg"
 	"github.com/powerman/structlog"
 	"github.com/spf13/cobra"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/cobrax"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 //nolint:gochecknoglobals // Main.

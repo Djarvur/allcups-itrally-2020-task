@@ -1,9 +1,10 @@
 package openapi
 
 import (
+	"github.com/go-openapi/swag"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
-	"github.com/go-openapi/swag"
 )
 
 func appWallet(ms model.Wallet) []int {

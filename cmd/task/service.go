@@ -4,6 +4,10 @@ import (
 	"context"
 	"regexp"
 
+	"github.com/powerman/structlog"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/spf13/cobra"
+
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
@@ -13,9 +17,6 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/concurrent"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/serve"
-	"github.com/powerman/structlog"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/spf13/cobra"
 )
 
 // Ctx is a synonym for convenience.
