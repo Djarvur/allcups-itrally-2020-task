@@ -4,6 +4,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/o1egl/paseto/v2"
 	"github.com/powerman/check"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
@@ -44,4 +45,72 @@ func TestExploreArea(tt *testing.T) {
 	count, err = a.ExploreArea(ctx, game.Area{X: 5, Y: 0, SizeX: 1, SizeY: 1})
 	t.Err(err, io.EOF)
 	t.Equal(count, 0)
+}
+
+func TestDig(tt *testing.T) {
+	t := check.T(tt)
+	cleanup, a, _, mockGame := testNew(t)
+	defer cleanup()
+
+	mockGame.EXPECT().Dig(1, game.Coord{X: 0, Y: 0, Depth: 0}).Return(false, game.ErrWrongDepth)
+	mockGame.EXPECT().Dig(1, game.Coord{X: 0, Y: 0, Depth: 1}).Return(false, nil)
+	mockGame.EXPECT().Dig(1, game.Coord{X: 0, Y: 0, Depth: 2}).Return(true, nil)
+
+	tests := []struct {
+		licenseID int
+		pos       game.Coord
+		want      string
+		wantErr   error
+	}{
+		{1, game.Coord{X: 0, Y: 0, Depth: 0}, `^$`, game.ErrWrongDepth},
+		{1, game.Coord{X: 0, Y: 0, Depth: 1}, `^$`, nil},
+		{1, game.Coord{X: 0, Y: 0, Depth: 2}, `^v2[.]local[.]`, nil},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run("", func(tt *testing.T) {
+			t := check.T(tt)
+			res, err := a.Dig(ctx, tc.licenseID, tc.pos)
+			t.Err(err, tc.wantErr)
+			t.Match(res, tc.want)
+		})
+	}
+}
+
+func TestCash(tt *testing.T) {
+	t := check.T(tt)
+	cleanup, a, _, mockGame := testNew(t)
+	defer cleanup()
+	cleanup2, a2, _, _ := testNew(t)
+	defer cleanup2()
+
+	mockGame.EXPECT().Dig(1, game.Coord{X: 0, Y: 0, Depth: 1}).Return(true, nil)
+	treasure, err := a.Dig(ctx, 1, game.Coord{X: 0, Y: 0, Depth: 1})
+	t.Nil(err)
+	t.HasPrefix(treasure, "v2.local.")
+
+	mockGame.EXPECT().Cash(game.Coord{X: 0, Y: 0, Depth: 1}).Return([]int{0, 1}, nil)
+
+	tests := []struct {
+		treasure string
+		want     []int
+		wantErr  error
+	}{
+		{"", nil, paseto.ErrIncorrectTokenHeader},
+		{"v2.local.AAAA", nil, paseto.ErrIncorrectTokenFormat},
+		{treasure, []int{0, 1}, nil},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run("", func(tt *testing.T) {
+			t := check.T(tt)
+			res, err := a.Cash(ctx, tc.treasure)
+			t.Err(err, tc.wantErr)
+			t.DeepEqual(res, tc.want)
+		})
+	}
+
+	res, err := a2.Cash(ctx, treasure)
+	t.Err(err, paseto.ErrInvalidTokenAuth)
+	t.Nil(res)
 }
