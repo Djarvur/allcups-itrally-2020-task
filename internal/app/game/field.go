@@ -3,6 +3,8 @@ package game
 import (
 	"fmt"
 	"sync"
+
+	"github.com/powerman/must"
 )
 
 type field struct {
@@ -19,6 +21,21 @@ func newField(cfg Config) *field {
 		depth:     make([]uint8, cfg.area()),
 		treasure:  make([]bool, cfg.volume()),
 		notCashed: make([]bool, cfg.volume()),
+	}
+}
+
+func (f *field) init() {
+	for x := 0; x < f.cfg.SizeX; x++ {
+		for y := 0; y < f.cfg.SizeY; y++ {
+			areaOffset, err := f.areaOffset(x, y)
+			must.NoErr(err)
+			for depth := uint8(1); depth <= f.depth[areaOffset]; depth++ {
+				offset, err := f.offset(Coord{X: x, Y: y, Depth: depth})
+				must.NoErr(err)
+				f.treasure[offset] = false
+				f.notCashed[offset] = false
+			}
+		}
 	}
 }
 

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/powerman/must"
+	"github.com/powerman/structlog"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
@@ -22,7 +23,8 @@ type Ctx = context.Context
 
 // Errors.
 var (
-	ErrContactExists = errors.New("contact already exists")
+	ErrContactExists    = errors.New("contact already exists")
+	errBadPASETOKeySize = errors.New("bad PASETO key size")
 )
 
 // Appl provides application features (use cases) service.
@@ -70,6 +72,21 @@ type Repo interface {
 	// SaveStartTime stores start time.
 	// Errors: none.
 	SaveStartTime(t time.Time) error
+	// LoadTreasureKey returns treasure key.
+	// Errors: none.
+	LoadTreasureKey() ([]byte, error)
+	// SaveTreasureKey stores treasure key.
+	// Errors: none.
+	SaveTreasureKey([]byte) error
+	// LoadGame returns game state.
+	// Errors: none.
+	LoadGame() (ReadSeekCloser, error)
+	// SaveGame stores game state.
+	// Errors: none.
+	SaveGame(io.WriterTo) error
+	// SaveResult stores final game result.
+	// Errors: none.
+	SaveResult(int) error
 }
 
 type (
@@ -78,7 +95,15 @@ type (
 		ID   int
 		Name string
 	}
+	// ReadSeekCloser is the interface that groups the basic Read,
+	// Seek and Close methods.
+	ReadSeekCloser interface {
+		io.ReadSeeker
+		io.Closer
+	}
 )
+
+const pasetoKeySize = 32
 
 // Difficulty contains predefined game difficulty levels.
 //nolint:gochecknoglobals,gomnd // Const.
@@ -118,36 +143,80 @@ type App struct {
 type GameFactory func(game.Config) (game.Game, error)
 
 func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
-	if cfg.Game != Difficulty["test"] && cfg.Game.Seed == 0 {
-		cfg.Game.Seed = time.Now().UnixNano() // TODO Restore after crash?
-	}
-	g, err := newGame(cfg.Game)
-	if err != nil {
-		return nil, fmt.Errorf("newGame: %w", err)
-	}
-
 	a := &App{
 		repo:    repo,
 		cfg:     cfg,
-		game:    g,
 		started: make(chan time.Time, 1),
-		key:     make([]byte, 32),
+		key:     make([]byte, pasetoKeySize),
 	}
-
-	_, err = io.ReadFull(rand.Reader, a.key)
-	must.NoErr(err)
-
 	t, err := a.repo.LoadStartTime()
 	if err != nil {
 		return nil, fmt.Errorf("LoadStartTime: %w", err)
 	}
-	if !t.IsZero() {
-		err = a.Start(*t)
+	if t.IsZero() {
+		err = a.startGame(newGame)
+	} else {
+		err = a.continueGame(*t)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("SaveStartTime: %w", err)
+		return nil, err
 	}
 	return a, nil
+}
+
+func (a *App) startGame(newGame GameFactory) (err error) {
+	if a.cfg.Game != Difficulty["test"] && a.cfg.Game.Seed == 0 {
+		a.cfg.Game.Seed = time.Now().UnixNano()
+	}
+
+	_, err = io.ReadFull(rand.Reader, a.key)
+	must.NoErr(err)
+	a.game, err = newGame(a.cfg.Game)
+	if err != nil {
+		return fmt.Errorf("newGame: %w", err)
+	}
+
+	err = a.repo.SaveTreasureKey(a.key)
+	if err != nil {
+		return fmt.Errorf("SaveTreasureKey: %w", err)
+	}
+	err = a.repo.SaveGame(a.game)
+	if err != nil {
+		return fmt.Errorf("SaveGame: %w", err)
+	}
+
+	structlog.New().Info("new game")
+	return nil
+}
+
+func (a *App) continueGame(t time.Time) (err error) {
+	a.key, err = a.repo.LoadTreasureKey()
+	if err != nil {
+		return fmt.Errorf("LoadTreasureKey: %w", err)
+	}
+	if len(a.key) != pasetoKeySize {
+		return fmt.Errorf("%w: %d", errBadPASETOKeySize, len(a.key))
+	}
+
+	f, err := a.repo.LoadGame()
+	if err != nil {
+		return fmt.Errorf("LoadGame: %w", err)
+	}
+	a.game, err = game.NewFrom(f)
+	if err != nil {
+		return fmt.Errorf("game.NewFrom: %w", err)
+	}
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("LoadGame.Close: %w", err)
+	}
+
+	structlog.New().Info("continue game")
+	err = a.Start(t)
+	if err != nil {
+		return fmt.Errorf("SaveStartTime: %w", err)
+	}
+	return nil
 }
 
 func (a *App) HealthCheck(_ Ctx) (interface{}, error) {

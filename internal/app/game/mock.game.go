@@ -6,6 +6,7 @@ package game
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	io "io"
 	reflect "reflect"
 )
 
@@ -30,6 +31,21 @@ func NewMockGame(ctrl *gomock.Controller) *MockGame {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockGame) EXPECT() *MockGameMockRecorder {
 	return m.recorder
+}
+
+// WriteTo mocks base method
+func (m *MockGame) WriteTo(w io.Writer) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteTo", w)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// WriteTo indicates an expected call of WriteTo
+func (mr *MockGameMockRecorder) WriteTo(w interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteTo", reflect.TypeOf((*MockGame)(nil).WriteTo), w)
 }
 
 // Balance mocks base method

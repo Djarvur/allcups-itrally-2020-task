@@ -21,6 +21,17 @@ func newLicenses(maxActive int) *licenses {
 	}
 }
 
+func (ls *licenses) init(active []License) {
+	for i := range active {
+		l := active[i]
+		if ls.nextID < l.ID+1 {
+			ls.nextID = l.ID + 1
+		}
+		ls.licenses[l.ID] = &l
+		ls.isActive[l.ID] = true
+	}
+}
+
 func (ls *licenses) active() []License {
 	ls.mu.Lock()
 	defer ls.mu.Unlock()
