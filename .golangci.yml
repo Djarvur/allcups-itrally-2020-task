@@ -406,6 +406,11 @@ issues:
       linters:
         - gocritic
 
+    - path: _test\.go|testing(_.*)?\.go
+      text: '"t" shadows'
+      linters:
+        - govet
+
     # Package def is designed to contain global constants.
     - path: pkg/def/
       linters:
