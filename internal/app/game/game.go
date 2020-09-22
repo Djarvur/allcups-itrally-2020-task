@@ -6,6 +6,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"io"
 	prng "math/rand"
 	"sync"
 
@@ -34,6 +35,8 @@ var (
 
 // Game implements treasure hunting game.
 type Game interface {
+	// WriteTo saves current game state.
+	WriteTo(w io.Writer) (n int64, err error)
 	// Balance returns current balance and up to 1000 issued coins.
 	Balance() (balance int, wallet []int)
 	// Licenses returns all active licenses.
@@ -92,6 +95,7 @@ type Config struct {
 type game struct {
 	cfg      Config
 	log      *structlog.Logger
+	muModify sync.RWMutex
 	licenses *licenses
 	bank     *bank
 	field    *field
@@ -147,6 +151,9 @@ func (g *game) Licenses() []License {
 }
 
 func (g *game) IssueLicense(wallet []int) (l License, err error) {
+	g.muModify.RLock()
+	defer g.muModify.RUnlock()
+
 	digAllowed := g.licensePrice(len(wallet))
 	license, err := g.licenses.beginIssue(digAllowed)
 	if err != nil {
@@ -166,6 +173,9 @@ func (g *game) CountTreasures(area Area, depth uint8) (int, error) {
 }
 
 func (g *game) Dig(licenseID int, pos Coord) (found bool, _ error) {
+	g.muModify.RLock()
+	defer g.muModify.RUnlock()
+
 	err := g.licenses.use(licenseID)
 	if err != nil {
 		return false, err
@@ -174,6 +184,9 @@ func (g *game) Dig(licenseID int, pos Coord) (found bool, _ error) {
 }
 
 func (g *game) Cash(pos Coord) (wallet []int, err error) {
+	g.muModify.RLock()
+	defer g.muModify.RUnlock()
+
 	err = g.field.cash(pos)
 	if err != nil {
 		return nil, err

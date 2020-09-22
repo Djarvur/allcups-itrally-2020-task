@@ -18,6 +18,7 @@ func TestWait(tt *testing.T) {
 	t.Parallel()
 	cleanup, a, mockRepo, _ := testNew(t)
 	defer cleanup()
+	mockRepo.EXPECT().SaveResult(0).Return(nil)
 
 	{ // ctxShutdown before a.Start().
 		ctx, shutdown := context.WithCancel(ctx)
@@ -37,6 +38,8 @@ func TestWait(tt *testing.T) {
 	}
 	{ // No ctxShutdown.
 		mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
+		mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
+		mockRepo.EXPECT().SaveGame(gomock.Any()).Return(nil).AnyTimes()
 		a, err := app.New(mockRepo, game.New, app.Config{
 			Duration: def.TestSecond,
 			Game:     app.Difficulty["test"],

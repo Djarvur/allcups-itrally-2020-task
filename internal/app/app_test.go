@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"bytes"
 	"io"
 	"testing"
 	"time"
@@ -29,17 +30,36 @@ func TestNew(tt *testing.T) {
 	_, err := app.New(mockRepo, game.New, cfg)
 	t.Err(err, io.EOF)
 
+	var dump *bytes.Buffer
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
+	mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
+	mockRepo.EXPECT().SaveGame(gomock.Any()).DoAndReturn(func(g io.WriterTo) error {
+		if dump == nil {
+			dump = new(bytes.Buffer)
+			g.WriteTo(dump)
+		}
+		return nil
+	}).AnyTimes()
 	_, err = app.New(mockRepo, game.New, cfg)
 	t.Nil(err)
 
 	mockRepo.EXPECT().LoadStartTime().Return(&start, nil)
-	mockRepo.EXPECT().SaveStartTime(start).Return(io.EOF)
+	mockRepo.EXPECT().LoadTreasureKey().Return(make([]byte, 32), nil)
+	mockRepo.EXPECT().LoadGame().Return(nil, io.EOF)
 	_, err = app.New(mockRepo, game.New, cfg)
 	t.Err(err, io.EOF)
 
+	dumpReader := nopCloser{bytes.NewReader(dump.Bytes())}
 	mockRepo.EXPECT().LoadStartTime().Return(&start, nil)
+	mockRepo.EXPECT().LoadTreasureKey().Return(make([]byte, 32), nil)
+	mockRepo.EXPECT().LoadGame().Return(dumpReader, nil)
 	mockRepo.EXPECT().SaveStartTime(start).Return(nil)
 	_, err = app.New(mockRepo, game.New, cfg)
 	t.Nil(err)
 }
+
+type nopCloser struct {
+	io.ReadSeeker
+}
+
+func (nopCloser) Close() error { return nil }

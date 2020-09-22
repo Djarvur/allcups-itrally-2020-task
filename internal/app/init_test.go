@@ -35,6 +35,8 @@ func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
 
 	mockRepo := app.NewMockRepo(ctrl)
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
+	mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
+	mockRepo.EXPECT().SaveGame(gomock.Any()).Return(nil).AnyTimes()
 	mockGame := game.NewMockGame(ctrl)
 	newGame := func(_ game.Config) (game.Game, error) { return mockGame, nil }
 

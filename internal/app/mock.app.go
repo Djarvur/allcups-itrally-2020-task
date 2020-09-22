@@ -7,6 +7,7 @@ package app
 import (
 	game "github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 	gomock "github.com/golang/mock/gomock"
+	io "io"
 	reflect "reflect"
 	time "time"
 )
@@ -204,4 +205,143 @@ func (m *MockRepo) SaveStartTime(t time.Time) error {
 func (mr *MockRepoMockRecorder) SaveStartTime(t interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveStartTime", reflect.TypeOf((*MockRepo)(nil).SaveStartTime), t)
+}
+
+// LoadTreasureKey mocks base method
+func (m *MockRepo) LoadTreasureKey() ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadTreasureKey")
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadTreasureKey indicates an expected call of LoadTreasureKey
+func (mr *MockRepoMockRecorder) LoadTreasureKey() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadTreasureKey", reflect.TypeOf((*MockRepo)(nil).LoadTreasureKey))
+}
+
+// SaveTreasureKey mocks base method
+func (m *MockRepo) SaveTreasureKey(arg0 []byte) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveTreasureKey", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveTreasureKey indicates an expected call of SaveTreasureKey
+func (mr *MockRepoMockRecorder) SaveTreasureKey(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveTreasureKey", reflect.TypeOf((*MockRepo)(nil).SaveTreasureKey), arg0)
+}
+
+// LoadGame mocks base method
+func (m *MockRepo) LoadGame() (ReadSeekCloser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadGame")
+	ret0, _ := ret[0].(ReadSeekCloser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadGame indicates an expected call of LoadGame
+func (mr *MockRepoMockRecorder) LoadGame() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadGame", reflect.TypeOf((*MockRepo)(nil).LoadGame))
+}
+
+// SaveGame mocks base method
+func (m *MockRepo) SaveGame(arg0 io.WriterTo) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveGame", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveGame indicates an expected call of SaveGame
+func (mr *MockRepoMockRecorder) SaveGame(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveGame", reflect.TypeOf((*MockRepo)(nil).SaveGame), arg0)
+}
+
+// SaveResult mocks base method
+func (m *MockRepo) SaveResult(arg0 int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveResult", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveResult indicates an expected call of SaveResult
+func (mr *MockRepoMockRecorder) SaveResult(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveResult", reflect.TypeOf((*MockRepo)(nil).SaveResult), arg0)
+}
+
+// MockReadSeekCloser is a mock of ReadSeekCloser interface
+type MockReadSeekCloser struct {
+	ctrl     *gomock.Controller
+	recorder *MockReadSeekCloserMockRecorder
+}
+
+// MockReadSeekCloserMockRecorder is the mock recorder for MockReadSeekCloser
+type MockReadSeekCloserMockRecorder struct {
+	mock *MockReadSeekCloser
+}
+
+// NewMockReadSeekCloser creates a new mock instance
+func NewMockReadSeekCloser(ctrl *gomock.Controller) *MockReadSeekCloser {
+	mock := &MockReadSeekCloser{ctrl: ctrl}
+	mock.recorder = &MockReadSeekCloserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockReadSeekCloser) EXPECT() *MockReadSeekCloserMockRecorder {
+	return m.recorder
+}
+
+// Read mocks base method
+func (m *MockReadSeekCloser) Read(p []byte) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Read", p)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Read indicates an expected call of Read
+func (mr *MockReadSeekCloserMockRecorder) Read(p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockReadSeekCloser)(nil).Read), p)
+}
+
+// Seek mocks base method
+func (m *MockReadSeekCloser) Seek(offset int64, whence int) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Seek", offset, whence)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Seek indicates an expected call of Seek
+func (mr *MockReadSeekCloserMockRecorder) Seek(offset, whence interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Seek", reflect.TypeOf((*MockReadSeekCloser)(nil).Seek), offset, whence)
+}
+
+// Close mocks base method
+func (m *MockReadSeekCloser) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close
+func (mr *MockReadSeekCloserMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockReadSeekCloser)(nil).Close))
 }

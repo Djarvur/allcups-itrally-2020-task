@@ -2,13 +2,22 @@ package dal
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
+
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 )
 
-const fnStartTime = "start.time"
+const (
+	fnStartTime   = "start.time"
+	fnTreasureKey = "treasure.key"
+	fnGame        = "game.data"
+	fnResult      = "result.txt"
+)
 
 func (r *Repo) LoadStartTime() (*time.Time, error) {
 	t := new(time.Time)
@@ -27,14 +36,36 @@ func (r *Repo) LoadStartTime() (*time.Time, error) {
 }
 
 func (r *Repo) SaveStartTime(t time.Time) error {
-	path := filepath.Join(r.cfg.WorkDir, fnStartTime)
 	buf, err := t.MarshalText()
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(path+".tmp", buf, 0o600)
-	if err == nil {
-		err = os.Rename(path+".tmp", path)
+	return save(r.cfg.WorkDir, fnStartTime, buf)
+}
+
+func (r *Repo) LoadTreasureKey() ([]byte, error) {
+	path := filepath.Join(r.cfg.WorkDir, fnTreasureKey)
+	return ioutil.ReadFile(path) //nolint:gosec // False positive.
+}
+
+func (r *Repo) SaveTreasureKey(buf []byte) error {
+	return save(r.cfg.WorkDir, fnTreasureKey, buf)
+}
+
+func (r *Repo) LoadGame() (app.ReadSeekCloser, error) {
+	path := filepath.Join(r.cfg.WorkDir, fnGame)
+	return os.Open(path) //nolint:gosec // False positive.
+}
+
+func (r *Repo) SaveGame(from io.WriterTo) error {
+	return saveFrom(r.cfg.WorkDir, fnGame, from)
+}
+
+func (r *Repo) SaveResult(result int) error {
+	path := filepath.Join(r.cfg.ResultDir, fnResult)
+	_, err := os.Stat(path)
+	if !os.IsNotExist(err) {
+		return os.ErrExist
 	}
-	return err
+	return save(r.cfg.ResultDir, fnResult, []byte(strconv.Itoa(result)))
 }
