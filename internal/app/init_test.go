@@ -27,6 +27,11 @@ type Ctx = context.Context
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
 	ctx = context.Background()
+	cfg = app.Config{
+		Duration:       60 * def.TestSecond,
+		Game:           app.Difficulty["test"],
+		AutosavePeriod: def.TestSecond,
+	}
 )
 
 func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
@@ -41,10 +46,7 @@ func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
 	mockGameFactory := app.NewMockGameFactory(ctrl)
 	mockGameFactory.EXPECT().New(app.Difficulty["test"]).Return(mockGame, nil)
 
-	a, err := app.New(mockRepo, mockGameFactory, app.Config{
-		Duration: 60 * def.TestSecond,
-		Game:     app.Difficulty["test"],
-	})
+	a, err := app.New(mockRepo, mockGameFactory, cfg)
 	t.Must(t.Nil(err))
 	return ctrl.Finish, a, mockRepo, mockGame
 }

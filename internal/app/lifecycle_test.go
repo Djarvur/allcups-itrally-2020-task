@@ -40,10 +40,9 @@ func TestWait(tt *testing.T) {
 		mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
 		mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
 		mockRepo.EXPECT().SaveGame(gomock.Any()).Return(nil).AnyTimes()
-		a, err := app.New(mockRepo, game.Factory{}, app.Config{
-			Duration: def.TestSecond,
-			Game:     app.Difficulty["test"],
-		})
+		cfg := cfg
+		cfg.Duration = def.TestSecond
+		a, err := app.New(mockRepo, game.Factory{}, cfg)
 		t.Must(t.Nil(err))
 		ctx, shutdown := context.WithCancel(ctx)
 		defer shutdown()

@@ -125,8 +125,9 @@ var Difficulty = map[string]game.Config{
 }
 
 type Config struct {
-	Duration time.Duration
-	Game     game.Config
+	Duration       time.Duration
+	Game           game.Config
+	AutosavePeriod time.Duration
 }
 
 // App implements interface Appl.

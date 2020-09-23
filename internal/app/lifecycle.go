@@ -44,14 +44,12 @@ func (a *App) Start(t time.Time) (err error) {
 	return
 }
 
-const autosavePeriod = time.Second
-
 func (a *App) autosave(ctx Ctx, errc chan<- error) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.After(autosavePeriod):
+		case <-time.After(a.cfg.AutosavePeriod):
 			t := time.Now()
 			err := a.repo.SaveGame(a.game)
 			if err != nil {

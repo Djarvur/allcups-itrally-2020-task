@@ -18,27 +18,23 @@ var (
 	dump  = nopCloser{bytes.NewReader([]byte("save"))}
 )
 
-func testPrepare(t *check.C) (func(), *app.MockRepo, *game.MockGame, *app.MockGameFactory, app.Config, func(a *app.App, err error)) {
+func testPrepare(t *check.C) (func(), *app.MockRepo, *game.MockGame, *app.MockGameFactory, func(a *app.App, err error)) {
 	ctrl := gomock.NewController(t)
 	mockRepo := app.NewMockRepo(ctrl)
 	mockGame := game.NewMockGame(ctrl)
 	mockGameFactory := app.NewMockGameFactory(ctrl)
-	cfg := app.Config{
-		Duration: time.Minute,
-		Game:     app.Difficulty["test"],
-	}
 	wantErr := func(a *app.App, err error) {
 		t.Helper()
 		t.Err(err, io.EOF)
 		t.Nil(a)
 	}
-	return ctrl.Finish, mockRepo, mockGame, mockGameFactory, cfg, wantErr
+	return ctrl.Finish, mockRepo, mockGame, mockGameFactory, wantErr
 }
 
 func TestNew(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, mockRepo, mockGame, mockGameFactory, cfg, wantErr := testPrepare(t)
+	cleanup, mockRepo, mockGame, mockGameFactory, wantErr := testPrepare(t)
 	defer cleanup()
 
 	mockRepo.EXPECT().LoadStartTime().Return(nil, io.EOF)
@@ -54,6 +50,7 @@ func TestNew(tt *testing.T) {
 	mockGameFactory.EXPECT().New(cfgNormal7).Return(nil, io.EOF)
 	mockGameFactory.EXPECT().New(cfgTest).Return(nil, io.EOF)
 	mockGameFactory.EXPECT().New(cfgTest).Return(mockGame, nil).Times(3)
+	cfg := cfg
 	cfg.Game = cfgNormal
 	wantErr(app.New(mockRepo, mockGameFactory, cfg))
 	cfg.Game = cfgNormal7
@@ -77,7 +74,7 @@ func TestNew(tt *testing.T) {
 func TestContinue(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, mockRepo, mockGame, mockGameFactory, cfg, wantErr := testPrepare(t)
+	cleanup, mockRepo, mockGame, mockGameFactory, wantErr := testPrepare(t)
 	defer cleanup()
 
 	mockRepo.EXPECT().LoadStartTime().Return(&start, nil).AnyTimes()
@@ -112,7 +109,7 @@ func TestContinue(tt *testing.T) {
 func TestRestoreKey(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, mockRepo, mockGame, mockGameFactory, cfg, _ := testPrepare(t)
+	cleanup, mockRepo, mockGame, mockGameFactory, _ := testPrepare(t)
 	defer cleanup()
 	var key []byte
 
@@ -128,7 +125,7 @@ func TestRestoreKey(tt *testing.T) {
 	t.NotNil(a)
 
 	mockGame.EXPECT().Dig(1, game.Coord{X: 0, Y: 0, Depth: 1}).Return(true, nil)
-	treasure, err := a.Dig(ctx, 1, game.Coord{X: 0, Y: 0, Depth: 1})
+	treasure, _ := a.Dig(ctx, 1, game.Coord{X: 0, Y: 0, Depth: 1})
 
 	mockRepo.EXPECT().LoadStartTime().Return(&start, nil)
 	mockRepo.EXPECT().LoadTreasureKey().Return(key, nil)
