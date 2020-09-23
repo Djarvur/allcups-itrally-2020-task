@@ -1,4 +1,4 @@
-//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo
+//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo,GameFactory
 
 // Package app provides business logic.
 package app
@@ -125,8 +125,9 @@ var Difficulty = map[string]game.Config{
 }
 
 type Config struct {
-	Duration time.Duration
-	Game     game.Config
+	Duration       time.Duration
+	Game           game.Config
+	AutosavePeriod time.Duration
 }
 
 // App implements interface Appl.
@@ -140,9 +141,12 @@ type App struct {
 }
 
 // GameFactory creates and returns new game.
-type GameFactory func(game.Config) (game.Game, error)
+type GameFactory interface {
+	New(cfg game.Config) (game.Game, error)
+	Continue(r io.ReadSeeker) (game.Game, error)
+}
 
-func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
+func New(repo Repo, factory GameFactory, cfg Config) (*App, error) {
 	a := &App{
 		repo:    repo,
 		cfg:     cfg,
@@ -154,9 +158,9 @@ func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
 		return nil, fmt.Errorf("LoadStartTime: %w", err)
 	}
 	if t.IsZero() {
-		err = a.startGame(newGame)
+		err = a.newGame(factory)
 	} else {
-		err = a.continueGame(*t)
+		err = a.continueGame(factory, *t)
 	}
 	if err != nil {
 		return nil, err
@@ -164,14 +168,15 @@ func New(repo Repo, newGame GameFactory, cfg Config) (*App, error) {
 	return a, nil
 }
 
-func (a *App) startGame(newGame GameFactory) (err error) {
+func (a *App) newGame(factory GameFactory) (err error) {
 	if a.cfg.Game != Difficulty["test"] && a.cfg.Game.Seed == 0 {
 		a.cfg.Game.Seed = time.Now().UnixNano()
 	}
 
 	_, err = io.ReadFull(rand.Reader, a.key)
 	must.NoErr(err)
-	a.game, err = newGame(a.cfg.Game)
+
+	a.game, err = factory.New(a.cfg.Game)
 	if err != nil {
 		return fmt.Errorf("newGame: %w", err)
 	}
@@ -189,7 +194,7 @@ func (a *App) startGame(newGame GameFactory) (err error) {
 	return nil
 }
 
-func (a *App) continueGame(t time.Time) (err error) {
+func (a *App) continueGame(factory GameFactory, t time.Time) (err error) {
 	a.key, err = a.repo.LoadTreasureKey()
 	if err != nil {
 		return fmt.Errorf("LoadTreasureKey: %w", err)
@@ -202,9 +207,9 @@ func (a *App) continueGame(t time.Time) (err error) {
 	if err != nil {
 		return fmt.Errorf("LoadGame: %w", err)
 	}
-	a.game, err = game.NewFrom(f)
+	a.game, err = factory.Continue(f)
 	if err != nil {
-		return fmt.Errorf("game.NewFrom: %w", err)
+		return fmt.Errorf("factory.Continue: %w", err)
 	}
 	err = f.Close()
 	if err != nil {

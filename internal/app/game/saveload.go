@@ -11,14 +11,14 @@ type state struct {
 	Balance        int
 }
 
-// NewFrom creates and returns new game restored from given reader, which
+// Continue creates and returns new game restored from given reader, which
 // should contain data written by Game.WriteTo.
-func NewFrom(r io.ReadSeeker) (g Game, err error) {
+func (factory Factory) Continue(r io.ReadSeeker) (g Game, err error) {
 	var previous state
 	dec := json.NewDecoder(r)
 	err = dec.Decode(&previous)
 	if err == nil {
-		g, err = New(previous.Cfg)
+		g, err = factory.New(previous.Cfg)
 	}
 	if err == nil {
 		_, err = r.Seek(dec.InputOffset()+1, io.SeekStart)

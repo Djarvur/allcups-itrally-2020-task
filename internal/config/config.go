@@ -29,6 +29,7 @@ const envPrefix = "HLCUP2020_"
 var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	AddrHost        appcfg.NotEmptyString `env:"ADDR_HOST"`
 	AddrPort        appcfg.Port           `env:"ADDR_PORT"`
+	AutosavePeriod  appcfg.Duration
 	Difficulty      appcfg.OneOfString    `env:"DIFFICULTY"`
 	Duration        appcfg.Duration       `env:"DURATION"`
 	MetricsAddrPort appcfg.Port           `env:"METRICS_ADDR_PORT"`
@@ -37,6 +38,7 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 }{ // Defaults, if any:
 	AddrHost:        appcfg.MustNotEmptyString(def.Hostname),
 	AddrPort:        appcfg.MustPort("8000"),
+	AutosavePeriod:  appcfg.MustDuration("1s"),
 	Difficulty:      appcfg.NewOneOfString(difficulties()),
 	Duration:        appcfg.MustDuration("10m"),
 	MetricsAddrPort: appcfg.MustPort("9000"),
@@ -73,12 +75,13 @@ func Init(flagsets FlagSets) error {
 
 // ServeConfig contains configuration for subcommand.
 type ServeConfig struct {
-	Addr        netx.Addr
-	Duration    time.Duration
-	Game        game.Config
-	MetricsAddr netx.Addr
-	ResultDir   string
-	WorkDir     string
+	Addr           netx.Addr
+	AutosavePeriod time.Duration
+	Duration       time.Duration
+	Game           game.Config
+	MetricsAddr    netx.Addr
+	ResultDir      string
+	WorkDir        string
 }
 
 // GetServe validates and returns configuration for subcommand.
@@ -86,12 +89,13 @@ func GetServe() (c *ServeConfig, err error) {
 	defer cleanup()
 
 	c = &ServeConfig{
-		Addr:        netx.NewAddr(all.AddrHost.Value(&err), all.AddrPort.Value(&err)),
-		Duration:    all.Duration.Value(&err),
-		Game:        app.Difficulty[all.Difficulty.Value(&err)],
-		MetricsAddr: netx.NewAddr(all.AddrHost.Value(&err), all.MetricsAddrPort.Value(&err)),
-		ResultDir:   all.ResultDir.Value(&err),
-		WorkDir:     all.WorkDir.Value(&err),
+		Addr:           netx.NewAddr(all.AddrHost.Value(&err), all.AddrPort.Value(&err)),
+		AutosavePeriod: all.AutosavePeriod.Value(&err),
+		Duration:       all.Duration.Value(&err),
+		Game:           app.Difficulty[all.Difficulty.Value(&err)],
+		MetricsAddr:    netx.NewAddr(all.AddrHost.Value(&err), all.MetricsAddrPort.Value(&err)),
+		ResultDir:      all.ResultDir.Value(&err),
+		WorkDir:        all.WorkDir.Value(&err),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.Serve, all)

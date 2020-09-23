@@ -59,9 +59,10 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	if s.appl == nil {
-		s.appl, err = app.New(s.repo, game.New, app.Config{
-			Duration: s.cfg.Duration,
-			Game:     s.cfg.Game,
+		s.appl, err = app.New(s.repo, game.Factory{}, app.Config{
+			Duration:       s.cfg.Duration,
+			Game:           s.cfg.Game,
+			AutosavePeriod: s.cfg.AutosavePeriod,
 		})
 	}
 	if err != nil {

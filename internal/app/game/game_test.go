@@ -18,7 +18,7 @@ func TestSmoke(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.New(C{
+	g, err := game.Factory{}.New(C{
 		Seed:              666, // {2 0 1}, {0 0 2}, {0 1 2} and 1 duplicate
 		MaxActiveLicenses: 2,
 		Density:           3,
@@ -131,7 +131,7 @@ func TestNew(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := game.New(tc.cfg)
+			res, err := game.Factory{}.New(tc.cfg)
 			t.Nil(err)
 			count, err := res.CountTreasures(game.Area{
 				SizeX: tc.cfg.SizeX,
@@ -167,7 +167,7 @@ func TestNewErr(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := game.New(tc.cfg)
+			res, err := game.Factory{}.New(tc.cfg)
 			if tc.wantErr == nil {
 				t.Nil(err)
 				t.NotNil(res)
@@ -183,7 +183,7 @@ func TestBalance(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.New(C{ // {0 0 1}, {0 1 1}, {1 1 1}
+	g, err := game.Factory{}.New(C{ // {0 0 1}, {0 1 1}, {1 1 1}
 		Seed:              0,
 		MaxActiveLicenses: 2,
 		Density:           1,
@@ -207,7 +207,7 @@ func TestBalance(tt *testing.T) {
 	t.Equal(balance, 2)
 	t.DeepEqual(wallet, []int{2, 0})
 
-	g, err = game.New(C{
+	g, err = game.Factory{}.New(C{
 		MaxActiveLicenses: 40*40 + 1,
 		Density:           1,
 		SizeX:             40,
@@ -235,7 +235,7 @@ func TestLicenses(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.New(C{
+	g, err := game.Factory{}.New(C{
 		Seed:              1,
 		MaxActiveLicenses: 2,
 		Density:           1,
@@ -285,14 +285,14 @@ func TestCountTreasures(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g1, err := game.New(C{
+	g1, err := game.Factory{}.New(C{
 		Density: 1,
 		SizeX:   1,
 		SizeY:   1,
 		Depth:   1,
 	})
 	t.Nil(err)
-	g5, err := game.New(C{
+	g5, err := game.Factory{}.New(C{
 		Density: 5,
 		SizeX:   5,
 		SizeY:   5,
@@ -341,7 +341,7 @@ func TestDig(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.New(C{ // {0 0 1}, {0 1 1}, {1 0 1}, {1 1 1}, {0 0 2}
+	g, err := game.Factory{}.New(C{ // {0 0 1}, {0 1 1}, {1 0 1}, {1 1 1}, {0 0 2}
 		Seed:              0,
 		MaxActiveLicenses: 10,
 		Density:           1,
@@ -393,7 +393,7 @@ func TestCash(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.New(C{ // {0 0 1}, {0 1 1}, {1 0 1}, {1 1 1}, {0 0 2}
+	g, err := game.Factory{}.New(C{ // {0 0 1}, {0 1 1}, {1 0 1}, {1 1 1}, {0 0 2}
 		Seed:              0,
 		MaxActiveLicenses: 10,
 		Density:           1,
