@@ -345,3 +345,56 @@ func (mr *MockReadSeekCloserMockRecorder) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockReadSeekCloser)(nil).Close))
 }
+
+// MockGameFactory is a mock of GameFactory interface
+type MockGameFactory struct {
+	ctrl     *gomock.Controller
+	recorder *MockGameFactoryMockRecorder
+}
+
+// MockGameFactoryMockRecorder is the mock recorder for MockGameFactory
+type MockGameFactoryMockRecorder struct {
+	mock *MockGameFactory
+}
+
+// NewMockGameFactory creates a new mock instance
+func NewMockGameFactory(ctrl *gomock.Controller) *MockGameFactory {
+	mock := &MockGameFactory{ctrl: ctrl}
+	mock.recorder = &MockGameFactoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockGameFactory) EXPECT() *MockGameFactoryMockRecorder {
+	return m.recorder
+}
+
+// New mocks base method
+func (m *MockGameFactory) New(cfg game.Config) (game.Game, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "New", cfg)
+	ret0, _ := ret[0].(game.Game)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// New indicates an expected call of New
+func (mr *MockGameFactoryMockRecorder) New(cfg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockGameFactory)(nil).New), cfg)
+}
+
+// Continue mocks base method
+func (m *MockGameFactory) Continue(r io.ReadSeeker) (game.Game, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Continue", r)
+	ret0, _ := ret[0].(game.Game)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Continue indicates an expected call of Continue
+func (mr *MockGameFactoryMockRecorder) Continue(r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Continue", reflect.TypeOf((*MockGameFactory)(nil).Continue), r)
+}

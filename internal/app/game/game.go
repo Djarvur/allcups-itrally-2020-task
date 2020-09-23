@@ -103,8 +103,11 @@ type game struct {
 	prng     *prng.Rand
 }
 
+// Factory provide different ways to create a new game.
+type Factory struct{}
+
 // New creates and returns new game.
-func New(cfg Config) (Game, error) {
+func (Factory) New(cfg Config) (Game, error) {
 	switch {
 	case cfg.Density <= 0, cfg.Density > cfg.volume(): // Min 1 treasure.
 		return nil, fmt.Errorf("%w: Density", errOutOfBounds)

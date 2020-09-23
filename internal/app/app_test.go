@@ -27,7 +27,7 @@ func TestNew(tt *testing.T) {
 	start := time.Now()
 
 	mockRepo.EXPECT().LoadStartTime().Return(nil, io.EOF)
-	_, err := app.New(mockRepo, game.New, cfg)
+	_, err := app.New(mockRepo, game.Factory{}, cfg)
 	t.Err(err, io.EOF)
 
 	var dump *bytes.Buffer
@@ -40,13 +40,13 @@ func TestNew(tt *testing.T) {
 		}
 		return nil
 	}).AnyTimes()
-	_, err = app.New(mockRepo, game.New, cfg)
+	_, err = app.New(mockRepo, game.Factory{}, cfg)
 	t.Nil(err)
 
 	mockRepo.EXPECT().LoadStartTime().Return(&start, nil)
 	mockRepo.EXPECT().LoadTreasureKey().Return(make([]byte, 32), nil)
 	mockRepo.EXPECT().LoadGame().Return(nil, io.EOF)
-	_, err = app.New(mockRepo, game.New, cfg)
+	_, err = app.New(mockRepo, game.Factory{}, cfg)
 	t.Err(err, io.EOF)
 
 	dumpReader := nopCloser{bytes.NewReader(dump.Bytes())}
@@ -54,7 +54,7 @@ func TestNew(tt *testing.T) {
 	mockRepo.EXPECT().LoadTreasureKey().Return(make([]byte, 32), nil)
 	mockRepo.EXPECT().LoadGame().Return(dumpReader, nil)
 	mockRepo.EXPECT().SaveStartTime(start).Return(nil)
-	_, err = app.New(mockRepo, game.New, cfg)
+	_, err = app.New(mockRepo, game.Factory{}, cfg)
 	t.Nil(err)
 }
 
