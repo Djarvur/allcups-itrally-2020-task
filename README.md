@@ -83,5 +83,5 @@ An alternative is to just run `bin/task` or use `docker run`.
 docker run --name=hlcup2020_task -i -t --rm \
     -e HLCUP2020_DIFFICULTY=normal \
     -v hlcup2020-task:/home/app/var/data \
-    ghcr.io/djarvur/allcups-itrally-2020-task:0.2.4
+    ghcr.io/djarvur/allcups-itrally-2020-task:0.3.0
 ```
