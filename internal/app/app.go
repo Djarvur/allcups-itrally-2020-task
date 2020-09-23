@@ -174,6 +174,7 @@ func (a *App) newGame(factory GameFactory) (err error) {
 
 	_, err = io.ReadFull(rand.Reader, a.key)
 	must.NoErr(err)
+
 	a.game, err = factory.New(a.cfg.Game)
 	if err != nil {
 		return fmt.Errorf("newGame: %w", err)
