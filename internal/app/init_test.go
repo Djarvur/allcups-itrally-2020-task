@@ -2,6 +2,7 @@ package app_test
 
 import (
 	"context"
+	"io"
 	"testing"
 	"time"
 
@@ -34,21 +35,31 @@ var (
 	}
 )
 
-func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
-	t.Helper()
+func testPrepare(t *check.C) (func(), *app.MockRepo, *game.MockGame, *app.MockGameFactory, func(a *app.App, err error)) {
 	ctrl := gomock.NewController(t)
-
 	mockRepo := app.NewMockRepo(ctrl)
-	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
-	mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
-	mockRepo.EXPECT().SaveGame(gomock.Any()).Return(nil).MinTimes(1)
 	mockGame := game.NewMockGame(ctrl)
 	mockGameFactory := app.NewMockGameFactory(ctrl)
-	mockGameFactory.EXPECT().New(app.Difficulty["test"]).Return(mockGame, nil)
+	wantErr := func(a *app.App, err error) {
+		t.Helper()
+		t.Err(err, io.EOF)
+		t.Nil(a)
+	}
+	return ctrl.Finish, mockRepo, mockGame, mockGameFactory, wantErr
+}
+
+func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
+	t.Helper()
+	cleanup, mockRepo, mockGame, mockGameFactory, _ := testPrepare(t)
+
+	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
+	mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
+	mockRepo.EXPECT().SaveGame(mockGame).Return(nil)
+	mockGameFactory.EXPECT().New(cfg.Game).Return(mockGame, nil)
 
 	a, err := app.New(mockRepo, mockGameFactory, cfg)
 	t.Must(t.Nil(err))
-	return ctrl.Finish, a, mockRepo, mockGame
+	return cleanup, a, mockRepo, mockGame
 }
 
 func waitErr(t *check.C, errc <-chan error, wait time.Duration, wantErr error) {

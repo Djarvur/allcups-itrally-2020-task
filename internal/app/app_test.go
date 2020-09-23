@@ -18,19 +18,6 @@ var (
 	dump  = nopCloser{bytes.NewReader([]byte("save"))}
 )
 
-func testPrepare(t *check.C) (func(), *app.MockRepo, *game.MockGame, *app.MockGameFactory, func(a *app.App, err error)) {
-	ctrl := gomock.NewController(t)
-	mockRepo := app.NewMockRepo(ctrl)
-	mockGame := game.NewMockGame(ctrl)
-	mockGameFactory := app.NewMockGameFactory(ctrl)
-	wantErr := func(a *app.App, err error) {
-		t.Helper()
-		t.Err(err, io.EOF)
-		t.Nil(a)
-	}
-	return ctrl.Finish, mockRepo, mockGame, mockGameFactory, wantErr
-}
-
 func TestNew(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
