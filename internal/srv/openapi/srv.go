@@ -26,8 +26,10 @@ type (
 	Log = *structlog.Logger
 	// Config contains configuration for OpenAPI server.
 	Config struct {
-		Addr     netx.Addr
-		BasePath string
+		DisableAccessLog bool
+		Addr             netx.Addr
+		BasePath         string
+		Pprof            bool
 	}
 	server struct {
 		app app.Appl
@@ -72,10 +74,14 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	globalMiddlewares := func(handler http.Handler) http.Handler {
 		xffmw, _ := xff.Default()
 		logger := makeLogger(cfg.BasePath)
-		accesslog := makeAccessLog(cfg.BasePath)
-		return noCache(xffmw.Handler(logger(recovery(accesslog(
+		accesslog := makeAccessLog(cfg.BasePath, cfg.DisableAccessLog)
+		optPprof := func(next http.Handler) http.Handler { return next }
+		if cfg.Pprof {
+			optPprof = pprof
+		}
+		return noCache(xffmw.Handler(logger(recovery(accesslog(optPprof(
 			middleware.Spec(cfg.BasePath, restapi.FlatSwaggerJSON,
-				cors(handler)))))))
+				cors(handler))))))))
 	}
 	// The middleware executes after serving /swagger.json and routing,
 	// but before authentication, binding and validation.
