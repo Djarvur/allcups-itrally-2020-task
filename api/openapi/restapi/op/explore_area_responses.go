@@ -60,7 +60,8 @@ func (o *ExploreAreaOK) WriteResponse(rw http.ResponseWriter, producer runtime.P
 
 func (o *ExploreAreaOK) ExploreAreaResponder() {}
 
-/*ExploreAreaDefault General errors using same model as used by go-swagger for validation errors.
+/*ExploreAreaDefault - 422.1000: wrong coordinates
+
 
 swagger:response exploreAreaDefault
 */

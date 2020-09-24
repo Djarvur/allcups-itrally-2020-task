@@ -83,7 +83,8 @@ func NewExploreAreaDefault(code int) *ExploreAreaDefault {
 
 /*ExploreAreaDefault handles this case with default header values.
 
-General errors using same model as used by go-swagger for validation errors.
+- 422.1000: wrong coordinates
+
 */
 type ExploreAreaDefault struct {
 	_statusCode int

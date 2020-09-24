@@ -29,7 +29,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# IT RALLY 2020 HighLoad Cup\n## List of all custom errors\nFirst number is HTTP Status code, second is value of \"code\" field in returned JSON object, text description may or may not match \"message\" field in returned JSON object.\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
+    "description": "# IT RALLY 2020 HighLoad Cup\n## Usage\n- The goal is to dig up and cash out treasures to increase your balance\n  as much as possible in fixed period of time (10 minutes).\n- [Optional] Use /explore to find out where treasures were buried.\n- Use /license to ensure you have valid license ID before calling /dig.\n  Each /dig call will increment license's DigUsed up to DigAllowed,\n  then this license will become inactive.\n- Use /dig with Depth increasing serially from 1 to 10, and sometimes you'll\n  find a treasure.\n- Use /cash on each treasure found by /dig to increase your balance.\n- [Optional] You can pay for a license if you like to - this will\n  decrease your balance, but paid licenses have more DigAllowed, so\n  you'll have to issue less licenses.\n  Each coin in the wallet returned by /cash is unique, and may be spent to get\n  paid license just once.\n- [Optional] You can get your current balance and coins using /balance, and your\n  current active licenses using /licenses.\n## List of all custom errors\nFirst number is HTTP Status code, second is value of \"code\" field in returned JSON object, text description may or may not match \"message\" field in returned JSON object.\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
     "title": "HighLoad Cup 2020",
     "version": "0.3.0"
   },
@@ -125,7 +125,10 @@ func init() {
             "$ref": "#/responses/explore"
           },
           "default": {
-            "$ref": "#/responses/error"
+            "description": "- 422.1000: wrong coordinates\n",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           }
         }
       }
@@ -425,7 +428,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# IT RALLY 2020 HighLoad Cup\n## List of all custom errors\nFirst number is HTTP Status code, second is value of \"code\" field in returned JSON object, text description may or may not match \"message\" field in returned JSON object.\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
+    "description": "# IT RALLY 2020 HighLoad Cup\n## Usage\n- The goal is to dig up and cash out treasures to increase your balance\n  as much as possible in fixed period of time (10 minutes).\n- [Optional] Use /explore to find out where treasures were buried.\n- Use /license to ensure you have valid license ID before calling /dig.\n  Each /dig call will increment license's DigUsed up to DigAllowed,\n  then this license will become inactive.\n- Use /dig with Depth increasing serially from 1 to 10, and sometimes you'll\n  find a treasure.\n- Use /cash on each treasure found by /dig to increase your balance.\n- [Optional] You can pay for a license if you like to - this will\n  decrease your balance, but paid licenses have more DigAllowed, so\n  you'll have to issue less licenses.\n  Each coin in the wallet returned by /cash is unique, and may be spent to get\n  paid license just once.\n- [Optional] You can get your current balance and coins using /balance, and your\n  current active licenses using /licenses.\n## List of all custom errors\nFirst number is HTTP Status code, second is value of \"code\" field in returned JSON object, text description may or may not match \"message\" field in returned JSON object.\n- 422.1000: wrong coordinates\n- 422.1001: wrong depth\n- 409.1002: no more active licenses allowed\n- 409.1003: treasure is not digged\n",
     "title": "HighLoad Cup 2020",
     "version": "0.3.0"
   },
@@ -536,7 +539,7 @@ func init() {
             }
           },
           "default": {
-            "description": "General errors using same model as used by go-swagger for validation errors.",
+            "description": "- 422.1000: wrong coordinates\n",
             "schema": {
               "$ref": "#/definitions/error"
             }
