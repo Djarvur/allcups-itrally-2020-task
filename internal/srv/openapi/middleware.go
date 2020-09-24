@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net"
 	"net/http"
+	pprofpkg "net/http/pprof"
 	"path"
 	"strconv"
 	"strings"
@@ -80,7 +81,7 @@ func recovery(next http.Handler) http.Handler {
 	})
 }
 
-func makeAccessLog(basePath string) middlewareFunc {
+func makeAccessLog(basePath string, disable bool) middlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			metric.reqInFlight.Inc()
@@ -101,6 +102,9 @@ func makeAccessLog(basePath string) middlewareFunc {
 			}
 			metric.reqDuration.With(l).Observe(m.Duration.Seconds())
 
+			if disable {
+				return
+			}
 			log := structlog.FromContext(r.Context(), nil)
 			if m.Code < http.StatusInternalServerError {
 				log.Info("handled", def.LogHTTPStatus, m.Code)
@@ -109,6 +113,27 @@ func makeAccessLog(basePath string) middlewareFunc {
 			}
 		})
 	}
+}
+
+func pprof(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasPrefix(r.URL.Path, "/debug/pprof/") {
+			next.ServeHTTP(w, r)
+			return
+		}
+		switch r.URL.Path {
+		default:
+			pprofpkg.Index(w, r)
+		case "/debug/pprof/cmdline":
+			pprofpkg.Cmdline(w, r)
+		case "/debug/pprof/profile":
+			pprofpkg.Profile(w, r)
+		case "/debug/pprof/symbol":
+			pprofpkg.Symbol(w, r)
+		case "/debug/pprof/trace":
+			pprofpkg.Trace(w, r)
+		}
+	})
 }
 
 func cors(next http.Handler) http.Handler {
