@@ -1,5 +1,7 @@
 package game
 
+import "fmt"
+
 func (cfg Config) treasures() int {
 	return cfg.area() * int(cfg.Depth) / cfg.Density
 }
@@ -23,7 +25,7 @@ func (cfg Config) totalCash() (total int) {
 		} else {
 			max = cfg.area()
 		}
-		_, cost := treasureCostAt(depth)
+		_, cost := cfg.treasureValueAt(depth)
 		total += max * cost
 		treasures -= max
 	}
@@ -31,4 +33,17 @@ func (cfg Config) totalCash() (total int) {
 		panic("not all treasures were counted")
 	}
 	return total
+}
+
+func (cfg Config) treasureValueAt(depth uint8) (min, max int) {
+	avg := (*cfg.TreasureValue)[depth-1]
+	//nolint:gomnd // Balance.
+	switch cfg.TreasureValueAlg {
+	case AlgDoubleMax:
+		return avg, avg * 2
+	case AlgQuarterAround:
+		return avg - avg/4, avg + avg/4
+	default:
+		panic(fmt.Sprintf("unknown TreasureValueAlg: %d", cfg.TreasureValueAlg))
+	}
 }

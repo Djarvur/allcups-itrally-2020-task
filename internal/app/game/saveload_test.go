@@ -20,21 +20,14 @@ func TestSaveLoad(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.Factory{}.New(C{
-		Seed:              666, // {2 0 1}, {0 0 2}, {0 1 2} and 1 duplicate
-		MaxActiveLicenses: 2,
-		Density:           3,
-		SizeX:             3,
-		SizeY:             2,
-		Depth:             2,
-	})
+	g, err := game.Factory{}.New(ctx, cfg3x2x2s666)
 	t.Nil(err)
 
 	var buf bytes.Buffer
 	n, err := g.WriteTo(&buf)
 	t.Nil(err)
-	t.Equal(n, int64(123))
-	_, err = game.Factory{}.Continue(bytes.NewReader(buf.Bytes()))
+	t.Equal(n, int64(166))
+	_, err = game.Factory{}.Continue(ctx, bytes.NewReader(buf.Bytes()))
 	t.Nil(err)
 
 	lic1, _ := g.IssueLicense(nil)
@@ -55,8 +48,8 @@ func TestSaveLoad(tt *testing.T) {
 	buf.Reset()
 	n, err = g.WriteTo(&buf)
 	t.Nil(err)
-	t.Equal(n, int64(194))
-	g, err = game.Factory{}.Continue(bytes.NewReader(buf.Bytes()))
+	t.Equal(n, int64(237))
+	g, err = game.Factory{}.Continue(ctx, bytes.NewReader(buf.Bytes()))
 	t.Nil(err)
 
 	balance, wallet = g.Balance()

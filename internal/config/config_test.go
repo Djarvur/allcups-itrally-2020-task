@@ -14,15 +14,18 @@ import (
 
 func Test(t *testing.T) {
 	want := &ServeConfig{
-		AccessLog:      true,
-		Addr:           netx.NewAddr(def.Hostname, 8000),
-		AutosavePeriod: time.Second,
-		Duration:       10 * time.Minute,
-		Game:           app.Difficulty["test"],
-		MetricsAddr:    netx.NewAddr(def.Hostname, 9000),
-		Pprof:          true,
-		ResultDir:      "var/data",
-		WorkDir:        "var",
+		AccessLog:         true,
+		Addr:              netx.NewAddr(def.Hostname, 8000),
+		AutosavePeriod:    time.Second,
+		Duration:          10 * time.Minute,
+		DepthProfitChange: 0.1,
+		DigBaseDelay:      time.Millisecond,
+		DigExtraDelay:     time.Millisecond / 10,
+		Game:              app.Difficulty["test"],
+		MetricsAddr:       netx.NewAddr(def.Hostname, 9000),
+		Pprof:             true,
+		ResultDir:         "var/data",
+		WorkDir:           "var",
 	}
 
 	t.Run("required", func(tt *testing.T) {

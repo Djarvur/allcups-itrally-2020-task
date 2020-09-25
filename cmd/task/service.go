@@ -59,10 +59,13 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	if s.appl == nil {
-		s.appl, err = app.New(s.repo, game.Factory{}, app.Config{
-			Duration:       s.cfg.Duration,
-			Game:           s.cfg.Game,
-			AutosavePeriod: s.cfg.AutosavePeriod,
+		s.appl, err = app.New(ctxStartup, s.repo, game.Factory{}, app.Config{
+			AutosavePeriod:    s.cfg.AutosavePeriod,
+			DepthProfitChange: s.cfg.DepthProfitChange,
+			DigBaseDelay:      s.cfg.DigBaseDelay,
+			DigExtraDelay:     s.cfg.DigExtraDelay,
+			Duration:          s.cfg.Duration,
+			Game:              s.cfg.Game,
 		})
 	}
 	if err != nil {

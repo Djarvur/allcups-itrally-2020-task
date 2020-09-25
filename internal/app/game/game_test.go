@@ -1,7 +1,6 @@
 package game_test
 
 import (
-	"errors"
 	"sort"
 	"testing"
 
@@ -10,22 +9,11 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
 )
 
-type C = game.Config
-
-var errOutOfBounds = errors.New("out of bounds")
-
 func TestSmoke(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.Factory{}.New(C{
-		Seed:              666, // {2 0 1}, {0 0 2}, {0 1 2} and 1 duplicate
-		MaxActiveLicenses: 2,
-		Density:           3,
-		SizeX:             3,
-		SizeY:             2,
-		Depth:             2,
-	})
+	g, err := game.Factory{}.New(ctx, cfg3x2x2s666)
 	t.Nil(err)
 
 	count, err := g.CountTreasures(game.Area{X: 0, Y: 0, SizeX: 3, SizeY: 2}, 1)
@@ -131,7 +119,7 @@ func TestNew(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := game.Factory{}.New(tc.cfg)
+			res, err := game.Factory{}.New(ctx, addTreasureValues(tc.cfg))
 			t.Nil(err)
 			count, err := res.CountTreasures(game.Area{
 				SizeX: tc.cfg.SizeX,
@@ -147,27 +135,40 @@ func TestNewErr(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
+	ints := func(v []int) *[]int { return &v }
+
 	tests := []struct {
-		cfg     C
-		wantErr error
+		cfg       C
+		wantErr   error
+		wantPanic string
 	}{
-		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 1}, nil},
-		{C{Density: 6000 * 6000 * 10, SizeX: 6000, SizeY: 6000, Depth: 10}, nil},
-		{C{Density: 0, SizeX: 1, SizeY: 1, Depth: 1}, errOutOfBounds},
-		{C{Density: 1, SizeX: 0, SizeY: 1, Depth: 1}, errOutOfBounds},
-		{C{Density: 1, SizeX: 1, SizeY: 0, Depth: 1}, errOutOfBounds},
-		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 0}, errOutOfBounds},
-		{C{Density: 6000*6000*10 + 1, SizeX: 6000, SizeY: 6000, Depth: 10}, errOutOfBounds},
-		{C{Density: 6000 * 6000 * 10, SizeX: 6001, SizeY: 6000, Depth: 10}, errOutOfBounds},
-		{C{Density: 6000 * 6000 * 10, SizeX: 6000, SizeY: 6001, Depth: 10}, errOutOfBounds},
-		{C{Density: 6000 * 6000 * 10, SizeX: 6000, SizeY: 6000, Depth: 11}, errOutOfBounds},
-		{C{}, errOutOfBounds},
+		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 1}, nil, ``},
+		{C{Density: 6000 * 6000 * 10, SizeX: 6000, SizeY: 6000, Depth: 10}, nil, ``},
+		{C{Density: 0, SizeX: 1, SizeY: 1, Depth: 1}, errOutOfBounds, ``},
+		{C{Density: 1, SizeX: 0, SizeY: 1, Depth: 1}, errOutOfBounds, ``},
+		{C{Density: 1, SizeX: 1, SizeY: 0, Depth: 1}, errOutOfBounds, ``},
+		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 0}, errOutOfBounds, ``},
+		{C{Density: 6000*6000*10 + 1, SizeX: 6000, SizeY: 6000, Depth: 10}, errOutOfBounds, ``},
+		{C{Density: 6000 * 6000 * 10, SizeX: 6001, SizeY: 6000, Depth: 10}, errOutOfBounds, ``},
+		{C{Density: 6000 * 6000 * 10, SizeX: 6000, SizeY: 6001, Depth: 10}, errOutOfBounds, ``},
+		{C{Density: 6000 * 6000 * 10, SizeX: 6000, SizeY: 6000, Depth: 11}, errOutOfBounds, ``},
+		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 1, TreasureValueAlg: game.AlgDoubleMax}, nil, `TreasureValue length`},
+		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 1, TreasureValueAlg: game.AlgDoubleMax, TreasureValue: ints([]int{})}, nil, `TreasureValue length`},
+		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 1, TreasureValueAlg: game.AlgDoubleMax, TreasureValue: ints([]int{0, 1})}, nil, `TreasureValue length`},
+		{C{Density: 1, SizeX: 1, SizeY: 1, Depth: 1, TreasureValueAlg: -1, TreasureValue: ints([]int{1})}, nil, `unknown TreasureValueAlg:`},
+		{C{}, errOutOfBounds, ``},
 	}
 	for _, tc := range tests {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := game.Factory{}.New(tc.cfg)
+			if tc.wantPanic != `` {
+				t.PanicMatch(func() {
+					game.Factory{}.New(ctx, addTreasureValues(tc.cfg))
+				}, tc.wantPanic)
+				return
+			}
+			res, err := game.Factory{}.New(ctx, addTreasureValues(tc.cfg))
 			if tc.wantErr == nil {
 				t.Nil(err)
 				t.NotNil(res)
@@ -183,14 +184,7 @@ func TestBalance(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.Factory{}.New(C{ // {0 0 1}, {0 1 1}, {1 1 1}
-		Seed:              0,
-		MaxActiveLicenses: 2,
-		Density:           1,
-		SizeX:             2,
-		SizeY:             2,
-		Depth:             1,
-	})
+	g, err := game.Factory{}.New(ctx, cfg2x2x1)
 	t.Nil(err)
 
 	balance, wallet := g.Balance()
@@ -207,13 +201,7 @@ func TestBalance(tt *testing.T) {
 	t.Equal(balance, 2)
 	t.DeepEqual(wallet, []int{2, 0})
 
-	g, err = game.Factory{}.New(C{
-		MaxActiveLicenses: 40*40 + 1,
-		Density:           1,
-		SizeX:             40,
-		SizeY:             40,
-		Depth:             1,
-	})
+	g, err = game.Factory{}.New(ctx, cfg40x40x1)
 	t.Nil(err)
 	for x := 0; x < 40; x++ {
 		for y := 0; y < 40; y++ {
@@ -235,14 +223,7 @@ func TestLicenses(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.Factory{}.New(C{
-		Seed:              1,
-		MaxActiveLicenses: 2,
-		Density:           1,
-		SizeX:             1,
-		SizeY:             1,
-		Depth:             1,
-	})
+	g, err := game.Factory{}.New(ctx, cfg1x1x1s1)
 	t.Nil(err)
 
 	t.Len(g.Licenses(), 0)
@@ -285,19 +266,9 @@ func TestCountTreasures(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g1, err := game.Factory{}.New(C{
-		Density: 1,
-		SizeX:   1,
-		SizeY:   1,
-		Depth:   1,
-	})
+	g1, err := game.Factory{}.New(ctx, cfg1x1x1)
 	t.Nil(err)
-	g5, err := game.Factory{}.New(C{
-		Density: 5,
-		SizeX:   5,
-		SizeY:   5,
-		Depth:   5,
-	})
+	g5, err := game.Factory{}.New(ctx, cfg5x5x5)
 	t.Nil(err)
 
 	tests := []struct {
@@ -341,14 +312,7 @@ func TestDig(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.Factory{}.New(C{ // {0 0 1}, {0 1 1}, {1 0 1}, {1 1 1}, {0 0 2}
-		Seed:              0,
-		MaxActiveLicenses: 10,
-		Density:           1,
-		SizeX:             2,
-		SizeY:             2,
-		Depth:             2,
-	})
+	g, err := game.Factory{}.New(ctx, cfg2x2x2)
 	t.Nil(err)
 
 	for i := 0; i < 10; i++ {
@@ -393,14 +357,7 @@ func TestCash(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
-	g, err := game.Factory{}.New(C{ // {0 0 1}, {0 1 1}, {1 0 1}, {1 1 1}, {0 0 2}
-		Seed:              0,
-		MaxActiveLicenses: 10,
-		Density:           1,
-		SizeX:             2,
-		SizeY:             2,
-		Depth:             2,
-	})
+	g, err := game.Factory{}.New(ctx, cfg2x2x2)
 	t.Nil(err)
 
 	g.IssueLicense(nil)

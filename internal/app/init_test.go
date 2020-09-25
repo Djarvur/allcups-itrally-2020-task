@@ -29,9 +29,12 @@ type Ctx = context.Context
 var (
 	ctx = context.Background()
 	cfg = app.Config{
-		Duration:       60 * def.TestSecond,
-		Game:           app.Difficulty["test"],
-		AutosavePeriod: def.TestSecond,
+		AutosavePeriod:    def.TestSecond,
+		DepthProfitChange: 0.1,
+		DigBaseDelay:      def.TestSecond / 1000,
+		DigExtraDelay:     def.TestSecond / 10000,
+		Duration:          60 * def.TestSecond,
+		Game:              app.Difficulty["test"],
 	}
 )
 
@@ -55,9 +58,9 @@ func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
 	mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
 	mockRepo.EXPECT().SaveGame(mockGame).Return(nil)
-	mockGameFactory.EXPECT().New(cfg.Game).Return(mockGame, nil)
+	mockGameFactory.EXPECT().New(gomock.Any(), cfg.Game).Return(mockGame, nil)
 
-	a, err := app.New(mockRepo, mockGameFactory, cfg)
+	a, err := app.New(ctx, mockRepo, mockGameFactory, cfg)
 	t.Must(t.Nil(err))
 	return cleanup, a, mockRepo, mockGame
 }
