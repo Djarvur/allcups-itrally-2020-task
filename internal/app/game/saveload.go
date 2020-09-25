@@ -13,12 +13,12 @@ type state struct {
 
 // Continue creates and returns new game restored from given reader, which
 // should contain data written by Game.WriteTo.
-func (factory Factory) Continue(r io.ReadSeeker) (g Game, err error) {
+func (factory Factory) Continue(ctx Ctx, r io.ReadSeeker) (g Game, err error) {
 	var previous state
 	dec := json.NewDecoder(r)
 	err = dec.Decode(&previous)
 	if err == nil {
-		g, err = factory.New(previous.Cfg)
+		g, err = factory.New(ctx, previous.Cfg)
 	}
 	if err == nil {
 		_, err = r.Seek(dec.InputOffset()+1, io.SeekStart)

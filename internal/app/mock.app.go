@@ -370,31 +370,31 @@ func (m *MockGameFactory) EXPECT() *MockGameFactoryMockRecorder {
 }
 
 // New mocks base method
-func (m *MockGameFactory) New(cfg game.Config) (game.Game, error) {
+func (m *MockGameFactory) New(arg0 Ctx, arg1 game.Config) (game.Game, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "New", cfg)
+	ret := m.ctrl.Call(m, "New", arg0, arg1)
 	ret0, _ := ret[0].(game.Game)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // New indicates an expected call of New
-func (mr *MockGameFactoryMockRecorder) New(cfg interface{}) *gomock.Call {
+func (mr *MockGameFactoryMockRecorder) New(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockGameFactory)(nil).New), cfg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockGameFactory)(nil).New), arg0, arg1)
 }
 
 // Continue mocks base method
-func (m *MockGameFactory) Continue(r io.ReadSeeker) (game.Game, error) {
+func (m *MockGameFactory) Continue(arg0 Ctx, arg1 io.ReadSeeker) (game.Game, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Continue", r)
+	ret := m.ctrl.Call(m, "Continue", arg0, arg1)
 	ret0, _ := ret[0].(game.Game)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Continue indicates an expected call of Continue
-func (mr *MockGameFactoryMockRecorder) Continue(r interface{}) *gomock.Call {
+func (mr *MockGameFactoryMockRecorder) Continue(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Continue", reflect.TypeOf((*MockGameFactory)(nil).Continue), r)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Continue", reflect.TypeOf((*MockGameFactory)(nil).Continue), arg0, arg1)
 }

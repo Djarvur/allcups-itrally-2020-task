@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	prng "math/rand"
 	"sync"
 	"time"
 
@@ -114,6 +115,11 @@ var Difficulty = map[string]game.Config{
 		SizeX:             5,
 		SizeY:             5,
 		Depth:             10,
+		TreasureValue: func() *[]int {
+			treasureValues := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+			return &treasureValues
+		}(),
+		TreasureValueAlg: game.AlgDoubleMax,
 	},
 	"normal": {
 		MaxActiveLicenses: 3,
@@ -125,9 +131,12 @@ var Difficulty = map[string]game.Config{
 }
 
 type Config struct {
-	Duration       time.Duration
-	Game           game.Config
-	AutosavePeriod time.Duration
+	Duration          time.Duration
+	Game              game.Config
+	AutosavePeriod    time.Duration
+	DigBaseDelay      time.Duration
+	DigExtraDelay     time.Duration
+	DepthProfitChange float64
 }
 
 // App implements interface Appl.
@@ -142,11 +151,11 @@ type App struct {
 
 // GameFactory creates and returns new game.
 type GameFactory interface {
-	New(cfg game.Config) (game.Game, error)
-	Continue(r io.ReadSeeker) (game.Game, error)
+	New(Ctx, game.Config) (game.Game, error)
+	Continue(Ctx, io.ReadSeeker) (game.Game, error)
 }
 
-func New(repo Repo, factory GameFactory, cfg Config) (*App, error) {
+func New(ctx Ctx, repo Repo, factory GameFactory, cfg Config) (*App, error) {
 	a := &App{
 		repo:    repo,
 		cfg:     cfg,
@@ -158,9 +167,9 @@ func New(repo Repo, factory GameFactory, cfg Config) (*App, error) {
 		return nil, fmt.Errorf("LoadStartTime: %w", err)
 	}
 	if t.IsZero() {
-		err = a.newGame(factory)
+		err = a.newGame(ctx, factory)
 	} else {
-		err = a.continueGame(factory, *t)
+		err = a.continueGame(ctx, factory, *t)
 	}
 	if err != nil {
 		return nil, err
@@ -168,15 +177,20 @@ func New(repo Repo, factory GameFactory, cfg Config) (*App, error) {
 	return a, nil
 }
 
-func (a *App) newGame(factory GameFactory) (err error) {
+func (a *App) newGame(ctx Ctx, factory GameFactory) (err error) {
+	log := structlog.FromContext(ctx, nil)
 	if a.cfg.Game != Difficulty["test"] && a.cfg.Game.Seed == 0 {
 		a.cfg.Game.Seed = time.Now().UnixNano()
+	}
+	if a.cfg.Game.TreasureValue == nil {
+		a.cfg.Game.TreasureValueAlg = game.AlgQuarterAround
+		a.calcTreasureValue(ctx)
 	}
 
 	_, err = io.ReadFull(rand.Reader, a.key)
 	must.NoErr(err)
 
-	a.game, err = factory.New(a.cfg.Game)
+	a.game, err = factory.New(ctx, a.cfg.Game)
 	if err != nil {
 		return fmt.Errorf("newGame: %w", err)
 	}
@@ -190,11 +204,12 @@ func (a *App) newGame(factory GameFactory) (err error) {
 		return fmt.Errorf("SaveGame: %w", err)
 	}
 
-	structlog.New().Info("new game")
+	log.Info("new game")
 	return nil
 }
 
-func (a *App) continueGame(factory GameFactory, t time.Time) (err error) {
+func (a *App) continueGame(ctx Ctx, factory GameFactory, t time.Time) (err error) {
+	log := structlog.FromContext(ctx, nil)
 	a.key, err = a.repo.LoadTreasureKey()
 	if err != nil {
 		return fmt.Errorf("LoadTreasureKey: %w", err)
@@ -207,7 +222,7 @@ func (a *App) continueGame(factory GameFactory, t time.Time) (err error) {
 	if err != nil {
 		return fmt.Errorf("LoadGame: %w", err)
 	}
-	a.game, err = factory.Continue(f)
+	a.game, err = factory.Continue(ctx, f)
 	if err != nil {
 		return fmt.Errorf("factory.Continue: %w", err)
 	}
@@ -216,7 +231,7 @@ func (a *App) continueGame(factory GameFactory, t time.Time) (err error) {
 		return fmt.Errorf("LoadGame.Close: %w", err)
 	}
 
-	structlog.New().Info("continue game")
+	log.Info("continue game")
 	err = a.Start(t)
 	if err != nil {
 		return fmt.Errorf("SaveStartTime: %w", err)
@@ -226,4 +241,34 @@ func (a *App) continueGame(factory GameFactory, t time.Time) (err error) {
 
 func (a *App) HealthCheck(_ Ctx) (interface{}, error) {
 	return "OK", nil
+}
+
+func (a *App) calcTreasureValue(ctx Ctx) {
+	log := structlog.FromContext(ctx, nil)
+	value := make([]int, a.cfg.Game.Depth)
+	a.cfg.Game.TreasureValue = &value
+
+	const minValue = 4 // Should be >=4, so ±25% in game.treasureValueAt will result in random, non-constant value.
+
+	bestDepth := uint8(3 + prng.New(prng.NewSource(a.cfg.Game.Seed)).Intn(5)) //nolint:gomnd,gosec // Balance: 5±2.
+
+	delay := make([]float64, a.cfg.Game.Depth)
+	timeToDig := make([]float64, a.cfg.Game.Depth)
+	delay[0] = a.cfg.DigBaseDelay.Seconds()
+	timeToDig[0] = a.cfg.DigBaseDelay.Seconds()
+	value[0] = minValue
+	log.Debug("calcTreasureValue", "depth", 1, "value", value[0], "maxProfitPerSecond", value[0]*int(1/timeToDig[0]))
+	for i := 1; i < int(a.cfg.Game.Depth); i++ {
+		depth := uint8(i + 1)
+		delay[i] = delay[i-1] + a.cfg.DigExtraDelay.Seconds()
+		timeToDig[i] = timeToDig[i-1] + delay[i]
+		coeff := 1 + a.cfg.DepthProfitChange
+		if bestDepth < depth {
+			coeff = 1 / (1 + a.cfg.DepthProfitChange)
+		}
+		profitPerSecond := float64(value[i-1]) * (1 / timeToDig[i-1]) * coeff
+		foundPerSecond := 1 / timeToDig[i]
+		value[i] = int(profitPerSecond / foundPerSecond)
+		log.Debug("calcTreasureValue", "depth", depth, "value", value[i], "maxProfitPerSecond", int(profitPerSecond))
+	}
 }

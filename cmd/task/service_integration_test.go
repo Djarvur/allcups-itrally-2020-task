@@ -132,7 +132,7 @@ func TestSmoke(tt *testing.T) {
 		args := treasure
 		res, err := openapiClient.Op.Cash(op.NewCashParams().WithArgs(args))
 		t.Nil(err)
-		t.DeepEqual(res, &op.CashOK{Payload: model.Wallet{0}})
+		t.DeepEqual(res, &op.CashOK{Payload: model.Wallet{0, 1, 2}})
 	}
 	{
 		res, err := openapiClient.Op.ListLicenses(op.NewListLicensesParams())

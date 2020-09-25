@@ -4,6 +4,7 @@
 package game
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +13,8 @@ import (
 
 	"github.com/powerman/structlog"
 )
+
+type Ctx = context.Context
 
 const (
 	maxSizeX, maxSizeY, maxDepth = 6000, 6000, 10 // About 1GB RAM without bit-optimization.
@@ -80,6 +83,18 @@ type (
 		Y     int   // From 0.
 		Depth uint8 // From 1.
 	}
+	// TreasureValueAlg define which algorithm to use for calculating
+	// min/max treasure value range at given depth.
+	TreasureValueAlg int
+)
+
+const (
+	// AlgDoubleMax generates treasure values in range x…x*2
+	// where x is Config.TreasureValue[depth].
+	AlgDoubleMax TreasureValueAlg = iota + 1
+	// AlgQuarterAround generates treasure values in range x*0.75…x*1.25
+	// where x is Config.TreasureValue[depth].
+	AlgQuarterAround
 )
 
 // Config contains game configuration.
@@ -90,11 +105,12 @@ type Config struct {
 	SizeX             int
 	SizeY             int
 	Depth             uint8
+	TreasureValue     *[]int // Pointer to keep this struct comparable.
+	TreasureValueAlg  TreasureValueAlg
 }
 
 type game struct {
 	cfg      Config
-	log      *structlog.Logger
 	muModify sync.RWMutex
 	licenses *licenses
 	bank     *bank
@@ -107,7 +123,8 @@ type game struct {
 type Factory struct{}
 
 // New creates and returns new game.
-func (Factory) New(cfg Config) (Game, error) {
+func (Factory) New(ctx Ctx, cfg Config) (Game, error) {
+	log := structlog.FromContext(ctx, nil)
 	switch {
 	case cfg.Density <= 0, cfg.Density > cfg.volume(): // Min 1 treasure.
 		return nil, fmt.Errorf("%w: Density", errOutOfBounds)
@@ -117,13 +134,14 @@ func (Factory) New(cfg Config) (Game, error) {
 		return nil, fmt.Errorf("%w: SizeY", errOutOfBounds)
 	case cfg.Depth <= 0, cfg.Depth > maxDepth:
 		return nil, fmt.Errorf("%w: Depth", errOutOfBounds)
+	case cfg.TreasureValue == nil || len(*cfg.TreasureValue) != int(cfg.Depth):
+		panic(fmt.Sprintf("TreasureValue length must be %d", cfg.Depth))
 	}
 
 	g := &game{
 		cfg:      cfg,
-		log:      structlog.New(),
 		licenses: newLicenses(cfg.MaxActiveLicenses),
-		bank:     newBank(cfg.totalCash()),
+		bank:     newBank(ctx, cfg.totalCash()),
 		field:    newField(cfg),
 		prng:     prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable game results.
 	}
@@ -138,10 +156,10 @@ func (Factory) New(cfg Config) (Game, error) {
 		if !g.field.addTreasure(pos) {
 			skipped++
 		} else if i < 10 { //nolint:gomnd // Debug.
-			g.log.Debug("buried one of first 10 treasures", "pos", pos)
+			log.Debug("buried one of first 10 treasures", "pos", pos)
 		}
 	}
-	g.log.Info("the treasures were buried", "all", cfg.treasures(), "skipped", skipped)
+	log.Info("the treasures were buried", "all", cfg.treasures(), "skipped", skipped)
 	return g, nil
 }
 
@@ -197,17 +215,13 @@ func (g *game) Cash(pos Coord) (wallet []int, err error) {
 
 	g.muPRNG.Lock()
 	defer g.muPRNG.Unlock()
-	min, max := treasureCostAt(pos.Depth)
+	min, max := g.cfg.treasureValueAt(pos.Depth)
 	amount := min + g.prng.Intn(max-min+1)
 
 	if amount <= 0 {
 		return nil, nil
 	}
 	return g.bank.earn(amount)
-}
-
-func treasureCostAt(depth uint8) (min, max int) {
-	return int(depth), int(depth * 2) //nolint:gomnd // TODO Balance?
 }
 
 func (g *game) licensePrice(coins int) (digAllowed int) {

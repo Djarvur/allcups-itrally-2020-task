@@ -3,6 +3,8 @@ package game
 import (
 	"fmt"
 	"sync"
+
+	"github.com/powerman/structlog"
 )
 
 type bank struct {
@@ -12,7 +14,9 @@ type bank struct {
 	coinIssued []bool
 }
 
-func newBank(totalCash int) *bank {
+func newBank(ctx Ctx, totalCash int) *bank {
+	log := structlog.FromContext(ctx, nil)
+	log.Debug("newBank", "totalCash", totalCash)
 	return &bank{
 		coinIssued: make([]bool, totalCash),
 	}
