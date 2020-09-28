@@ -36,7 +36,9 @@ func newErrCode(statusCode int, extraCode int32) errCode {
 //nolint:gochecknoglobals,gomnd // Const.
 var (
 	codeInternal           = newErrCode(500, 0)
+	codeBadGateway         = newErrCode(502, 0)
 	codeServiceUnavailable = newErrCode(503, 0)
+	codeGatewayTimeout     = newErrCode(504, 0)
 	codePaymentRequired    = newErrCode(402, 0)
 	codeForbidden          = newErrCode(403, 0)
 	codeNotFound           = newErrCode(404, 0)

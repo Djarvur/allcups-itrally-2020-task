@@ -30,6 +30,7 @@ type (
 	Log = *structlog.Logger
 	// Config contains configuration for OpenAPI server.
 	Config struct {
+		Seed                 int64
 		DisableAccessLog     bool
 		Addr                 netx.Addr
 		BasePath             string
@@ -43,7 +44,6 @@ type (
 		OpGetBalanceRate     int
 		OpIssueLicenseRate   int
 		OpListLicensesRate   int
-		Seed                 int64
 	}
 	server struct {
 		app               app.Appl

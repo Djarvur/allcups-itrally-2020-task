@@ -41,6 +41,7 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	Duration              appcfg.Duration `env:"DURATION"`
 	LicenseMaxDelay       appcfg.Duration
 	LicenseMinDelay       appcfg.Duration
+	LicensePercentFail    appcfg.IntBetween
 	LicensePercentTimeout appcfg.IntBetween
 	LicenseTimeoutDelay   appcfg.Duration
 	MetricsAddrPort       appcfg.Port `env:"METRICS_ADDR_PORT"`
@@ -68,6 +69,7 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	Duration:              appcfg.MustDuration("10m"),
 	LicenseMaxDelay:       appcfg.MustDuration("0.1s"),
 	LicenseMinDelay:       appcfg.MustDuration("0.01s"),
+	LicensePercentFail:    appcfg.MustIntBetween("60", 0, 100), // Only for ListLicenses and issue free license.
 	LicensePercentTimeout: appcfg.MustIntBetween("10", 0, 100),
 	LicenseTimeoutDelay:   appcfg.MustDuration("1s"),
 	MetricsAddrPort:       appcfg.MustPort("9000"),
@@ -125,6 +127,7 @@ type ServeConfig struct {
 	Game                  game.Config
 	LicenseMaxDelay       time.Duration
 	LicenseMinDelay       time.Duration
+	LicensePercentFail    int
 	LicensePercentTimeout int
 	LicenseTimeoutDelay   time.Duration
 	MetricsAddr           netx.Addr
@@ -157,6 +160,7 @@ func GetServe() (c *ServeConfig, err error) {
 		Game:                  app.Difficulty[all.Difficulty.Value(&err)],
 		LicenseMaxDelay:       all.LicenseMaxDelay.Value(&err),
 		LicenseMinDelay:       all.LicenseMinDelay.Value(&err),
+		LicensePercentFail:    all.LicensePercentFail.Value(&err),
 		LicensePercentTimeout: all.LicensePercentTimeout.Value(&err),
 		LicenseTimeoutDelay:   all.LicenseTimeoutDelay.Value(&err),
 		MetricsAddr:           netx.NewAddr(all.AddrHost.Value(&err), all.MetricsAddrPort.Value(&err)),

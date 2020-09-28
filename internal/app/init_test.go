@@ -50,6 +50,8 @@ func testPrepare(t *check.C) (func(), *app.MockRepo, *app.MockCPU, *app.MockLice
 		t.Err(err, io.EOF)
 		t.Nil(a)
 	}
+	mockCPU.EXPECT().Consume(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()     // TODO Test later.
+	mockLicenseSvc.EXPECT().Call(gomock.Any(), gomock.Any()).Return(nil).AnyTimes() // TODO Test later.
 	return ctrl.Finish, mockRepo, mockCPU, mockLicenseSvc, mockGame, mockGameFactory, wantErr
 }
 

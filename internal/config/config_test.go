@@ -20,6 +20,7 @@ func Test(t *testing.T) {
 		Duration:              10 * time.Minute,
 		LicenseMaxDelay:       time.Second / 10,
 		LicenseMinDelay:       time.Second / 100,
+		LicensePercentFail:    60,
 		LicensePercentTimeout: 10,
 		LicenseTimeoutDelay:   time.Second,
 		DepthProfitChange:     0.1,

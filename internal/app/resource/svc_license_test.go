@@ -42,6 +42,7 @@ func TestSvcLicensePercent(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 	s := resource.NewLicenseSvc(resource.LicenseSvcConfig{
+		Seed:           11,
 		PercentTimeout: 10,
 	})
 	var timeout, internal int
@@ -53,6 +54,6 @@ func TestSvcLicensePercent(tt *testing.T) {
 			internal++
 		}
 	}
-	t.Equal(timeout, 40)
-	t.Equal(internal, 431)
+	t.Equal(timeout, 46)
+	t.Equal(internal, 421)
 }

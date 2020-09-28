@@ -64,6 +64,7 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	const hz = 10000
 	s.cpu = resource.NewCPU(hz)
 	s.svcLicense = resource.NewLicenseSvc(resource.LicenseSvcConfig{
+		Seed:           s.cfg.Game.Seed,
 		PercentTimeout: s.cfg.LicensePercentTimeout,
 		MinDelay:       s.cfg.LicenseMinDelay,
 		MaxDelay:       s.cfg.LicenseMaxDelay,
@@ -72,18 +73,20 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 
 	if s.appl == nil {
 		s.appl, err = app.New(ctxStartup, s.repo, s.cpu, s.svcLicense, game.Factory{}, app.Config{
-			AutosavePeriod:    s.cfg.AutosavePeriod,
-			DepthProfitChange: s.cfg.DepthProfitChange,
-			DigBaseDelay:      s.cfg.DigBaseDelay,
-			DigExtraDelay:     s.cfg.DigExtraDelay,
-			Duration:          s.cfg.Duration,
-			Game:              s.cfg.Game,
+			AutosavePeriod:     s.cfg.AutosavePeriod,
+			DepthProfitChange:  s.cfg.DepthProfitChange,
+			DigBaseDelay:       s.cfg.DigBaseDelay,
+			DigExtraDelay:      s.cfg.DigExtraDelay,
+			Duration:           s.cfg.Duration,
+			Game:               s.cfg.Game,
+			LicensePercentFail: s.cfg.LicensePercentFail,
 		})
 	}
 	if err != nil {
 		return log.Err("failed to app.New", "err", err)
 	}
 	s.srv, err = openapi.NewServer(s.appl, openapi.Config{
+		Seed:                 s.cfg.Game.Seed,
 		DisableAccessLog:     !s.cfg.AccessLog,
 		Addr:                 s.cfg.Addr,
 		Pprof:                s.cfg.Pprof,
