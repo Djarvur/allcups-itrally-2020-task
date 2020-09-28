@@ -3,11 +3,20 @@ package game_test
 import (
 	"context"
 	"errors"
+	"testing"
+
+	"github.com/powerman/check"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
+	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
 type C = game.Config
+
+func TestMain(m *testing.M) {
+	def.Init()
+	check.TestMain(m)
+}
 
 var (
 	ctx            = context.Background()
