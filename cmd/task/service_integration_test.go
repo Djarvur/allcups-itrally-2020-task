@@ -14,6 +14,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/netx"
 )
@@ -94,6 +95,12 @@ func TestSmoke(tt *testing.T) {
 			Balance: swag.Uint32(0),
 			Wallet:  model.Wallet{},
 		}})
+	}
+	{
+		args := model.Wallet{}
+		res, err := openapiClient.Op.IssueLicense(op.NewIssueLicenseParams().WithArgs(args))
+		t.DeepEqual(openapi.ErrPayload(err), apiError502)
+		t.Nil(res)
 	}
 	{
 		args := model.Wallet{}

@@ -44,10 +44,11 @@ type Appl interface {
 	// Errors: none.
 	Balance(Ctx) (balance int, wallet []int, err error)
 	// Licenses returns all active licenses.
-	// Errors: none.
+	// Errors: resource.ErrRPCInternal, resource.ErrRPCTimeout.
 	Licenses(Ctx) ([]game.License, error)
 	// IssueLicense creates and returns a new license with given digAllowed.
-	// Errors: game.ErrActiveLicenseLimit, game.ErrBogusCoin.
+	// Errors: game.ErrActiveLicenseLimit, game.ErrBogusCoin,
+	// resource.ErrRPCInternal, resource.ErrRPCTimeout.
 	IssueLicense(_ Ctx, wallet []int) (game.License, error)
 	// ExploreArea returns amount of not-digged-yet treasures in the
 	// area at depth.
@@ -149,7 +150,7 @@ var Difficulty = map[string]game.Config{
 		TreasureValueAlg: game.AlgDoubleMax,
 	},
 	"normal": {
-		MaxActiveLicenses: 3,
+		MaxActiveLicenses: 10,
 		Density:           250,
 		SizeX:             3500,
 		SizeY:             3500,
@@ -158,12 +159,13 @@ var Difficulty = map[string]game.Config{
 }
 
 type Config struct {
-	Duration          time.Duration
-	Game              game.Config
-	AutosavePeriod    time.Duration
-	DigBaseDelay      time.Duration
-	DigExtraDelay     time.Duration
-	DepthProfitChange float64
+	Duration           time.Duration
+	Game               game.Config
+	AutosavePeriod     time.Duration
+	DigBaseDelay       time.Duration
+	DigExtraDelay      time.Duration
+	DepthProfitChange  float64
+	LicensePercentFail int
 }
 
 // App implements interface Appl.

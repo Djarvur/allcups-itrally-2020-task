@@ -12,6 +12,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/client/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/resource"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
@@ -91,11 +92,13 @@ func TestListLicenses(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{
-		OpListLicensesRate: 3,
+		OpListLicensesRate: 5,
 	})
 	defer cleanup()
 
 	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, io.EOF)
+	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, resource.ErrRPCInternal)
+	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, resource.ErrRPCTimeout)
 	mockApp.EXPECT().Licenses(gomock.Any()).Return(nil, nil)
 	mockApp.EXPECT().Licenses(gomock.Any()).Return([]game.License{
 		{ID: 1, DigAllowed: 3, DigUsed: 0},
@@ -107,6 +110,8 @@ func TestListLicenses(tt *testing.T) {
 		wantErr *model.Error
 	}{
 		{nil, apiError500},
+		{nil, apiError502},
+		{nil, apiError504},
 		{model.LicenseList{}, nil},
 		{model.LicenseList{
 			&model.License{ID: swag.Int64(1), DigAllowed: 3, DigUsed: 0},
@@ -133,11 +138,13 @@ func TestIssueLicense(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 	cleanup, c, _, mockApp, _ := testNewServer(t, openapi.Config{
-		OpIssueLicenseRate: 4,
+		OpIssueLicenseRate: 6,
 	})
 	defer cleanup()
 
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{}).Return(game.License{}, io.EOF)
+	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{}).Return(game.License{}, resource.ErrRPCInternal)
+	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{}).Return(game.License{}, resource.ErrRPCTimeout)
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{0}).Return(game.License{ID: 1, DigAllowed: 3, DigUsed: 2}, nil)
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{0}).Return(game.License{}, game.ErrBogusCoin)
 	mockApp.EXPECT().IssueLicense(gomock.Any(), []int{1, 2}).Return(game.License{}, game.ErrActiveLicenseLimit)
@@ -148,6 +155,8 @@ func TestIssueLicense(tt *testing.T) {
 		wantErr *model.Error
 	}{
 		{model.Wallet{}, nil, apiError500},
+		{model.Wallet{}, nil, apiError502},
+		{model.Wallet{}, nil, apiError504},
 		{model.Wallet{0}, &model.License{ID: swag.Int64(1), DigAllowed: 3, DigUsed: 2}, nil},
 		{model.Wallet{0}, nil, apiError402},
 		{model.Wallet{1, 2}, nil, apiError1002},

@@ -7,6 +7,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/resource"
 )
 
 func (srv *server) HealthCheck(params op.HealthCheckParams) op.HealthCheckResponder {
@@ -45,6 +46,10 @@ func (srv *server) ListLicenses(params op.ListLicensesParams) op.ListLicensesRes
 	switch {
 	default:
 		return errListLicenses(log, err, codeInternal)
+	case errors.Is(err, resource.ErrRPCInternal):
+		return errListLicenses(log, err, codeBadGateway)
+	case errors.Is(err, resource.ErrRPCTimeout):
+		return errListLicenses(log, err, codeGatewayTimeout)
 	case err == nil:
 		return op.NewListLicensesOK().WithPayload(apiLicenseList(licenses))
 	}
@@ -64,6 +69,10 @@ func (srv *server) IssueLicense(params op.IssueLicenseParams) op.IssueLicenseRes
 		return errIssueLicense(log, err, codeActiveLicenseLimit)
 	case errors.Is(err, game.ErrBogusCoin):
 		return errIssueLicense(log, err, codePaymentRequired)
+	case errors.Is(err, resource.ErrRPCInternal):
+		return errIssueLicense(log, err, codeBadGateway)
+	case errors.Is(err, resource.ErrRPCTimeout):
+		return errIssueLicense(log, err, codeGatewayTimeout)
 	case err == nil:
 		return op.NewIssueLicenseOK().WithPayload(apiLicense(license))
 	}

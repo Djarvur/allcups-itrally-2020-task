@@ -23,6 +23,7 @@ func TestMain(m *testing.M) {
 
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
-	cfg *config.ServeConfig
-	ctx = context.Background()
+	cfg         *config.ServeConfig
+	ctx         = context.Background()
+	apiError502 = openapi.APIError(502, "RPC failed")
 )

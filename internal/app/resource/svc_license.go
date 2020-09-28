@@ -31,6 +31,9 @@ type LicenseSvc struct {
 
 // NewLicenseSvc creates and returns new LicenseSvc.
 func NewLicenseSvc(cfg LicenseSvcConfig) *LicenseSvc {
+	if cfg.Seed == 0 {
+		cfg.Seed = time.Now().UnixNano()
+	}
 	return &LicenseSvc{
 		cfg:  cfg,
 		prng: prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable results.
