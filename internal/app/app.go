@@ -1,4 +1,4 @@
-//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo,GameFactory
+//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo,GameFactory,CPU,LicenseSvc
 
 // Package app provides business logic.
 package app
@@ -90,6 +90,33 @@ type Repo interface {
 	SaveResult(int) error
 }
 
+// GameFactory provides different ways to create a new game.
+type GameFactory interface {
+	// New creates and returns new game.
+	New(Ctx, game.Config) (game.Game, error)
+	// Continue creates and returns new game restored from given reader, which
+	// should contain data written by Game.WriteTo.
+	Continue(Ctx, io.ReadSeeker) (game.Game, error)
+}
+
+// CPU is a resource which can be consumed for up to time.Second per
+// real-time second (i.e. it's a single-core CPU).
+type CPU interface {
+	// Consume t resources of this CPU instance.
+	// It returns nil if consumed successfully or ctx.Err() if ctx is done
+	// earlier than t resources will be consumed.
+	Consume(Ctx, time.Duration) error
+}
+
+// LicenseSvc is a virtual resource which pretends to be an RPC client.
+type LicenseSvc interface {
+	// Call will use percentFail and percentTimeout to decide call result:
+	//   - delay 0.01…0.1 sec without error
+	//   - delay 0.01 sec with ErrRPCInternal
+	//   - delay 1 sec with ErrRPCTimeout
+	Call(ctx Ctx, percentFail int) error
+}
+
 type (
 	// Contact describes record in address book.
 	Contact struct {
@@ -141,26 +168,24 @@ type Config struct {
 
 // App implements interface Appl.
 type App struct {
-	repo      Repo
-	cfg       Config
-	game      game.Game
-	started   chan time.Time
-	startOnce sync.Once
-	key       []byte
+	repo       Repo
+	cpu        CPU
+	svcLicense LicenseSvc
+	cfg        Config
+	game       game.Game
+	started    chan time.Time
+	startOnce  sync.Once
+	key        []byte
 }
 
-// GameFactory creates and returns new game.
-type GameFactory interface {
-	New(Ctx, game.Config) (game.Game, error)
-	Continue(Ctx, io.ReadSeeker) (game.Game, error)
-}
-
-func New(ctx Ctx, repo Repo, factory GameFactory, cfg Config) (*App, error) {
+func New(ctx Ctx, repo Repo, cpu CPU, svcLicense LicenseSvc, factory GameFactory, cfg Config) (*App, error) {
 	a := &App{
-		repo:    repo,
-		cfg:     cfg,
-		started: make(chan time.Time, 1),
-		key:     make([]byte, pasetoKeySize),
+		repo:       repo,
+		cpu:        cpu,
+		svcLicense: svcLicense,
+		cfg:        cfg,
+		started:    make(chan time.Time, 1),
+		key:        make([]byte, pasetoKeySize),
 	}
 	t, err := a.repo.LoadStartTime()
 	if err != nil {

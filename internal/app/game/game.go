@@ -119,10 +119,10 @@ type game struct {
 	prng     *prng.Rand
 }
 
-// Factory provide different ways to create a new game.
+// Factory implements app.GameFactory interface.
 type Factory struct{}
 
-// New creates and returns new game.
+// New implements app.GameFactory interface.
 func (Factory) New(ctx Ctx, cfg Config) (Game, error) {
 	log := structlog.FromContext(ctx, nil)
 	switch {
@@ -143,7 +143,7 @@ func (Factory) New(ctx Ctx, cfg Config) (Game, error) {
 		licenses: newLicenses(cfg.MaxActiveLicenses),
 		bank:     newBank(ctx, cfg.totalCash()),
 		field:    newField(cfg),
-		prng:     prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable game results.
+		prng:     prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable results.
 	}
 
 	skipped := 0

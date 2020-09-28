@@ -21,12 +21,12 @@ var (
 func TestNew(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, mockRepo, mockGame, mockGameFactory, wantErr := testPrepare(t)
+	cleanup, mockRepo, mockCPU, mockLicenseSvc, mockGame, mockGameFactory, wantErr := testPrepare(t)
 	defer cleanup()
 
 	mockRepo.EXPECT().LoadStartTime().Return(nil, io.EOF)
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil).Times(7)
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
 	// Enforce random seed if difficulty is not "test" and seed is 0.
 	cfgNormal := app.Difficulty["normal"]
@@ -47,23 +47,23 @@ func TestNew(tt *testing.T) {
 	mockGameFactory.EXPECT().New(gomock.Any(), cfgTest).Return(mockGame, nil).Times(3)
 	cfg := cfg
 	cfg.Game = cfgNormal
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 	cfg.Game = cfgNormal7
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 	cfg.Game = cfgNormalNoAlg
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 	cfg.Game = cfgTest
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
 	mockRepo.EXPECT().SaveTreasureKey(gomock.Len(32)).Return(io.EOF)
 	mockRepo.EXPECT().SaveTreasureKey(gomock.Len(32)).Return(nil).Times(2)
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
 	mockRepo.EXPECT().SaveGame(mockGame).Return(io.EOF)
 	mockRepo.EXPECT().SaveGame(mockGame).Return(nil).MinTimes(1)
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
-	a, err := app.New(ctx, mockRepo, mockGameFactory, cfg)
+	a, err := app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg)
 	t.Nil(err)
 	t.NotNil(a)
 }
@@ -71,7 +71,7 @@ func TestNew(tt *testing.T) {
 func TestContinue(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, mockRepo, mockGame, mockGameFactory, wantErr := testPrepare(t)
+	cleanup, mockRepo, mockCPU, mockLicenseSvc, mockGame, mockGameFactory, wantErr := testPrepare(t)
 	defer cleanup()
 
 	mockRepo.EXPECT().LoadStartTime().Return(&start, nil).AnyTimes()
@@ -80,25 +80,25 @@ func TestContinue(tt *testing.T) {
 	mockRepo.EXPECT().LoadTreasureKey().Return(make([]byte, 33), nil)
 	mockRepo.EXPECT().LoadTreasureKey().Return(make([]byte, 32), nil).Times(4)
 
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
-	a, err := app.New(ctx, mockRepo, mockGameFactory, cfg)
+	a, err := app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg)
 	t.Match(err, `bad PASETO key size`)
 	t.Nil(a)
 
 	mockRepo.EXPECT().LoadGame().Return(nil, io.EOF)
 	mockRepo.EXPECT().LoadGame().Return(dump, nil).Times(3)
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
 	mockGameFactory.EXPECT().Continue(gomock.Any(), dump).Return(nil, io.EOF)
 	mockGameFactory.EXPECT().Continue(gomock.Any(), dump).Return(mockGame, nil).Times(2)
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
 	mockRepo.EXPECT().SaveStartTime(start).Return(io.EOF)
-	wantErr(app.New(ctx, mockRepo, mockGameFactory, cfg))
+	wantErr(app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg))
 
 	mockRepo.EXPECT().SaveStartTime(start).Return(nil)
-	a, err = app.New(ctx, mockRepo, mockGameFactory, cfg)
+	a, err = app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg)
 	t.Nil(err)
 	t.NotNil(a)
 }
@@ -106,7 +106,7 @@ func TestContinue(tt *testing.T) {
 func TestRestoreKey(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, mockRepo, mockGame, mockGameFactory, _ := testPrepare(t)
+	cleanup, mockRepo, mockCPU, mockLicenseSvc, mockGame, mockGameFactory, _ := testPrepare(t)
 	defer cleanup()
 	var key []byte
 
@@ -117,7 +117,7 @@ func TestRestoreKey(tt *testing.T) {
 		return nil
 	})
 	mockRepo.EXPECT().SaveGame(mockGame).Return(nil).MinTimes(1)
-	a, err := app.New(ctx, mockRepo, mockGameFactory, cfg)
+	a, err := app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg)
 	t.Nil(err)
 	t.NotNil(a)
 
@@ -129,7 +129,7 @@ func TestRestoreKey(tt *testing.T) {
 	mockRepo.EXPECT().LoadGame().Return(dump, nil)
 	mockGameFactory.EXPECT().Continue(gomock.Any(), dump).Return(mockGame, nil)
 	mockRepo.EXPECT().SaveStartTime(start).Return(nil)
-	a, err = app.New(ctx, mockRepo, mockGameFactory, cfg)
+	a, err = app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg)
 	t.Nil(err)
 	t.NotNil(a)
 
