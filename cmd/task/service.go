@@ -11,6 +11,7 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/game"
+	"github.com/Djarvur/allcups-itrally-2020-task/internal/app/resource"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/config"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/dal"
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/srv/openapi"
@@ -25,10 +26,12 @@ type Ctx = context.Context
 var reg = prometheus.NewPedanticRegistry() //nolint:gochecknoglobals // Metrics are global anyway.
 
 type service struct {
-	cfg  *config.ServeConfig
-	repo *dal.Repo
-	appl *app.App
-	srv  *restapi.Server
+	cfg        *config.ServeConfig
+	repo       *dal.Repo
+	cpu        *resource.CPU
+	svcLicense *resource.LicenseSvc
+	appl       *app.App
+	srv        *restapi.Server
 }
 
 func initService(_, serveCmd *cobra.Command) error {
@@ -58,8 +61,17 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 		return log.Err("failed to connect", "err", err)
 	}
 
+	const hz = 10000
+	s.cpu = resource.NewCPU(hz)
+	s.svcLicense = resource.NewLicenseSvc(resource.LicenseSvcConfig{
+		PercentTimeout: s.cfg.LicensePercentTimeout,
+		MinDelay:       s.cfg.LicenseMinDelay,
+		MaxDelay:       s.cfg.LicenseMaxDelay,
+		TimeoutDelay:   s.cfg.LicenseTimeoutDelay,
+	})
+
 	if s.appl == nil {
-		s.appl, err = app.New(ctxStartup, s.repo, game.Factory{}, app.Config{
+		s.appl, err = app.New(ctxStartup, s.repo, s.cpu, s.svcLicense, game.Factory{}, app.Config{
 			AutosavePeriod:    s.cfg.AutosavePeriod,
 			DepthProfitChange: s.cfg.DepthProfitChange,
 			DigBaseDelay:      s.cfg.DigBaseDelay,
@@ -81,9 +93,10 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	err = concurrent.Serve(ctxShutdown, shutdown,
-		s.serveMetrics,
-		s.serveOpenAPI,
+		s.cpu.Provide,
 		s.appl.Wait,
+		s.serveOpenAPI,
+		s.serveMetrics,
 	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)

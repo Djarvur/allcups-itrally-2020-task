@@ -2,6 +2,7 @@ package resource_test
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -14,6 +15,10 @@ import (
 func TestCPUSmoke(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
+	if os.Getenv("CI") != "" {
+		t.Skip("skipping test on CI")
+	}
+
 	ctxShutdown, shutdown := context.WithCancel(ctx)
 	defer shutdown()
 	cpu := resource.NewCPU(10000)

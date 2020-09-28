@@ -38,9 +38,11 @@ var (
 	}
 )
 
-func testPrepare(t *check.C) (func(), *app.MockRepo, *game.MockGame, *app.MockGameFactory, func(a *app.App, err error)) {
+func testPrepare(t *check.C) (func(), *app.MockRepo, *app.MockCPU, *app.MockLicenseSvc, *game.MockGame, *app.MockGameFactory, func(a *app.App, err error)) {
 	ctrl := gomock.NewController(t)
 	mockRepo := app.NewMockRepo(ctrl)
+	mockCPU := app.NewMockCPU(ctrl)
+	mockLicenseSvc := app.NewMockLicenseSvc(ctrl)
 	mockGame := game.NewMockGame(ctrl)
 	mockGameFactory := app.NewMockGameFactory(ctrl)
 	wantErr := func(a *app.App, err error) {
@@ -48,19 +50,19 @@ func testPrepare(t *check.C) (func(), *app.MockRepo, *game.MockGame, *app.MockGa
 		t.Err(err, io.EOF)
 		t.Nil(a)
 	}
-	return ctrl.Finish, mockRepo, mockGame, mockGameFactory, wantErr
+	return ctrl.Finish, mockRepo, mockCPU, mockLicenseSvc, mockGame, mockGameFactory, wantErr
 }
 
 func testNew(t *check.C) (func(), *app.App, *app.MockRepo, *game.MockGame) {
 	t.Helper()
-	cleanup, mockRepo, mockGame, mockGameFactory, _ := testPrepare(t)
+	cleanup, mockRepo, mockCPU, mockLicenseSvc, mockGame, mockGameFactory, _ := testPrepare(t)
 
 	mockRepo.EXPECT().LoadStartTime().Return(&time.Time{}, nil)
 	mockRepo.EXPECT().SaveTreasureKey(gomock.Any()).Return(nil)
 	mockRepo.EXPECT().SaveGame(mockGame).Return(nil)
 	mockGameFactory.EXPECT().New(gomock.Any(), cfg.Game).Return(mockGame, nil)
 
-	a, err := app.New(ctx, mockRepo, mockGameFactory, cfg)
+	a, err := app.New(ctx, mockRepo, mockCPU, mockLicenseSvc, mockGameFactory, cfg)
 	t.Must(t.Nil(err))
 	return cleanup, a, mockRepo, mockGame
 }

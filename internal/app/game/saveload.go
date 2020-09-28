@@ -11,8 +11,7 @@ type state struct {
 	Balance        int
 }
 
-// Continue creates and returns new game restored from given reader, which
-// should contain data written by Game.WriteTo.
+// Continue implements app.GameFactory interface.
 func (factory Factory) Continue(ctx Ctx, r io.ReadSeeker) (g Game, err error) {
 	var previous state
 	dec := json.NewDecoder(r)

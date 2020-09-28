@@ -279,6 +279,133 @@ func (mr *MockRepoMockRecorder) SaveResult(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveResult", reflect.TypeOf((*MockRepo)(nil).SaveResult), arg0)
 }
 
+// MockGameFactory is a mock of GameFactory interface
+type MockGameFactory struct {
+	ctrl     *gomock.Controller
+	recorder *MockGameFactoryMockRecorder
+}
+
+// MockGameFactoryMockRecorder is the mock recorder for MockGameFactory
+type MockGameFactoryMockRecorder struct {
+	mock *MockGameFactory
+}
+
+// NewMockGameFactory creates a new mock instance
+func NewMockGameFactory(ctrl *gomock.Controller) *MockGameFactory {
+	mock := &MockGameFactory{ctrl: ctrl}
+	mock.recorder = &MockGameFactoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockGameFactory) EXPECT() *MockGameFactoryMockRecorder {
+	return m.recorder
+}
+
+// New mocks base method
+func (m *MockGameFactory) New(arg0 Ctx, arg1 game.Config) (game.Game, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "New", arg0, arg1)
+	ret0, _ := ret[0].(game.Game)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// New indicates an expected call of New
+func (mr *MockGameFactoryMockRecorder) New(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockGameFactory)(nil).New), arg0, arg1)
+}
+
+// Continue mocks base method
+func (m *MockGameFactory) Continue(arg0 Ctx, arg1 io.ReadSeeker) (game.Game, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Continue", arg0, arg1)
+	ret0, _ := ret[0].(game.Game)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Continue indicates an expected call of Continue
+func (mr *MockGameFactoryMockRecorder) Continue(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Continue", reflect.TypeOf((*MockGameFactory)(nil).Continue), arg0, arg1)
+}
+
+// MockCPU is a mock of CPU interface
+type MockCPU struct {
+	ctrl     *gomock.Controller
+	recorder *MockCPUMockRecorder
+}
+
+// MockCPUMockRecorder is the mock recorder for MockCPU
+type MockCPUMockRecorder struct {
+	mock *MockCPU
+}
+
+// NewMockCPU creates a new mock instance
+func NewMockCPU(ctrl *gomock.Controller) *MockCPU {
+	mock := &MockCPU{ctrl: ctrl}
+	mock.recorder = &MockCPUMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockCPU) EXPECT() *MockCPUMockRecorder {
+	return m.recorder
+}
+
+// Consume mocks base method
+func (m *MockCPU) Consume(arg0 Ctx, arg1 time.Duration) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Consume", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Consume indicates an expected call of Consume
+func (mr *MockCPUMockRecorder) Consume(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Consume", reflect.TypeOf((*MockCPU)(nil).Consume), arg0, arg1)
+}
+
+// MockLicenseSvc is a mock of LicenseSvc interface
+type MockLicenseSvc struct {
+	ctrl     *gomock.Controller
+	recorder *MockLicenseSvcMockRecorder
+}
+
+// MockLicenseSvcMockRecorder is the mock recorder for MockLicenseSvc
+type MockLicenseSvcMockRecorder struct {
+	mock *MockLicenseSvc
+}
+
+// NewMockLicenseSvc creates a new mock instance
+func NewMockLicenseSvc(ctrl *gomock.Controller) *MockLicenseSvc {
+	mock := &MockLicenseSvc{ctrl: ctrl}
+	mock.recorder = &MockLicenseSvcMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockLicenseSvc) EXPECT() *MockLicenseSvcMockRecorder {
+	return m.recorder
+}
+
+// Call mocks base method
+func (m *MockLicenseSvc) Call(ctx Ctx, percentFail int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Call", ctx, percentFail)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Call indicates an expected call of Call
+func (mr *MockLicenseSvcMockRecorder) Call(ctx, percentFail interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Call", reflect.TypeOf((*MockLicenseSvc)(nil).Call), ctx, percentFail)
+}
+
 // MockReadSeekCloser is a mock of ReadSeekCloser interface
 type MockReadSeekCloser struct {
 	ctrl     *gomock.Controller
@@ -344,57 +471,4 @@ func (m *MockReadSeekCloser) Close() error {
 func (mr *MockReadSeekCloserMockRecorder) Close() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockReadSeekCloser)(nil).Close))
-}
-
-// MockGameFactory is a mock of GameFactory interface
-type MockGameFactory struct {
-	ctrl     *gomock.Controller
-	recorder *MockGameFactoryMockRecorder
-}
-
-// MockGameFactoryMockRecorder is the mock recorder for MockGameFactory
-type MockGameFactoryMockRecorder struct {
-	mock *MockGameFactory
-}
-
-// NewMockGameFactory creates a new mock instance
-func NewMockGameFactory(ctrl *gomock.Controller) *MockGameFactory {
-	mock := &MockGameFactory{ctrl: ctrl}
-	mock.recorder = &MockGameFactoryMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockGameFactory) EXPECT() *MockGameFactoryMockRecorder {
-	return m.recorder
-}
-
-// New mocks base method
-func (m *MockGameFactory) New(arg0 Ctx, arg1 game.Config) (game.Game, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "New", arg0, arg1)
-	ret0, _ := ret[0].(game.Game)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// New indicates an expected call of New
-func (mr *MockGameFactoryMockRecorder) New(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockGameFactory)(nil).New), arg0, arg1)
-}
-
-// Continue mocks base method
-func (m *MockGameFactory) Continue(arg0 Ctx, arg1 io.ReadSeeker) (game.Game, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Continue", arg0, arg1)
-	ret0, _ := ret[0].(game.Game)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Continue indicates an expected call of Continue
-func (mr *MockGameFactoryMockRecorder) Continue(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Continue", reflect.TypeOf((*MockGameFactory)(nil).Continue), arg0, arg1)
 }

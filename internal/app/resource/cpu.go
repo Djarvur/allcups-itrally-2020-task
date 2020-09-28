@@ -10,8 +10,7 @@ import (
 
 type Ctx = context.Context
 
-// CPU is a resource which can be consumed for up to time.Second per
-// real-time second (i.e. it's a single-core CPU).
+// CPU implements app.CPU interface.
 type CPU struct {
 	freq time.Duration
 	tick chan struct{}
@@ -55,9 +54,7 @@ func (c *CPU) Provide(ctx Ctx) error {
 	}
 }
 
-// Consume t resources of this CPU instance.
-// It returns nil if consumed successfully or ctx.Err() if ctx is done
-// earlier than t resources will be consumed.
+// Consume implements app.CPU interface.
 func (c *CPU) Consume(ctx Ctx, t time.Duration) error {
 	for ticks := int(t.Round(c.freq) / c.freq); ticks > 0; ticks-- {
 		select {
