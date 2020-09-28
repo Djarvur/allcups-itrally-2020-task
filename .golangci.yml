@@ -426,6 +426,12 @@ issues:
       linters:
         - funlen
 
+    # Commands initialization are allowed to contain a lot of objects.
+    - path: service.go
+      text: Function '(runServe)'
+      linters:
+        - funlen
+
     # Servers are allowed to contain a lot of handlers/middlewares.
     - path: internal/srv/[^/]*/srv.go
       text: Function 'NewServer'

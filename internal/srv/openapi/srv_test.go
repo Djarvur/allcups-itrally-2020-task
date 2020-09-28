@@ -91,7 +91,6 @@ func TestServeLogger(t *testing.T) {
 				return nil, nil
 			})
 
-			t.Log(tsURL + path.Join(basePath, healthCheckEndpoint))
 			resp := fetch(t, tsURL+path.Join(basePath, healthCheckEndpoint))
 			t.Equal(resp.StatusCode, 200)
 			var buf bytes.Buffer

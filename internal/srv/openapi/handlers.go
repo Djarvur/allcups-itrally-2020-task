@@ -1,6 +1,7 @@
 package openapi
 
 import (
+	"context"
 	"errors"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/model"
@@ -21,6 +22,10 @@ func (srv *server) HealthCheck(params op.HealthCheckParams) op.HealthCheckRespon
 
 func (srv *server) GetBalance(params op.GetBalanceParams) op.GetBalanceResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
+	if srv.cfg.OpGetBalanceRate != 0 && !srv.limitGetBalance.Allow() {
+		return errGetBalance(log, errTooManyRequests, codeTooManyRequests)
+	}
+
 	balance, wallet, err := srv.app.Balance(ctx)
 	switch {
 	default:
@@ -32,6 +37,10 @@ func (srv *server) GetBalance(params op.GetBalanceParams) op.GetBalanceResponder
 
 func (srv *server) ListLicenses(params op.ListLicensesParams) op.ListLicensesResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
+	if srv.cfg.OpListLicensesRate != 0 && !srv.limitListLicenses.Allow() {
+		return errListLicenses(log, errTooManyRequests, codeTooManyRequests)
+	}
+
 	licenses, err := srv.app.Licenses(ctx)
 	switch {
 	default:
@@ -43,6 +52,10 @@ func (srv *server) ListLicenses(params op.ListLicensesParams) op.ListLicensesRes
 
 func (srv *server) IssueLicense(params op.IssueLicenseParams) op.IssueLicenseResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
+	if srv.cfg.OpIssueLicenseRate != 0 && !srv.limitIssueLicense.Allow() {
+		return errIssueLicense(log, errTooManyRequests, codeTooManyRequests)
+	}
+
 	license, err := srv.app.IssueLicense(ctx, appWallet(params.Args))
 	switch {
 	default:
@@ -58,10 +71,18 @@ func (srv *server) IssueLicense(params op.IssueLicenseParams) op.IssueLicenseRes
 
 func (srv *server) ExploreArea(params op.ExploreAreaParams) op.ExploreAreaResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
+	if srv.cfg.OpExploreAreaRate != 0 && !srv.limitExploreArea.Allow() {
+		return errExploreArea(log, errTooManyRequests, codeTooManyRequests)
+	}
+	ctx, cancel := context.WithTimeout(ctx, srv.cfg.OpExploreAreaTimeout)
+	defer cancel()
+
 	count, err := srv.app.ExploreArea(ctx, appArea(params.Args))
 	switch {
 	default:
 		return errExploreArea(log, err, codeInternal)
+	case ctx.Err() != nil:
+		return errExploreArea(log, errServiceUnavailable, codeServiceUnavailable)
 	case errors.Is(err, game.ErrWrongCoord):
 		return errExploreArea(log, err, codeWrongCoord)
 	case err == nil:
@@ -74,11 +95,19 @@ func (srv *server) ExploreArea(params op.ExploreAreaParams) op.ExploreAreaRespon
 
 func (srv *server) Dig(params op.DigParams) op.DigResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
+	if srv.cfg.OpDigRate != 0 && !srv.limitDig.Allow() {
+		return errDig(log, errTooManyRequests, codeTooManyRequests)
+	}
+	ctx, cancel := context.WithTimeout(ctx, srv.cfg.OpDigTimeout)
+	defer cancel()
+
 	coord := appCoord(params.Args)
 	treasure, err := srv.app.Dig(ctx, int(*params.Args.LicenseID), coord)
 	switch {
 	default:
 		return errDig(log, err, codeInternal)
+	case ctx.Err() != nil:
+		return errDig(log, errServiceUnavailable, codeServiceUnavailable)
 	case errors.Is(err, game.ErrNoSuchLicense):
 		return errDig(log, err, codeForbidden)
 	case errors.Is(err, game.ErrWrongCoord):
@@ -94,6 +123,13 @@ func (srv *server) Dig(params op.DigParams) op.DigResponder {
 
 func (srv *server) Cash(params op.CashParams) op.CashResponder {
 	ctx, log := fromRequest(params.HTTPRequest)
+	if srv.cfg.OpCashRate != 0 && !srv.limitCash.Allow() {
+		return errCash(log, errTooManyRequests, codeTooManyRequests)
+	}
+	if srv.inPercent(srv.cfg.OpCashPercentFail) {
+		return errCash(log, errServiceUnavailable, codeServiceUnavailable)
+	}
+
 	wallet, err := srv.app.Cash(ctx, string(params.Args))
 	switch {
 	default:

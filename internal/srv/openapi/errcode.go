@@ -1,5 +1,9 @@
 package openapi
 
+import (
+	"errors"
+)
+
 // As go-swagger already returns a lot of different errors (like auth or
 // validation) on it's own in specific format (usual HTTP Status Code plus
 // body with JSON like {"code":600,"message":"some error"}) and already
@@ -32,11 +36,15 @@ func newErrCode(statusCode int, extraCode int32) errCode {
 //nolint:gochecknoglobals,gomnd // Const.
 var (
 	codeInternal           = newErrCode(500, 0)
+	codeServiceUnavailable = newErrCode(503, 0)
 	codePaymentRequired    = newErrCode(402, 0)
 	codeForbidden          = newErrCode(403, 0)
 	codeNotFound           = newErrCode(404, 0)
+	codeTooManyRequests    = newErrCode(429, 0)
 	codeWrongCoord         = newErrCode(422, 1000)
 	codeWrongDepth         = newErrCode(422, 1001)
 	codeActiveLicenseLimit = newErrCode(409, 1002)
 	codeNotDigged          = newErrCode(409, 1003)
+	errServiceUnavailable  = errors.New("service unavailable")
+	errTooManyRequests     = errors.New("too many requests")
 )

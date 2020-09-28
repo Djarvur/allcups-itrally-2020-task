@@ -43,7 +43,16 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	LicenseMinDelay       appcfg.Duration
 	LicensePercentTimeout appcfg.IntBetween
 	LicenseTimeoutDelay   appcfg.Duration
-	MetricsAddrPort       appcfg.Port           `env:"METRICS_ADDR_PORT"`
+	MetricsAddrPort       appcfg.Port `env:"METRICS_ADDR_PORT"`
+	OpCashPercentFail     appcfg.IntBetween
+	OpCashRate            appcfg.Uint
+	OpDigRate             appcfg.Uint
+	OpDigTimeout          appcfg.Duration
+	OpExploreAreaRate     appcfg.Uint
+	OpExploreAreaTimeout  appcfg.Duration
+	OpGetBalanceRate      appcfg.Uint
+	OpIssueLicenseRate    appcfg.Uint
+	OpListLicensesRate    appcfg.Uint
 	Pprof                 appcfg.Bool           `env:"PPROF"`
 	ResultDir             appcfg.NotEmptyString `env:"RESULT_DIR"`
 	WorkDir               appcfg.NotEmptyString `env:"WORK_DIR"`
@@ -62,6 +71,15 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	LicensePercentTimeout: appcfg.MustIntBetween("10", 0, 100),
 	LicenseTimeoutDelay:   appcfg.MustDuration("1s"),
 	MetricsAddrPort:       appcfg.MustPort("9000"),
+	OpCashPercentFail:     appcfg.MustIntBetween("5", 0, 100),
+	OpCashRate:            appcfg.MustUint("300"),
+	OpDigRate:             appcfg.MustUint("1000"),
+	OpDigTimeout:          appcfg.MustDuration("2s"),
+	OpExploreAreaRate:     appcfg.MustUint("1000"),
+	OpExploreAreaTimeout:  appcfg.MustDuration("1s"),
+	OpGetBalanceRate:      appcfg.MustUint("100"),
+	OpIssueLicenseRate:    appcfg.MustUint("350"),
+	OpListLicensesRate:    appcfg.MustUint("100"),
 	Pprof:                 appcfg.MustBool("true"),
 	ResultDir:             appcfg.MustNotEmptyString("var/data"),
 	WorkDir:               appcfg.MustNotEmptyString("var"),
@@ -110,6 +128,15 @@ type ServeConfig struct {
 	LicensePercentTimeout int
 	LicenseTimeoutDelay   time.Duration
 	MetricsAddr           netx.Addr
+	OpCashPercentFail     int
+	OpCashRate            int
+	OpDigRate             int
+	OpDigTimeout          time.Duration
+	OpExploreAreaRate     int
+	OpExploreAreaTimeout  time.Duration
+	OpGetBalanceRate      int
+	OpIssueLicenseRate    int
+	OpListLicensesRate    int
 	Pprof                 bool
 	ResultDir             string
 	WorkDir               string
@@ -133,6 +160,15 @@ func GetServe() (c *ServeConfig, err error) {
 		LicensePercentTimeout: all.LicensePercentTimeout.Value(&err),
 		LicenseTimeoutDelay:   all.LicenseTimeoutDelay.Value(&err),
 		MetricsAddr:           netx.NewAddr(all.AddrHost.Value(&err), all.MetricsAddrPort.Value(&err)),
+		OpCashPercentFail:     all.OpCashPercentFail.Value(&err),
+		OpCashRate:            int(all.OpCashRate.Value(&err)),
+		OpDigRate:             int(all.OpDigRate.Value(&err)),
+		OpDigTimeout:          all.OpDigTimeout.Value(&err),
+		OpExploreAreaRate:     int(all.OpExploreAreaRate.Value(&err)),
+		OpExploreAreaTimeout:  all.OpExploreAreaTimeout.Value(&err),
+		OpGetBalanceRate:      int(all.OpGetBalanceRate.Value(&err)),
+		OpIssueLicenseRate:    int(all.OpIssueLicenseRate.Value(&err)),
+		OpListLicensesRate:    int(all.OpListLicensesRate.Value(&err)),
 		Pprof:                 all.Pprof.Value(&err),
 		ResultDir:             all.ResultDir.Value(&err),
 		WorkDir:               all.WorkDir.Value(&err),
