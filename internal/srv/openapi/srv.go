@@ -4,13 +4,17 @@ package openapi
 import (
 	"context"
 	"fmt"
+	prng "math/rand"
 	"net"
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/powerman/structlog"
 	"github.com/sebest/xff"
+	"golang.org/x/time/rate"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi"
 	"github.com/Djarvur/allcups-itrally-2020-task/api/openapi/restapi/op"
@@ -26,23 +30,51 @@ type (
 	Log = *structlog.Logger
 	// Config contains configuration for OpenAPI server.
 	Config struct {
-		DisableAccessLog bool
-		Addr             netx.Addr
-		BasePath         string
-		Pprof            bool
+		DisableAccessLog     bool
+		Addr                 netx.Addr
+		BasePath             string
+		Pprof                bool
+		OpCashPercentFail    int
+		OpCashRate           int
+		OpDigRate            int
+		OpDigTimeout         time.Duration
+		OpExploreAreaRate    int
+		OpExploreAreaTimeout time.Duration
+		OpGetBalanceRate     int
+		OpIssueLicenseRate   int
+		OpListLicensesRate   int
+		Seed                 int64
 	}
 	server struct {
-		app app.Appl
-		cfg Config
+		app               app.Appl
+		cfg               Config
+		muPRNG            sync.Mutex
+		prng              *prng.Rand
+		limitGetBalance   *rate.Limiter
+		limitListLicenses *rate.Limiter
+		limitIssueLicense *rate.Limiter
+		limitExploreArea  *rate.Limiter
+		limitDig          *rate.Limiter
+		limitCash         *rate.Limiter
 	}
 )
 
 // NewServer returns OpenAPI server configured to listen on the TCP network
 // address cfg.Host:cfg.Port and handle requests on incoming connections.
 func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
+	if cfg.Seed == 0 {
+		cfg.Seed = time.Now().UnixNano()
+	}
 	srv := &server{
-		app: appl,
-		cfg: cfg,
+		app:               appl,
+		cfg:               cfg,
+		prng:              prng.New(prng.NewSource(cfg.Seed)), //nolint:gosec // We need repeatable results.
+		limitGetBalance:   rate.NewLimiter(rate.Limit(cfg.OpGetBalanceRate), cfg.OpGetBalanceRate),
+		limitListLicenses: rate.NewLimiter(rate.Limit(cfg.OpListLicensesRate), cfg.OpListLicensesRate),
+		limitIssueLicense: rate.NewLimiter(rate.Limit(cfg.OpIssueLicenseRate), cfg.OpIssueLicenseRate),
+		limitExploreArea:  rate.NewLimiter(rate.Limit(cfg.OpExploreAreaRate), cfg.OpExploreAreaRate),
+		limitDig:          rate.NewLimiter(rate.Limit(cfg.OpDigRate), cfg.OpDigRate),
+		limitCash:         rate.NewLimiter(rate.Limit(cfg.OpCashRate), cfg.OpCashRate),
 	}
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
@@ -94,6 +126,13 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	log := structlog.New()
 	log.Info("OpenAPI protocol", "version", swaggerSpec.Spec().Info.Version)
 	return server, nil
+}
+
+func (srv *server) inPercent(p int) bool {
+	const percent100 = 100
+	srv.muPRNG.Lock()
+	defer srv.muPRNG.Unlock()
+	return srv.prng.Intn(percent100) < p
 }
 
 func fromRequest(r *http.Request) (Ctx, Log) {

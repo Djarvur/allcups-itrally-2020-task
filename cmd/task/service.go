@@ -84,9 +84,18 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 		return log.Err("failed to app.New", "err", err)
 	}
 	s.srv, err = openapi.NewServer(s.appl, openapi.Config{
-		DisableAccessLog: !s.cfg.AccessLog,
-		Addr:             s.cfg.Addr,
-		Pprof:            s.cfg.Pprof,
+		DisableAccessLog:     !s.cfg.AccessLog,
+		Addr:                 s.cfg.Addr,
+		Pprof:                s.cfg.Pprof,
+		OpCashPercentFail:    s.cfg.OpCashPercentFail,
+		OpCashRate:           s.cfg.OpCashRate,
+		OpDigRate:            s.cfg.OpDigRate,
+		OpDigTimeout:         s.cfg.OpDigTimeout,
+		OpExploreAreaRate:    s.cfg.OpExploreAreaRate,
+		OpExploreAreaTimeout: s.cfg.OpExploreAreaTimeout,
+		OpGetBalanceRate:     s.cfg.OpGetBalanceRate,
+		OpIssueLicenseRate:   s.cfg.OpIssueLicenseRate,
+		OpListLicensesRate:   s.cfg.OpListLicensesRate,
 	})
 	if err != nil {
 		return log.Err("failed to openapi.NewServer", "err", err)
