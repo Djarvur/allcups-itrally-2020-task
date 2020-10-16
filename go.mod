@@ -19,12 +19,12 @@ require (
 	github.com/powerman/getenv v0.1.0
 	github.com/powerman/must v0.1.0
 	github.com/powerman/structlog v0.7.1
-	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_golang v1.8.0
 	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
-	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 )
