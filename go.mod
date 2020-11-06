@@ -15,7 +15,7 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/powerman/appcfg v0.5.0
-	github.com/powerman/check v1.2.1
+	github.com/powerman/check v1.3.0
 	github.com/powerman/getenv v0.1.0
 	github.com/powerman/must v0.1.0
 	github.com/powerman/structlog v0.7.1
