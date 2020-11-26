@@ -2,6 +2,7 @@ package resource_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -47,10 +48,10 @@ func TestSvcLicensePercent(tt *testing.T) {
 	})
 	var timeout, internal int
 	for i := 0; i < 1000; i++ {
-		switch s.Call(ctx, 50) {
-		case resource.ErrRPCTimeout:
+		switch err := s.Call(ctx, 50); true {
+		case errors.Is(err, resource.ErrRPCTimeout):
 			timeout++
-		case resource.ErrRPCInternal:
+		case errors.Is(err, resource.ErrRPCInternal):
 			internal++
 		}
 	}

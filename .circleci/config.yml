@@ -7,11 +7,8 @@ setup_env: &setup_env
     command: |
       env | sort > /tmp/env.old
 
-      export HADOLINT_VER=1.18.0
+      export HADOLINT_VER=1.19.0
       export SHELLCHECK_VER=0.7.1
-      export GOLANGCI_LINT_VER=1.31.0
-      export GOTESTSUM_VER=0.5.3
-      export GOSWAGGER_VER=0.25.0
 
       env | sort > /tmp/env.new
       ! diff -u /tmp/env.old /tmp/env.new | sed -n '/^+[^+]/s/^./export /p' >> $BASH_ENV
@@ -36,25 +33,17 @@ jobs:
       - *setup_env
       - restore_cache:
           keys:
-            - v5-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
-            - v5-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-
-            - v5-{{ checksum "/tmp/tools.ver" }}-
+            - v6-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
+            - v6-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-
+            - v6-{{ checksum "/tmp/tools.ver" }}-
       - run:
           name: Install tools
-          environment:
-            GO111MODULE: "on"
           command: |
-            cd /tmp # Protect go.mod for modifications by `go get`.
+            GO111MODULE=off go get -u github.com/myitcv/gobin
             hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||
               curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
             shellcheck --version | tee /dev/stderr | grep -wq $SHELLCHECK_VER ||
               curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
-            golangci-lint version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
-              curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GOLANGCI_LINT_VER
-            gotestsum --version | tee /dev/stderr | grep -wq $GOTESTSUM_VER ||
-              curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum
-            swagger version | tee /dev/stderr | grep -wq v$GOSWAGGER_VER ||
-              curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v${GOSWAGGER_VER}/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
       - run:
           name: Ensure API spec match auto-generated code
           command: |
@@ -63,13 +52,15 @@ jobs:
       - run: scripts/test
       - save_cache:
           when: always
-          key: v5-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
+          key: v6-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
           paths:
             - ~/go/bin/
             - ~/go/pkg/
             - ~/go/src/
             - ~/.cache/go-build/
             - ~/.cache/golangci-lint/
+            - ~/.cache/gobin/
+            - .gobincache/
 
 workflows:
   default:

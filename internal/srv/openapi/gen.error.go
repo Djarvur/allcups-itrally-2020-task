@@ -2,6 +2,7 @@
 // Any changes will be lost if this file is regenerated.
 // see https://github.com/cheekybits/genny
 
+
 package openapi
 
 import (
@@ -31,6 +32,7 @@ func errCash(log Log, err error, code errCode) op.CashResponder {
 	})
 }
 
+
 func errDig(log Log, err error, code errCode) op.DigResponder {
 	if code.status < http.StatusInternalServerError {
 		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
@@ -48,6 +50,7 @@ func errDig(log Log, err error, code errCode) op.DigResponder {
 		Message: swag.String(msg),
 	})
 }
+
 
 func errExploreArea(log Log, err error, code errCode) op.ExploreAreaResponder {
 	if code.status < http.StatusInternalServerError {
@@ -67,6 +70,7 @@ func errExploreArea(log Log, err error, code errCode) op.ExploreAreaResponder {
 	})
 }
 
+
 func errGetBalance(log Log, err error, code errCode) op.GetBalanceResponder {
 	if code.status < http.StatusInternalServerError {
 		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
@@ -85,6 +89,7 @@ func errGetBalance(log Log, err error, code errCode) op.GetBalanceResponder {
 	})
 }
 
+
 func errIssueLicense(log Log, err error, code errCode) op.IssueLicenseResponder {
 	if code.status < http.StatusInternalServerError {
 		log.Info("client error", def.LogHTTPStatus, code.status, "code", code.extra, "err", err)
@@ -102,6 +107,7 @@ func errIssueLicense(log Log, err error, code errCode) op.IssueLicenseResponder 
 		Message: swag.String(msg),
 	})
 }
+
 
 func errListLicenses(log Log, err error, code errCode) op.ListLicensesResponder {
 	if code.status < http.StatusInternalServerError {

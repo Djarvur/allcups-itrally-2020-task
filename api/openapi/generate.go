@@ -2,6 +2,6 @@
 package api
 
 //go:generate rm -rf model restapi client
-//go:generate swagger generate server --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order --exclude-main
-//go:generate swagger generate client --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order
+//go:generate gobin -m -run github.com/go-swagger/go-swagger/cmd/swagger generate server --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order --exclude-main
+//go:generate gobin -m -run github.com/go-swagger/go-swagger/cmd/swagger generate client --api-package op --model-package model --strict-responders --strict-additional-properties --keep-spec-order
 //go:generate find restapi -maxdepth 1 -name "configure_*.go" -exec sed -i -e "/go:generate/d" {} ;

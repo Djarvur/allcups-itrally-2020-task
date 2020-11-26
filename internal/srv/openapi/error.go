@@ -1,4 +1,5 @@
-//go:generate genny -in=$GOFILE -out=gen.$GOFILE gen "HealthCheck=Cash,Dig,ExploreArea,GetBalance,IssueLicense,ListLicenses"
+//go:generate gobin -m -run github.com/cheekybits/genny -in=$GOFILE -out=gen.$GOFILE gen "HealthCheck=Cash,Dig,ExploreArea,GetBalance,IssueLicense,ListLicenses"
+//go:generate sed -i -e "\\,^//go:generate,d" gen.$GOFILE
 
 package openapi
 
