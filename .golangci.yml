@@ -101,6 +101,8 @@ linters-settings:
     # see https://github.com/kisielk/errcheck#excluding-functions for details
     #exclude: .errcheck.excludes
   exhaustive:
+    # check switch statements in generated files also
+    check-generated: false
     # indicates that switch statements are to be considered exhaustive if a
     # 'default' case is present, even if all enum members aren't listed in the
     # switch
@@ -219,6 +221,9 @@ linters-settings:
         # - golang.org
     blocked:
       modules:                                                        # List of blocked modules
+        - github.com/cenkalti/backoff:
+            recommendations:
+              - github.com/cenkalti/backoff/v4
         # - github.com/uudashr/go-module:                             # Blocked module
         #     recommendations:                                        # Recommended modules that should be used instead (Optional)
         #       - golang.org/x/mod
@@ -344,6 +349,9 @@ linters-settings:
     # Choose whether or not to use the extra rules that are disabled
     # by default
     extra-rules: false
+  errorlint:
+    # Report non-wrapping error creation using fmt.Errorf
+    errorf: true
 
   # The custom section can be used to define linter plugins to be loaded at runtime. See README doc
   #  for more info.
@@ -365,10 +373,12 @@ linters:
   disable:
     - dogsled # questionable
     - dupl
+    - exhaustivestruct
     - lll
     - maligned # premature optimization
     - nlreturn
     - prealloc
+    - wrapcheck # enable after implementing https://github.com/tomarrell/wrapcheck/issues/1
     - wsl # questionable
   #disable-all: false
   #presets:

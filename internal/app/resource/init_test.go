@@ -22,7 +22,7 @@ func waitErr(t *check.C, errc <-chan error, wait time.Duration, wantErr error) {
 	now := time.Now()
 	select {
 	case err := <-errc:
-		t.Between(time.Since(now), wait-wait/4, wait+wait/4)
+		t.Between(time.Since(now), wait-wait/2, wait+wait/2)
 		t.Err(err, wantErr)
 	case <-time.After(def.TestTimeout):
 		t.FailNow()

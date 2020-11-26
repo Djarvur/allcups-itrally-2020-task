@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -16,7 +17,8 @@ import (
 const codeWrongCoord = 1000
 
 func errCode(err error) int {
-	switch errDefault, ok := err.(interface{ GetPayload() *model.Error }); true {
+	var errDefault interface{ GetPayload() *model.Error }
+	switch ok := errors.As(err, &errDefault); true {
 	case ok:
 		return int(*errDefault.GetPayload().Code)
 	case err == nil:

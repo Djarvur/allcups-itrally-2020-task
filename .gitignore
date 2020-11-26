@@ -8,6 +8,7 @@
 
 # Created by scripts/*.
 /.circleci/config-local.yml
+/.gobincache/
 /cover.out
 /bin/
 
