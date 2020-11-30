@@ -1,12 +1,12 @@
 package dal
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/Djarvur/allcups-itrally-2020-task/internal/app"
@@ -16,7 +16,7 @@ const (
 	fnStartTime   = "start.time"
 	fnTreasureKey = "treasure.key"
 	fnGame        = "game.data"
-	fnResult      = "result.txt"
+	fnResult      = "result.json"
 )
 
 func (r *Repo) LoadStartTime() (*time.Time, error) {
@@ -67,5 +67,16 @@ func (r *Repo) SaveResult(result int) error {
 	if !os.IsNotExist(err) {
 		return os.ErrExist
 	}
-	return save(r.cfg.ResultDir, fnResult, []byte(strconv.Itoa(result)))
+	data := struct {
+		Status string `json:"status"`
+		Score  int    `json:"score"`
+	}{
+		Status: "OK",
+		Score:  result,
+	}
+	buf, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return save(r.cfg.ResultDir, fnResult, buf)
 }

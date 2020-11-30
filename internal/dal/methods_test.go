@@ -120,7 +120,7 @@ func TestSaveResult(tt *testing.T) {
 
 	t.Nil(r.SaveResult(42))
 	t.Err(r.SaveResult(7), os.ErrExist)
-	buf, err := ioutil.ReadFile(cfg.ResultDir + "/result.txt")
+	buf, err := ioutil.ReadFile(cfg.ResultDir + "/result.json")
 	t.Nil(err)
-	t.Equal(string(buf), "42")
+	t.Equal(string(buf), `{"status":"OK","score":42}`)
 }
