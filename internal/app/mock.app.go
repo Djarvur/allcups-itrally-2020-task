@@ -279,6 +279,20 @@ func (mr *MockRepoMockRecorder) SaveResult(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveResult", reflect.TypeOf((*MockRepo)(nil).SaveResult), arg0)
 }
 
+// SaveError mocks base method
+func (m *MockRepo) SaveError(msg string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveError", msg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveError indicates an expected call of SaveError
+func (mr *MockRepoMockRecorder) SaveError(msg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveError", reflect.TypeOf((*MockRepo)(nil).SaveError), msg)
+}
+
 // MockGameFactory is a mock of GameFactory interface
 type MockGameFactory struct {
 	ctrl     *gomock.Controller

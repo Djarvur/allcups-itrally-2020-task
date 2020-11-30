@@ -80,3 +80,23 @@ func (r *Repo) SaveResult(result int) error {
 	}
 	return save(r.cfg.ResultDir, fnResult, buf)
 }
+
+func (r *Repo) SaveError(msg string) error {
+	path := filepath.Join(r.cfg.ResultDir, fnResult)
+	_, err := os.Stat(path)
+	if !os.IsNotExist(err) {
+		return os.ErrExist
+	}
+	data := struct {
+		Status string   `json:"status"`
+		Errors []string `json:"errors"`
+	}{
+		Status: "ERR",
+		Errors: []string{msg},
+	}
+	buf, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return save(r.cfg.ResultDir, fnResult, buf)
+}
