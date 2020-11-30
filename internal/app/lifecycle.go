@@ -11,6 +11,12 @@ func (a *App) Wait(ctx Ctx) (err error) {
 	log := structlog.FromContext(ctx, nil)
 	select {
 	case <-ctx.Done():
+	case <-time.After(a.cfg.StartTimeout):
+		err = a.repo.SaveError("waiting for first API request: timeout")
+		if err != nil {
+			log.PrintErr("SaveError", "err", err)
+		}
+		log.Info("task failed to start timely")
 	case t := <-a.started:
 		dur := time.Until(t.Add(a.cfg.Duration))
 		log.Info("task started", "dur", dur)

@@ -13,6 +13,30 @@ import (
 	"github.com/Djarvur/allcups-itrally-2020-task/pkg/def"
 )
 
+func TestWait_TimeoutBeforeStart(tt *testing.T) {
+	t := check.T(tt)
+	t.Parallel()
+	cleanup, a, mockRepo, _ := testNew(t)
+	defer cleanup()
+
+	mockRepo.EXPECT().SaveError("waiting for first API request: timeout").Return(nil)
+	errc := make(chan error, 1)
+	go func() { errc <- a.Wait(ctx) }()
+	waitErr(t, errc, cfg.StartTimeout, nil)
+}
+
+func TestWait_SaveErrorErr(tt *testing.T) {
+	t := check.T(tt)
+	t.Parallel()
+	cleanup, a, mockRepo, _ := testNew(t)
+	defer cleanup()
+
+	mockRepo.EXPECT().SaveError("waiting for first API request: timeout").Return(io.EOF)
+	errc := make(chan error, 1)
+	go func() { errc <- a.Wait(ctx) }()
+	waitErr(t, errc, cfg.StartTimeout, io.EOF)
+}
+
 func TestWait_ShutdownBeforeStart(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()

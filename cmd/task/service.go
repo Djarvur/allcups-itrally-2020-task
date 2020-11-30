@@ -80,6 +80,7 @@ func (s *service) runServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 			Duration:           s.cfg.Duration,
 			Game:               s.cfg.Game,
 			LicensePercentFail: s.cfg.LicensePercentFail,
+			StartTimeout:       s.cfg.StartTimeout,
 		})
 	}
 	if err != nil {

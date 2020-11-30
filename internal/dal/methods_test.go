@@ -124,3 +124,19 @@ func TestSaveResult(tt *testing.T) {
 	t.Nil(err)
 	t.Equal(string(buf), `{"status":"OK","score":42}`)
 }
+
+func TestSaveError(tt *testing.T) {
+	t := check.T(tt)
+	cfg := dal.Config{
+		ResultDir: t.TempDir(),
+		WorkDir:   t.TempDir(),
+	}
+	r, err := dal.New(ctx, cfg)
+	t.Nil(err)
+
+	t.Nil(r.SaveError("Boo!"))
+	t.Err(r.SaveError("Oops!"), os.ErrExist)
+	buf, err := ioutil.ReadFile(cfg.ResultDir + "/result.json")
+	t.Nil(err)
+	t.Equal(string(buf), `{"status":"ERR","errors":["Boo!"]}`)
+}

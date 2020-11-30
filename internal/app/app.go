@@ -89,6 +89,9 @@ type Repo interface {
 	// SaveResult stores final game result.
 	// Errors: none.
 	SaveResult(int) error
+	// SaveError stores final game error.
+	// Errors: none.
+	SaveError(msg string) error
 }
 
 // GameFactory provides different ways to create a new game.
@@ -159,6 +162,7 @@ var Difficulty = map[string]game.Config{
 }
 
 type Config struct {
+	StartTimeout       time.Duration
 	Duration           time.Duration
 	Game               game.Config
 	AutosavePeriod     time.Duration

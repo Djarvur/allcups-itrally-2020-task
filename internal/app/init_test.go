@@ -35,6 +35,7 @@ var (
 		DigExtraDelay:     def.TestSecond / 10000,
 		Duration:          60 * def.TestSecond,
 		Game:              app.Difficulty["test"],
+		StartTimeout:      3 * def.TestSecond,
 	}
 )
 
