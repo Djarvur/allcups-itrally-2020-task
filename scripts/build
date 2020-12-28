@@ -28,6 +28,7 @@ build() {
 GOOS=linux GOARCH=amd64 build "$@"
 
 docker build -t "$(basename "$(go list -m)")" .
+docker build -t "$(basename "$(go list -m)")"-digger-basic -f Dockerfile.digger_basic .
 
 # Build binaries for host system.
 test "$(go env GOOS)" = linux -a "$(go env GOARCH)" = amd64 || build "$@"

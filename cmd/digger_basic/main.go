@@ -51,6 +51,7 @@ func main() {
 			case code == codeWrongCoord:
 				break ROW
 			case code == -1:
+				fmt.Println(err)
 				os.Exit(0)
 			case code != 0:
 				continue ROW
