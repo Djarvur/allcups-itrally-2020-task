@@ -103,4 +103,7 @@ jobs:
             IMAGE_TAG="ghcr.io/${GITHUB_REPOSITORY,,*}:$TAG"
             docker tag "$(basename $(go list -m))" "$IMAGE_TAG"
             docker push "$IMAGE_TAG"
+            IMAGE_TAG="ghcr.io/${GITHUB_REPOSITORY,,*}-digger-basic:$TAG"
+            docker tag "$(basename $(go list -m))"-digger-basic "$IMAGE_TAG"
+            docker push "$IMAGE_TAG"
           done
