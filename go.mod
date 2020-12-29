@@ -14,7 +14,7 @@ require (
 	github.com/go-openapi/validate v0.19.12
 	github.com/go-swagger/go-swagger v0.25.0
 	github.com/golang/mock v1.4.4
-	github.com/golangci/golangci-lint v1.32.2
+	github.com/golangci/golangci-lint v1.34.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/powerman/appcfg v0.5.0
