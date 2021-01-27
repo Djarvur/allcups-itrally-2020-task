@@ -14,7 +14,7 @@ require (
 	github.com/go-openapi/validate v0.19.12
 	github.com/go-swagger/go-swagger v0.25.0
 	github.com/golang/mock v1.4.4
-	github.com/golangci/golangci-lint v1.32.2
+	github.com/golangci/golangci-lint v1.36.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/o1egl/paseto/v2 v2.1.1
 	github.com/powerman/appcfg v0.5.0
@@ -28,7 +28,7 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 	gotest.tools/gotestsum v0.6.0
 )
