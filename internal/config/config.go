@@ -56,6 +56,7 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	OpListLicensesRate    appcfg.Uint
 	Pprof                 appcfg.Bool           `env:"PPROF"`
 	ResultDir             appcfg.NotEmptyString `env:"RESULT_DIR"`
+	Seed                  appcfg.Int64          `env:"SEED"`
 	StartTimeout          appcfg.Duration       `env:"START_TIMEOUT"`
 	WorkDir               appcfg.NotEmptyString `env:"WORK_DIR"`
 }{ // Defaults, if any:
@@ -85,6 +86,7 @@ var all = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	OpListLicensesRate:    appcfg.MustUint("100"),
 	Pprof:                 appcfg.MustBool("true"),
 	ResultDir:             appcfg.MustNotEmptyString("var/data"),
+	Seed:                  appcfg.MustInt64("0"),
 	StartTimeout:          appcfg.MustDuration("2m"),
 	WorkDir:               appcfg.MustNotEmptyString("var"),
 }
@@ -113,6 +115,7 @@ func Init(flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.Serve, &all.AddrPort, "port", "port to serve OpenAPI")
 	appcfg.AddPFlag(fs.Serve, &all.Duration, "duration", "overall task duration")
 	appcfg.AddPFlag(fs.Serve, &all.MetricsAddrPort, "metrics.port", "port to serve Prometheus metrics")
+	appcfg.AddPFlag(fs.Serve, &all.Seed, "seed", "PRNG seed (0 means random)")
 	appcfg.AddPFlag(fs.Serve, &all.StartTimeout, "start-timeout", "task start timeout")
 
 	return nil
@@ -182,6 +185,7 @@ func GetServe() (c *ServeConfig, err error) {
 		StartTimeout:          all.StartTimeout.Value(&err),
 		WorkDir:               all.WorkDir.Value(&err),
 	}
+	c.Game.Seed = all.Seed.Value(&err)
 	if err == nil && c.LicenseMinDelay > c.LicenseMaxDelay {
 		err = errLicenseMinDelay
 	}
