@@ -98,6 +98,15 @@ func NewServer(appl app.Appl, cfg Config) (*restapi.Server, error) {
 	api.CashHandler = op.CashHandlerFunc(srv.Cash)
 
 	server := restapi.NewServer(api)
+	server.CleanupTimeout = 10 * time.Second //nolint:gomnd // Const.
+	server.GracefulTimeout = 5 * time.Second //nolint:gomnd // Const.
+	server.MaxHeaderSize = 1000000           //nolint:gomnd // Const.
+	server.KeepAlive = 3 * time.Minute       //nolint:gomnd // Const.
+	server.ReadTimeout = 30 * time.Second    //nolint:gomnd // Const.
+	server.WriteTimeout = 30 * time.Second   //nolint:gomnd // Const.
+	server.TLSKeepAlive = server.KeepAlive
+	server.TLSReadTimeout = server.ReadTimeout
+	server.TLSWriteTimeout = server.WriteTimeout
 	server.Host = cfg.Addr.Host()
 	server.Port = cfg.Addr.Port()
 
