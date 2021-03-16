@@ -236,3 +236,16 @@ func TestServeCORS(tt *testing.T) {
 	t.Equal(resp.StatusCode, 200)
 	t.Equal(resp.Header.Get("Access-Control-Allow-Origin"), "*")
 }
+
+func TestKeepAlive(tt *testing.T) {
+	t := check.T(tt)
+	t.Parallel()
+	cleanup, _, tsURL, mockAppl, _ := testNewServer(t, openapi.Config{})
+	defer cleanup()
+
+	mockAppl.EXPECT().HealthCheck(gomock.Any()).Return(nil, nil)
+
+	resp := fetch(t, tsURL+healthCheckEndpoint)
+	t.Equal(resp.StatusCode, 200)
+	t.False(resp.Close)
+}
