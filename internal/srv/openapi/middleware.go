@@ -90,13 +90,13 @@ func makeAccessLog(basePath string, disable bool) middlewareFunc {
 			m := httpsnoop.CaptureMetrics(next, w, r)
 
 			l := prometheus.Labels{
-				resourceLabel: strings.TrimPrefix(r.URL.Path, basePath),
+				resourceLabel: path.Join("/", strings.TrimPrefix(r.URL.Path, basePath)),
 				methodLabel:   r.Method,
 				codeLabel:     strconv.Itoa(m.Code),
 			}
 			metric.reqTotal.With(l).Inc()
 			l = prometheus.Labels{
-				resourceLabel: strings.TrimPrefix(r.URL.Path, basePath),
+				resourceLabel: path.Join("/", strings.TrimPrefix(r.URL.Path, basePath)),
 				methodLabel:   r.Method,
 				failedLabel:   strconv.FormatBool(m.Code >= http.StatusInternalServerError),
 			}
